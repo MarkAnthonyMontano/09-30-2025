@@ -13,7 +13,7 @@ import ErrorIcon from '@mui/icons-material/Error';
 import { useNavigate } from 'react-router-dom';
 import { motion } from "framer-motion";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
-import ExamPermit from "../components/ExamPermit";
+import ExamPermit from "../applicant/ExamPermit";
 
 
 const Dashboard2 = () => {

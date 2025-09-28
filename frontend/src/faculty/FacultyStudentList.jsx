@@ -1,7 +1,6 @@
 
 import React, { useState, useEffect } from "react";
 import '../styles/TempStyles.css';
-import SortingIcon from "../components/SortingIcon";
 import {useParams} from "react-router-dom";
 import { Typography, Table, TableBody, TableCell, TableHead, TableRow, TextField, FormControl, Select, InputLabel, MenuItem, Button } from "@mui/material";
 import axios from "axios";

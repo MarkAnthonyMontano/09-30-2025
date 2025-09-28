@@ -1,139 +1,138 @@
 import React, { useState, useEffect } from 'react';
-import './App.css';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { createTheme, ThemeProvider, CssBaseline } from '@mui/material';
+import './App.css';
+
+// COMPONENTS FOLDER
+import Unauthorized from './components/Unauthorized';
 import Register from './components/Register';
 import Login from './components/Login';
+import LoginEnrollment from './components/LoginEnrollment';
 import ApplicantForgotPassword from './components/ApplicantForgotPassword';
-import ApplicantResetPassword from './components/ApplicantResetPassword';
 import RegistrarForgotPassword from './components/RegistrarForgotPassword';
 import RegistrarResetPassword from './components/RegistrarResetPassword';
-import StudentResetPassword from './components/StudentResetPassword';
-import FacultyResetPassword from './components/FacultyResetPassword';
-import SuperAdminApplicantResetPassword from './components/SuperAdminApplicantResetPassword';
-import SuperAdminStudentResetPassword from './components/SuperAdminStudentResetPassword';
-import SuperAdminFacultyResetPassword from './components/SuperAdminFacultyResetPassword';
-import SuperAdminFacultyRegistrarPassword from './components/SuperAdminRegistrarResetPassword';
-import { createTheme, ThemeProvider, CssBaseline } from '@mui/material';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
-import DepartmentRegistration from './components/DprtmntRegistration';
-import DepartmentRoom from './components/DprtmntRoom';
-import DepartmentProf from './components/DprtmntProf';
 import SideBar from './components/Sidebar';
-import ProgramTagging from './components/ProgramTagging';
-import CourseManagement from './pages/CourseManagement';
-import CoursePanel from './components/CoursePanel';
-import ProgramPanel from './components/ProgramPanel';
-import CurriculumPanel from './components/CurriculumPanel';
-import SectionPanel from './components/SectionPanel';
-import DepartmentSection from './components/DepartmentSection';
 import ProtectedRoute from './components/ProtectedRoute';
 import RegisterProf from './components/RegisterProf';
-import StudentProfileForm from './components/StudentProfile';
-import YearLevelPanel from './components/YearLevelPanel';
-import YearPanel from './components/YearPanel';
-import YearUpdateForm from './components/YearUpdateForm';
-import SemesterPanel from './components/SemesterPanel';
-import SchoolYearPanel from './components/SchoolYearPanel';
-import SchoolYearActivatorPanel from './components/SchoolYearActivatorPanel';
-import RequirementsForm from './components/RequirementsForm';
+
+// PAGES FOLDER
+import CourseManagement from './pages/CourseManagement';
+import DepartmentManagement from './pages/DepartmentDashboard';
 import AdmissionDashboardPanel from './pages/AdmissionDashboard';
 import SystemDashboardPanel from './pages/SystemDashboard';
-import DepartmentManagement from './pages/DepartmentDashboard';
-import HistoryLogs from './pages/HistoryLogs';
-import StudentNumbering from './components/StudentNumbering';
-import StudentNumberingPerCollege from './components/StudentNumberingPerCollege';
-import CourseTagging from './components/CourseTagging';
-import ChangeGradingPeriod from './components/ChangeYearGradPer';
-import AccountDashboard from './pages/AccountDashboard';
-import ScheduleChecker from './components/ScheduleChecker';
-import SearchCertificateOfRegistration from './components/SearchCertificateOfRegistration';
-import RoomRegistration from './components/RoomRegistration';
-import ScheduleFilterer from './pages/SchedulePlottingFilter';
-
+import StudentDashboard from './pages/StudentDashboard';
 import FacultyDashboard from './pages/FacultyDashboard'; //For Professors & Faculty Members
 import Dashboard from './pages/Dashboard'; // For SuperAdmin & Admin
 import ApplicantDashboard from './pages/ApplicantDashboard';
+import AccountDashboard from './pages/AccountDashboard';
+import ScheduleFilterer from './pages/SchedulePlottingFilter';
+import HistoryLogs from './pages/HistoryLogs';
 
-import Unauthorized from './components/Unauthorized';
-import StudentRequirements from './components/StudentRequirements';
-
-
-import GradingSheet from './components/GradingSheet';
-import FacultyWorkload from './components/FacultyWorkload';
-import FacultyMasterList from './components/FacultyMasterlist';
-import FacultyStudentClassList from './components/FacultyStudentClassList';
-import FacultySchedule from './components/FacultySchedule';
-import StudentDashboard from './pages/StudentDashboard';
-
-import AdminDashboard1 from './components/AdminDashboard1';
-import AdminDashboard2 from './components/AdminDashboard2';
-import AdminDashboard3 from './components/AdminDashboard3';
-import AdminDashboard4 from './components/AdminDashboard4';
-import AdminDashboard5 from './components/AdminDashboard5';
-
-import StudentDashboard1 from './components/StudentDashboard1';
-import StudentDashboard2 from './components/StudentDashboard2';
-import StudentDashboard3 from './components/StudentDashboard3';
-import StudentDashboard4 from './components/StudentDashboard4';
-import StudentDashboard5 from './components/StudentDashboard5';
-
-import SuperAdminDashboard1 from './components/SuperAdminDashboard1';
-import SuperAdminDashboard2 from './components/SuperAdminDashboard2';
-import SuperAdminDashboard3 from './components/SuperAdminDashboard3';
-import SuperAdminDashboard4 from './components/SuperAdminDashboard4';
-import SuperAdminDashboard5 from './components/SuperAdminDashboard5';
-
-import ApplicantList from './components/ApplicantList';
-import ApplicantListAdmin from './components/ApplicantListAdmin';
-import SuperAdminApplicantList from './components/SuperAdminApplicantList';
-import Notifications from './components/Notifications';
-import ExaminationProfile from './components/ExaminationProfile';
-import AssignScheduleToApplicants from './components/AssignScheduleToApplicants';
-import AssignEntranceExam from './components/AssignEntranceExam';
-import ProctorApplicantList from './components/ProctorApplicantList';
-import ApplicantScoring from './components/ApplicantScoring';
-import QualifyingExamScore from './components/QualifyingExamScore';
-import MedicalClearance from './components/MedicalClearance';
-
-import Dashboard1 from './components/Dashboard1';
-import Dashboard2 from './components/Dashboard2';
-import Dashboard3 from './components/Dashboard3';
-import Dashboard4 from './components/Dashboard4';
-import Dashboard5 from './components/Dashboard5';
-import RequirementUploader from './components/RequirementUploader';
-
-import PersonalDataForm from './components/PersonalDataForm';
-import ECATApplicationForm from './components/ECATApplicationForm';
-import AdmissionFormProcess from './components/AdmissionFormProcess';
-import AdmissionServices from './components/AdmissionServices';
-import OfficeOfTheRegistrar from './components/OfficeOfTheRegistrar';
-
-import AdminECATApplicationForm from './components/AdminECATApplicationForm';
-import AdminPersonalDataForm from './components/AdminPersonalDataForm';
-import AdminOfficeOfTheRegistrar from './components/AdminOfficeOfTheRegistrar';
+// FACULTY FOLDER
+import GradingSheet from './faculty/GradingSheet';
+import FacultyWorkload from './faculty/FacultyWorkload';
+import FacultyMasterList from './faculty/FacultyMasterlist';
+import FacultyStudentClassList from './faculty/FacultyStudentClassList';
+import FacultySchedule from './faculty/FacultySchedule';
+import FacultyStudentList from './faculty/FacultyStudentList';
+import FacultyResetPassword from './faculty/FacultyResetPassword';
 
 
-import LoginEnrollment from './components/LoginEnrollment';
+// REGISTRAR FOLDER
+import SearchCertificateOfRegistration from './registrar/SearchCertificateOfRegistration';
+import AdminECATApplicationForm from './registrar/AdminECATApplicationForm';
+import AdminPersonalDataForm from './registrar/AdminPersonalDataForm';
+import AdminOfficeOfTheRegistrar from './registrar/AdminOfficeOfTheRegistrar';
+import AdminDashboard1 from './registrar/AdminDashboard1';
+import AdminDashboard2 from './registrar/AdminDashboard2';
+import AdminDashboard3 from './registrar/AdminDashboard3';
+import AdminDashboard4 from './registrar/AdminDashboard4';
+import AdminDashboard5 from './registrar/AdminDashboard5';
+import ApplicantList from './registrar/ApplicantList';
+import ApplicantListAdmin from './registrar/ApplicantListAdmin';
+import StudentRequirements from './registrar/StudentRequirements';
+import ExaminationProfile from './registrar/ExaminationProfile';
+import AssignScheduleToApplicants from './registrar/AssignScheduleToApplicants';
+import AssignEntranceExam from './registrar/AssignEntranceExam';
+import ProctorApplicantList from './registrar/ProctorApplicantList';
+import ApplicantScoring from './registrar/ApplicantScoring';
+import QualifyingExamScore from './registrar/QualifyingExamScore';
+import MedicalClearance from './registrar/MedicalClearance';
+import InterviewerApplicantList from './registrar/InterviewerApplicantList';
+import AssignInterviewExam from './registrar/AssignInterviewExam';
+import AssignScheduleToApplicantsInterviewer from './registrar/AssignScheduleToApplicantsInterviewer';
+import ClassList from './registrar/ClassList';
+import ClassRoster from './registrar/ClassRoster';
+import ProfessorListPerSection from './registrar/ProfessorListPerClass';
+import DepartmentRegistration from './registrar/DprtmntRegistration';
+import DepartmentRoom from './registrar/DprtmntRoom';
+import DepartmentProf from './registrar/DprtmntProf';
+import ProgramTagging from './registrar/ProgramTagging';
+import CoursePanel from './registrar/CoursePanel';
+import ProgramPanel from './registrar/ProgramPanel';
+import CurriculumPanel from './registrar/CurriculumPanel';
+import SectionPanel from './registrar/SectionPanel';
+import DepartmentSection from './registrar/DepartmentSection';
+import StudentProfileForm from './registrar/StudentProfile';
+import YearLevelPanel from './registrar/YearLevelPanel';
+import YearPanel from './registrar/YearPanel';
+import YearUpdateForm from './registrar/YearUpdateForm';
+import SemesterPanel from './registrar/SemesterPanel';
+import SchoolYearPanel from './registrar/SchoolYearPanel';
+import SchoolYearActivatorPanel from './registrar/SchoolYearActivatorPanel';
+import RequirementsForm from './registrar/RequirementsForm';
+import StudentNumbering from './registrar/StudentNumbering';
+import StudentNumberingPerCollege from './registrar/StudentNumberingPerCollege';
+import CourseTagging from './registrar/CourseTagging';
+import ChangeGradingPeriod from './registrar/ChangeYearGradPer';
+import ScheduleChecker from './registrar/ScheduleChecker';
+import RoomRegistration from './registrar/RoomRegistration';
 
-import ClassList from './components/ClassList';
-import ClassRoster from './components/ClassRoster';
-import StudentList from './components/StudentListPerCourse';
-import ProfessorListPerSection from './components/ProfessorListPerClass';
-import FacultyStudentList from './components/FacultyStudentList';
 
-import StudentSchedule from './components/StudentSchedule';
-import StudentGradingPage from './components/StudentGrade';
-import StudentFacultyEvaluation from './components/StudentFacultyEval';
-import CertificateOfRegistration from './components/CertificateOfRegistration';
+// APPLICANT FOLDER
+import Dashboard1 from './applicant/Dashboard1';
+import Dashboard2 from './applicant/Dashboard2';
+import Dashboard3 from './applicant/Dashboard3';
+import Dashboard4 from './applicant/Dashboard4';
+import Dashboard5 from './applicant/Dashboard5';
+import RequirementUploader from './applicant/RequirementUploader';
+import PersonalDataForm from './applicant/PersonalDataForm';
+import ECATApplicationForm from './applicant/ECATApplicationForm';
+import AdmissionFormProcess from './applicant/AdmissionFormProcess';
+import AdmissionServices from './applicant/AdmissionServices';
+import OfficeOfTheRegistrar from './applicant/OfficeOfTheRegistrar';
+import ExamPermit from "./applicant/ExamPermit";
+import ApplicantResetPassword from './applicant/ApplicantResetPassword';
 
-import InterviewerApplicantList from './components/InterviewerApplicantList';
-import AssignInterviewExam from './components/AssignInterviewExam';
-import AssignScheduleToApplicantsInterviewer from './components/AssignScheduleToApplicantsInterviewer';
+// STUDENT FOLDER
+import StudentSchedule from './student/StudentSchedule';
+import StudentGradingPage from './student/StudentGrade';
+import StudentFacultyEvaluation from './student/StudentFacultyEval';
+import StudentDashboard1 from './student/StudentDashboard1';
+import StudentDashboard2 from './student/StudentDashboard2';
+import StudentDashboard3 from './student/StudentDashboard3';
+import StudentDashboard4 from './student/StudentDashboard4';
+import StudentDashboard5 from './student/StudentDashboard5';
+import StudentResetPassword from './student/StudentResetPassword';
+import CertificateOfRegistration from './student/CertificateOfRegistration';
 
-import EmailTemplateManager from './components/EmailTemplateManager';
-import Announcement from './components/Announcement';
-import ExamPermit from "./components/ExamPermit";
+
+// SUPERADMIN FOLDER
+import EmailTemplateManager from './superadmin/EmailTemplateManager';
+import Announcement from './superadmin/Announcement';
+import SuperAdminApplicantList from './superadmin/SuperAdminApplicantList';
+import SuperAdminDashboard1 from './superadmin/SuperAdminDashboard1';
+import SuperAdminDashboard2 from './superadmin/SuperAdminDashboard2';
+import SuperAdminDashboard3 from './superadmin/SuperAdminDashboard3';
+import SuperAdminDashboard4 from './superadmin/SuperAdminDashboard4';
+import SuperAdminDashboard5 from './superadmin/SuperAdminDashboard5';
+import SuperAdminApplicantResetPassword from './superadmin/SuperAdminApplicantResetPassword';
+import SuperAdminStudentResetPassword from './superadmin/SuperAdminStudentResetPassword';
+import SuperAdminFacultyResetPassword from './superadmin/SuperAdminFacultyResetPassword';
+import SuperAdminFacultyRegistrarPassword from './superadmin/SuperAdminRegistrarResetPassword';
+import Notifications from './superadmin/Notifications';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -414,7 +413,6 @@ function App() {
               <Route path="/class_roster" element={<ProtectedRoute ><ClassRoster /></ProtectedRoute>} />
               <Route path="/class_roster/class_list/ccs/:curriculum_id" element={<ProtectedRoute ><ClassList /></ProtectedRoute>} />
               <Route path="/class_list/ccs/:curriculum_id/:dstID" element={<ProtectedRoute><ProfessorListPerSection /></ProtectedRoute>} />
-              <Route path="/class_list/css/:curriculum_id/:dstID/:courseID/:professorID" element={<ProtectedRoute><StudentList /></ProtectedRoute>} />
               <Route path="/email_template_manager" element={<ProtectedRoute><EmailTemplateManager /></ProtectedRoute>} />
               <Route path="/announcement" element={<ProtectedRoute><Announcement /></ProtectedRoute>} />
               <Route path="/exam_permit" element={<ExamPermit />} />

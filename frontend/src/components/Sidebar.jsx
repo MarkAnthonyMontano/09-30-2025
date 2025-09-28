@@ -352,7 +352,6 @@ const SideBar = ({ setIsAuthenticated }) => {
             </Link>
           </>
         )}
-
         {role === "faculty" && (
           <>
             <Link to="/faculty_dashboard">
@@ -396,6 +395,7 @@ const SideBar = ({ setIsAuthenticated }) => {
                 </span>
               </li>
             </Link>
+
             <Link to="/faculty_workload">
               <li
                 className={`w-full flex items-center border border-maroon-500 px-2 rounded m-2 mx-0 button-hover ${location.pathname === "/faculty_workload"
@@ -409,6 +409,7 @@ const SideBar = ({ setIsAuthenticated }) => {
                 </span>
               </li>
             </Link>
+
             <Link to="/faculty_evaluation">
               <li
                 className={`w-full flex items-center border border-maroon-500 px-2 rounded m-2 mx-0 button-hover ${location.pathname === "/faculty_evaluation"
@@ -422,6 +423,7 @@ const SideBar = ({ setIsAuthenticated }) => {
                 </span>
               </li>
             </Link>
+            
             <Link to="/faculty_reset_password">
               <li
                 className={`w-full flex items-center border border-maroon-500 px-2 rounded m-2 mx-0 button-hover ${location.pathname === "/faculty_reset_password"

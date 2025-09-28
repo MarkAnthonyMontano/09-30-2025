@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { Box, TextField, Typography } from "@mui/material";
 import '../styles/Print.css'
-import CertificateOfRegistration from './CertificateOfRegistration';
+import CertificateOfRegistration from '../student/CertificateOfRegistration';
 import { Search } from "@mui/icons-material";
 import { FcPrint } from "react-icons/fc";
 

@@ -22,7 +22,7 @@ import PersonIcon from "@mui/icons-material/Person";
 import { ArrowBackIos, ArrowForwardIos } from "@mui/icons-material";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer, Cell } from "recharts";
 import AddIcon from "@mui/icons-material/Add";
-import ExaminationProfile from "../components/ExaminationProfile";
+import ExaminationProfile from "../registrar/ExaminationProfile";
 
 
 const Dashboard = () => {

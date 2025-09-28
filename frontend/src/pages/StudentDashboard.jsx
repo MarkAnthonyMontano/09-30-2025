@@ -18,7 +18,7 @@ import {
 import DownloadIcon from "@mui/icons-material/Download";
 import SchoolIcon from "@mui/icons-material/School";
 import PersonIcon from "@mui/icons-material/Person";
-import CertificateOfRegistration from "../components/CertificateOfRegistration";
+import CertificateOfRegistration from "../student/CertificateOfRegistration";
 import { ArrowBackIos, ArrowForwardIos } from "@mui/icons-material";
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 

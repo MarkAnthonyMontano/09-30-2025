@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
-import { Button, Box, TextField, Container, Typography, Card, TableContainer, Paper, Table, TableHead, TableRow, TableCell, FormHelperText, FormControl, InputLabel, Select, MenuItem, Modal, FormControlLabel, Checkbox, IconButton } from "@mui/material";
+import { Button, Box, TextField, Container, Typography, Card, TableContainer, Paper, Table, TableHead, TableRow, TableCell, FormHelperText, FormControl, InputLabel, Select, MenuItem, Modal, FormControlLabel, Checkbox, Snackbar, Alert } from "@mui/material";
 import { Link, useLocation } from "react-router-dom";
 import PersonIcon from "@mui/icons-material/Person";
 import FamilyRestroomIcon from "@mui/icons-material/FamilyRestroom";
@@ -8,39 +8,26 @@ import SchoolIcon from "@mui/icons-material/School";
 import HealthAndSafetyIcon from "@mui/icons-material/HealthAndSafety";
 import InfoIcon from "@mui/icons-material/Info";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import FolderIcon from '@mui/icons-material/Folder';
 import ErrorIcon from '@mui/icons-material/Error';
 import { useNavigate } from 'react-router-dom';
 import { motion } from "framer-motion";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
-import ExamPermit from "../components/ExamPermit";
+import ExamPermit from "../applicant/ExamPermit";
 
-
-
-const Dashboard3 = () => {
+const Dashboard5 = () => {
     const navigate = useNavigate();
     const [userID, setUserID] = useState("");
     const [user, setUser] = useState("");
     const [userRole, setUserRole] = useState("");
+    const [snack, setSnack] = useState({ open: false, message: "", severity: "info" });
     const [person, setPerson] = useState({
-        schoolLevel: "",
-        schoolLastAttended: "",
-        schoolAddress: "",
-        courseProgram: "",
-        honor: "",
-        generalAverage: "",
-        yearGraduated: "",
-        schoolLevel1: "",
-        schoolLastAttended1: "",
-        schoolAddress1: "",
-        courseProgram1: "",
-        honor1: "",
-        generalAverage1: "",
-        yearGraduated1: "",
-        strand: "",
+        termsOfAgreement: "",
     });
 
-    // do not alter
+
+
+
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
     const queryPersonId = queryParams.get("person_id")?.trim() || "";
@@ -78,6 +65,7 @@ const Dashboard3 = () => {
         window.location.href = "/login";
     }, [queryPersonId]);
 
+
     const [selectedPerson, setSelectedPerson] = useState(null);
     const fetchByPersonId = async (personID) => {
         try {
@@ -90,8 +78,6 @@ const Dashboard3 = () => {
             console.error("❌ person_with_applicant failed:", err);
         }
     };
-
-
 
     useEffect(() => {
         let consumedFlag = false;
@@ -127,17 +113,43 @@ const Dashboard3 = () => {
         });
     }, [queryPersonId]);
 
+    const [activeStep, setActiveStep] = useState(4);
+    const [clickedSteps, setClickedSteps] = useState([]);
+
+    const steps = [
+        { label: "Personal Information", icon: <PersonIcon />, path: "/super_admin_dashboard1" },
+        { label: "Family Background", icon: <FamilyRestroomIcon />, path: "/super_admin_dashboard2" },
+        { label: "Educational Attainment", icon: <SchoolIcon />, path: "/super_admin_dashboard3" },
+        { label: "Health Medical Records", icon: <HealthAndSafetyIcon />, path: "/super_admin_dashboard4" },
+        { label: "Other Information", icon: <InfoIcon />, path: "/super_admin_dashboard5" },
+    ];
+
+    const handleStepClick = (index) => {
+        setActiveStep(index);
+        setClickedSteps((prev) => [...new Set([...prev, index])]);
+        navigate(steps[index].path); // Go to the clicked step’s page
+    };
+
 
 
     // Do not alter
-    const handleUpdate = async (updatedPerson) => {
+    const handleUpdate = async () => {
+        const currentDate = new Date();
+        const formattedDate = currentDate.toLocaleDateString('en-GB'); // Format: DD/MM/YYYY
+
+        const updatedPerson = {
+            ...person,
+            created_at: person.created_at || formattedDate // Only add if not already set
+        };
+
         try {
             await axios.put(`http://localhost:5000/api/person/${userID}`, updatedPerson);
-            console.log("Auto-saved");
+            console.log("Auto-saved with created_at:", updatedPerson.created_at);
         } catch (error) {
             console.error("Auto-save failed:", error);
         }
     };
+
 
     // Real-time save on every character typed
     const handleChange = (e) => {
@@ -161,31 +173,14 @@ const Dashboard3 = () => {
         }
     };
 
-
-
-
-    const [activeStep, setActiveStep] = useState(2);
-    const [clickedSteps, setClickedSteps] = useState([]);
-
-    const steps = [
-        { label: "Personal Information", icon: <PersonIcon />, path: "/super_admin_dashboard1" },
-        { label: "Family Background", icon: <FamilyRestroomIcon />, path: "/super_admin_dashboard2" },
-        { label: "Educational Attainment", icon: <SchoolIcon />, path: "/super_admin_dashboard3" },
-        { label: "Health Medical Records", icon: <HealthAndSafetyIcon />, path: "/super_admin_dashboard4" },
-        { label: "Other Information", icon: <InfoIcon />, path: "/super_admin_dashboard5" },
-    ];
-
-    const handleStepClick = (index) => {
-        setActiveStep(index);
-        setClickedSteps((prev) => [...new Set([...prev, index])]);
-        navigate(steps[index].path); // Go to the clicked step’s page
-    };
-
-
     const [errors, setErrors] = useState({});
 
 
 
+    const handleClose = (_, reason) => {
+        if (reason === 'clickaway') return;
+        setSnack(prev => ({ ...prev, open: false }));
+    };
 
     const divToPrintRef = useRef();
     const [showPrintView, setShowPrintView] = useState(false);
@@ -271,7 +266,6 @@ const Dashboard3 = () => {
         { label: "Examination Permit", onClick: handleExamPermitClick }, // ✅
     ];
 
-
     const [canPrintPermit, setCanPrintPermit] = useState(false);
 
     useEffect(() => {
@@ -286,14 +280,17 @@ const Dashboard3 = () => {
 
 
 
-
+    // dot not alter
     return (
-        <Box sx={{ height: "calc(100vh - 150px)", overflowY: "auto", paddingRight: 1, backgroundColor: "transparent" }}>
-     {showPrintView && (
+        <Box sx={{ height: 'calc(100vh - 140px)', overflowY: 'auto', paddingRight: 1, backgroundColor: 'transparent' }}>
+
+  {showPrintView && (
   <div ref={divToPrintRef} style={{ display: "block" }}>
     <ExamPermit personId={userID} />   {/* ✅ pass the searched person_id */}
   </div>
 )}
+
+
 
             {/* Top header: DOCUMENTS SUBMITTED + Search */}
             <Box
@@ -353,7 +350,6 @@ const Dashboard3 = () => {
                     </TableHead>
                 </Table>
             </TableContainer>
-
 
             <Box
                 sx={{
@@ -471,16 +467,18 @@ const Dashboard3 = () => {
             </Box>
 
 
+            <Container maxWidth="lg">
 
-
-            <Container>
 
                 <Container>
-                    <h1 style={{ fontSize: "50px", fontWeight: "bold", textAlign: "center", color: "maroon", marginTop: "25px" }}>APPLICANT FORM</h1>
-                    <div style={{ textAlign: "center" }}>Complete the applicant form to secure your place for the upcoming academic year at EARIST.</div>
+                    <h1 style={{ fontSize: "50px", fontWeight: "bold", textAlign: "center", color: "maroon", marginTop: "25px" }}>
+                        APPLICANT FORM
+                    </h1>
+                    <div style={{ textAlign: "center" }}>
+                        Complete the applicant form to secure your place for the upcoming academic year at EARIST.
+                    </div>
                 </Container>
                 <br />
-
                 <Box sx={{ display: "flex", justifyContent: "center", width: "100%", px: 4 }}>
                     {steps.map((step, index) => (
                         <React.Fragment key={index}>
@@ -533,402 +531,65 @@ const Dashboard3 = () => {
                     ))}
                 </Box>
 
-                <br />
 
+
+                <br />
                 <form>
-                    <Container
-                        maxWidth="100%"
-                        sx={{
-                            backgroundColor: "#6D2323",
-                            border: "2px solid black",
-                            maxHeight: "500px",
-                            overflowY: "auto",
-                            color: "white",
-                            borderRadius: 2,
-                            boxShadow: 3,
-                            padding: "4px",
-                        }}
-                    >
+                    <Container maxWidth="100%" sx={{ backgroundColor: "#6D2323", border: "2px solid black", color: "white", borderRadius: 2, boxShadow: 3, padding: "4px" }}>
                         <Box sx={{ width: "100%" }}>
-                            <Typography style={{ fontSize: "20px", padding: "10px", fontFamily: "Arial Black" }}>Step 3: Educational Attainment</Typography>
+                            <Typography style={{ fontSize: "20px", padding: "10px", fontFamily: "Arial Black" }}>Step 5: Other Information</Typography>
                         </Box>
                     </Container>
-
                     <Container maxWidth="100%" sx={{ backgroundColor: "#f1f1f1", border: "2px solid black", padding: 4, borderRadius: 2, boxShadow: 3 }}>
-                        <Typography style={{ fontSize: "20px", color: "#6D2323", fontWeight: "bold" }}>Junior High School - Background:</Typography>
-                        <hr style={{ border: "1px solid #ccc", width: "100%" }} />
-                        <br />
-
-
-                        <Box
-                            sx={{
-                                display: "flex",
-                                gap: 2, // space between fields
-                                mb: 2,
-                            }}
-                        >
-                            {/* Each Box here is one input container */}
-                            <Box sx={{ flex: "1 1 25%" }}>
-                                <Typography variant="subtitle1" mb={1}>
-                                    School Level
-                                </Typography>
-                                <Box sx={{ flex: "1 1 25%" }}>
-                                    <FormControl fullWidth size="small" required error={!!errors.schoolLevel}>
-                                        <InputLabel id="schoolLevel-label">School Level</InputLabel>
-                                        <Select
-                                            labelId="schoolLevel-label"
-                                            id="schoolLevel"
-                                            name="schoolLevel"
-                                            value={person.schoolLevel ?? ""}
-                                            label="School Level"
-                                            onChange={handleChange}
-                                            onBlur={handleBlur}
-                                        >
-                                            <MenuItem value="">
-                                                <em>Select School Level</em>
-                                            </MenuItem>
-                                            <MenuItem value="High School/Junior High School">High School/Junior High School</MenuItem>
-                                            <MenuItem value="Senior High School">Senior High School</MenuItem>
-                                            <MenuItem value="Undergraduate">Undergraduate</MenuItem>
-                                            <MenuItem value="Graduate">Graduate</MenuItem>
-                                            <MenuItem value="ALS">ALS</MenuItem>
-                                            <MenuItem value="Vocational/Trade Course">Vocational/Trade Course</MenuItem>
-                                        </Select>
-                                        {errors.schoolLevel && (
-                                            <FormHelperText>This field is required.</FormHelperText>
-                                        )}
-                                    </FormControl>
-                                </Box>
-
-                            </Box>
-
-
-                            <Box sx={{ flex: "1 1 25%" }}>
-                                <Typography variant="subtitle1" mb={1}>
-                                    School Last Attended
-                                </Typography>
-                                <TextField
-                                    fullWidth
-                                    size="small"
-                                    required
-                                    name="schoolLastAttended"
-                                    placeholder="Enter School Last Attended"
-                                    value={person.schoolLastAttended ?? ""}
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                    error={errors.schoolLastAttended}
-                                    helperText={errors.schoolLastAttended ? "This field is required." : ""}
-                                />
-                            </Box>
-
-                            <Box sx={{ flex: "1 1 25%" }}>
-                                <Typography variant="subtitle1" mb={1}>
-                                    School Address
-                                </Typography>
-                                <TextField
-                                    fullWidth
-                                    size="small"
-                                    required
-                                    name="schoolAddress"
-                                    value={person.schoolAddress ?? ""}
-                                    onChange={handleChange}
-                                    placeholder="Enter your School Address"
-                                    onBlur={handleBlur}
-                                    error={errors.schoolAddress}
-                                    helperText={errors.schoolAddress ? "This field is required." : ""}
-                                />
-                            </Box>
-
-                            <Box sx={{ flex: "1 1 25%" }}>
-                                <Typography variant="subtitle1" mb={1}>
-                                    Course Program
-                                </Typography>
-                                <TextField
-                                    fullWidth
-                                    size="small"
-                                    name="courseProgram"
-                                    required
-                                    value={person.courseProgram ?? ""}
-                                    placeholder="Enter your Course Program"
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                    error={errors.courseProgram}
-                                    helperText={errors.courseProgram ? "This field is required." : ""}
-                                />
-                            </Box>
-                        </Box>
-
-                        <Box
-                            sx={{
-                                display: "flex",
-                                gap: 2,
-                                mb: 2,
-                            }}
-                        >
-                            <Box sx={{ flex: "1 1 33%" }}>
-                                <Typography variant="subtitle1" mb={1}>
-                                    Honor
-                                </Typography>
-                                <TextField
-                                    fullWidth
-                                    size="small"
-                                    name="honor"
-                                    required
-                                    value={person.honor ?? ""}
-                                    placeholder="Enter your Honor"
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                    error={errors.honor}
-                                    helperText={errors.honor ? "This field is required." : ""}
-                                />
-                            </Box>
-
-                            <Box sx={{ flex: "1 1 33%" }}>
-                                <Typography variant="subtitle1" mb={1}>
-                                    General Average
-                                </Typography>
-                                <TextField
-                                    fullWidth
-                                    size="small"
-                                    required
-                                    name="generalAverage"
-                                    value={person.generalAverage ?? ""}
-                                    placeholder="Enter your General Average"
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                    error={errors.generalAverage}
-                                    helperText={errors.generalAverage ? "This field is required." : ""}
-                                />
-                            </Box>
-
-                            <Box sx={{ flex: "1 1 33%" }}>
-                                <Typography variant="subtitle1" mb={1}>
-                                    Year Graduated
-                                </Typography>
-                                <TextField
-                                    fullWidth
-                                    size="small"
-                                    required
-                                    name="yearGraduated"
-                                    placeholder="Enter your Year Graduated"
-                                    value={person.yearGraduated ?? ""}
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                    error={errors.yearGraduated}
-                                    helperText={errors.yearGraduated ? "This field is required." : ""}
-                                />
-                            </Box>
-                        </Box>
-
-
-
-
-
-                        <Typography style={{ fontSize: "20px", color: "#6D2323", fontWeight: "bold" }}>Senior High School - Background:</Typography>
-                        <hr style={{ border: "1px solid #ccc", width: "100%" }} />
-                        <br />
-
-                        <Box
-                            sx={{
-                                display: "flex",
-                                gap: 2,
-                                mb: 2,
-                            }}
-                        >
-                            {/* School Level 1 */}
-                            <Box sx={{ flex: "1 1 25%" }}>
-                                <Typography variant="subtitle1" mb={1}>
-                                    School Level
-                                </Typography>
-                                <FormControl fullWidth size="small" required error={!!errors.schoolLevel1}>
-                                    <InputLabel id="schoolLevel1-label">School Level</InputLabel>
-                                    <Select
-                                        labelId="schoolLevel1-label"
-                                        id="schoolLevel1"
-                                        name="schoolLevel1"
-                                        value={person.schoolLevel1 ?? ""}
-                                        label="School Level"
-                                        onChange={handleChange}
-                                        onBlur={handleBlur}
-                                    >
-                                        <MenuItem value=""><em>Select School Level</em></MenuItem>
-                                        <MenuItem value="High School/Junior High School">High School/Junior High School</MenuItem>
-                                        <MenuItem value="Senior High School">Senior High School</MenuItem>
-                                        <MenuItem value="Undergraduate">Undergraduate</MenuItem>
-                                        <MenuItem value="Graduate">Graduate</MenuItem>
-                                        <MenuItem value="ALS">ALS</MenuItem>
-                                        <MenuItem value="Vocational/Trade Course">Vocational/Trade Course</MenuItem>
-                                    </Select>
-                                    {errors.schoolLevel1 && (
-                                        <FormHelperText>This field is required.</FormHelperText>
-                                    )}
-                                </FormControl>
-                            </Box>
-
-                            {/* School Last Attended 1 */}
-                            <Box sx={{ flex: "1 1 25%" }}>
-                                <Typography variant="subtitle1" mb={1}>
-                                    School Last Attended
-                                </Typography>
-                                <TextField
-                                    fullWidth
-                                    size="small"
-                                    required
-                                    name="schoolLastAttended1"
-                                    placeholder="Enter School Last Attended"
-                                    value={person.schoolLastAttended1 ?? ""}
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                    error={errors.schoolLastAttended1}
-                                    helperText={errors.schoolLastAttended1 ? "This field is required." : ""}
-                                />
-                            </Box>
-
-                            {/* School Address 1 */}
-                            <Box sx={{ flex: "1 1 25%" }}>
-                                <Typography variant="subtitle1" mb={1}>
-                                    School Address
-                                </Typography>
-                                <TextField
-                                    fullWidth
-                                    size="small"
-                                    required
-                                    name="schoolAddress1"
-                                    placeholder="Enter your School Address"
-                                    value={person.schoolAddress1 ?? ""}
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                    error={errors.schoolAddress1}
-                                    helperText={errors.schoolAddress1 ? "This field is required." : ""}
-                                />
-                            </Box>
-
-                            {/* Course Program 1 */}
-                            <Box sx={{ flex: "1 1 25%" }}>
-                                <Typography variant="subtitle1" mb={1}>
-                                    Course Program
-                                </Typography>
-                                <TextField
-                                    fullWidth
-                                    size="small"
-                                    required
-                                    name="courseProgram1"
-                                    placeholder="Enter your Course Program"
-                                    value={person.courseProgram1 ?? ""}
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                    error={errors.courseProgram1}
-                                    helperText={errors.courseProgram1 ? "This field is required." : ""}
-                                />
-                            </Box>
-                        </Box>
-
-                        <Box
-                            sx={{
-                                display: "flex",
-                                gap: 2,
-                                mb: 2,
-                            }}
-                        >
-                            {/* Honor 1 */}
-                            <Box sx={{ flex: "1 1 33%" }}>
-                                <Typography variant="subtitle1" mb={1}>
-                                    Honor
-                                </Typography>
-                                <TextField
-                                    fullWidth
-                                    size="small"
-                                    required
-                                    name="honor1"
-                                    placeholder="Enter your Honor"
-                                    value={person.honor1 ?? ""} 
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                    error={errors.honor1}
-                                    helperText={errors.honor1 ? "This field is required." : ""}
-                                />
-                            </Box>
-
-                            {/* General Average 1 */}
-                            <Box sx={{ flex: "1 1 33%" }}>
-                                <Typography variant="subtitle1" mb={1}>
-                                    General Average
-                                </Typography>
-                                <TextField
-                                    fullWidth
-                                    size="small"
-                                    required
-                                    name="generalAverage1"
-                                    placeholder="Enter your General Average"
-                                    value={person.generalAverage1 ?? ""}
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                    error={errors.generalAverage1}
-                                    helperText={errors.generalAverage1 ? "This field is required." : ""}
-                                />
-                            </Box>
-
-                            {/* Year Graduated 1 */}
-                            <Box sx={{ flex: "1 1 33%" }}>
-                                <Typography variant="subtitle1" mb={1}>
-                                    Year Graduated
-                                </Typography>
-                                <TextField
-                                    fullWidth
-                                    size="small"
-                                    required
-                                    name="yearGraduated1"
-                                    placeholder="Enter your Year Graduated"
-                                    value={person.yearGraduated1 ?? ""}
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                    error={errors.yearGraduated1}
-                                    helperText={errors.yearGraduated1 ? "This field is required." : ""}
-                                />
-                            </Box>
-                        </Box>
-
                         <Typography style={{ fontSize: "20px", color: "#6D2323", fontWeight: "bold" }}>
-                            Strand (For Senior High School)
+                            Other Information:
                         </Typography>
                         <hr style={{ border: "1px solid #ccc", width: "100%" }} />
+                        <Typography style={{ fontWeight: "bold", textAlign: "Center" }}>
+                            Data Subject Consent Form
+                        </Typography>
+                        < br />
+                        <Typography style={{ fontSize: "12px", fontFamily: "Arial", textAlign: "Left" }}>
+                            In accordance with RA 10173 or Data Privacy Act of 2012, I give my consent to the following terms and conditions on the collection, use, processing, and disclosure of my personal data:
+                        </Typography>
+                        < br />
+                        <Typography style={{ fontSize: "12px", fontFamily: "Arial", textAlign: "Left" }}>
+                            1. I am aware that the Eulogio "Amang" Rodriguez Institute of Science and Technology (EARIST) has collected and stored my personal data during my admission/enrollment at EARIST. This data includes my demographic profile, contact details like home address, email address, landline numbers, and mobile numbers.
+                        </Typography>
+                        <Typography style={{ fontSize: "12px", fontFamily: "Arial", textAlign: "Left" }}>
+                            2. I agree to personally update these data through personal request from the Office of the registrar.
+                        </Typography>
+                        <Typography style={{ fontSize: "12px", fontFamily: "Arial", textAlign: "Left" }}>
+                            3. In consonance with the above stated Act, I am aware that the University will protect my school records related to my being a student/graduated of EARIST. However, I have the right to authorize a representative to claim the same subject to the policy of the University.
+                        </Typography>
+
+                        <Typography style={{ fontSize: "12px", fontFamily: "Arial", textAlign: "Left" }}>
+                            4. In order to promote efficient management of the organization’s records, I authorize the University to manage my data for data sharing with industry partners, government agencies/embassies, other educational institutions, and other offices for the university for employment, statistics, immigration, transfer credentials, and other legal purposes that may serve me best.
+                        </Typography>
+                        < br />
+                        <Typography style={{ fontSize: "12px", fontFamily: "Arial", textAlign: "Left" }}>
+                            By clicking the submit button, I warrant that I have read, understood all of the above provisions, and agreed to its full implementation.
+                        </Typography>
                         <br />
+                        <hr style={{ border: "1px solid #ccc", width: "100%" }} />
+                        < br />
+                        <Typography style={{ fontSize: "12px", fontFamily: "Arial", textAlign: "Left" }}>
+                            I certify that the information given above are true, complete, and accurate to the best of my knowledge and belief. I promise to abide by the rules and regulations of Eulogio "Amang" Rodriguez Institute of Science and Technology regarding the ECAT and my possible admission. I am aware that any false or misleading information and/or statement may result in the refusal or disqualification of my admission to the institution.
+                        </Typography>
 
-
-                        <FormControl fullWidth size="small" required error={!!errors.strand} className="mb-4">
-                            <InputLabel id="strand-label">Strand</InputLabel>
-                            <Select
-                                labelId="strand-label"
-                                id="strand-select"
-                                name="strand"
-                                value={person.strand ?? ""}
-                                label="Strand"
-                                onChange={handleChange}
-                                onBlur={handleBlur}
-                            >
-                                <MenuItem value="">
-                                    <em>Select Strand</em>
-                                </MenuItem>
-                                <MenuItem value="Accountancy, Business and Management (ABM)">
-                                    Accountancy, Business and Management (ABM)
-                                </MenuItem>
-                                <MenuItem value="Humanities and Social Sciences (HUMSS)">
-                                    Humanities and Social Sciences (HUMSS)
-                                </MenuItem>
-                                <MenuItem value="Science, Technology, Engineering, and Mathematics (STEM)">
-                                    Science, Technology, Engineering, and Mathematics (STEM)
-                                </MenuItem>
-                                <MenuItem value="General Academic (GAS)">General Academic (GAS)</MenuItem>
-                                <MenuItem value="Home Economics (HE)">Home Economics (HE)</MenuItem>
-                                <MenuItem value="Information and Communications Technology (ICT)">
-                                    Information and Communications Technology (ICT)
-                                </MenuItem>
-                                <MenuItem value="Agri-Fishery Arts (AFA)">Agri-Fishery Arts (AFA)</MenuItem>
-                                <MenuItem value="Industrial Arts (IA)">Industrial Arts (IA)</MenuItem>
-                                <MenuItem value="Sports Track">Sports Track</MenuItem>
-                                <MenuItem value="Design and Arts Track">Design and Arts Track</MenuItem>
-                            </Select>
-                            {errors.strand && (
+                        <FormControl required error={!!errors.termsOfAgreement} component="fieldset" sx={{ mb: 2 }}>
+                            <FormControlLabel
+                                control={
+                                    <Checkbox
+                                        name="termsOfAgreement"
+                                        checked={person.termsOfAgreement === 1}
+                                        onChange={handleChange}
+                                        onBlur={handleBlur}
+                                    />
+                                }
+                                label="I agree Terms of Agreement"
+                            />
+                            {errors.termsOfAgreement && (
                                 <FormHelperText>This field is required.</FormHelperText>
                             )}
                         </FormControl>
@@ -982,7 +643,7 @@ const Dashboard3 = () => {
                             <Button
                                 variant="contained"
                                 component={Link}
-                                to="/super_admin_dashboard2"
+                                to="/super_admin_dashboard4"
                                 startIcon={
                                     <ArrowBackIcon
                                         sx={{
@@ -1005,16 +666,33 @@ const Dashboard3 = () => {
                             >
                                 Previous Step
                             </Button>
-
-                            {/* Next Step Button */}
+                            {/* Next Step (Submit) Button */}
                             <Button
                                 variant="contained"
-                                onClick={() => {
-                                    handleUpdate();
-                                    navigate("/super_admin_dashboard4");
+                                onClick={async () => {
+                                    handleUpdate(); // Save data
+
+                                    try {
+                                        await axios.post("http://localhost:5000/api/notify-submission", {
+                                            person_id: userID,
+                                        });
+
+                                        setSnack({
+                                            open: true,
+                                            message:
+                                                "Your account has been successfully registered! Wait for further announcement. Please upload your documents.",
+                                            severity: "success",
+                                        });
+
+                                        setTimeout(() => {
+                                            navigate("/requirements_uploader");
+                                        }, 2000);
+                                    } catch (error) {
+                                        console.error("Notification failed:", error);
+                                    }
                                 }}
                                 endIcon={
-                                    <ArrowForwardIcon
+                                    <FolderIcon
                                         sx={{
                                             color: "#fff",
                                             transition: "color 0.3s",
@@ -1033,17 +711,34 @@ const Dashboard3 = () => {
                                     },
                                 }}
                             >
-                                Next Step
+                                Submit (Save Information)
                             </Button>
+
+
                         </Box>
+                        <Snackbar
+                            open={snack.open}
+                            autoHideDuration={5000}
+                            onClose={handleClose}
+                            anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+                        >
+                            <Alert severity={snack.severity} onClose={handleClose} sx={{ width: '100%' }}>
+                                {snack.message}
+                            </Alert>
+                        </Snackbar>
 
 
                     </Container>
+
                 </form>
+
             </Container>
+
+
         </Box>
+
     );
 };
 
 
-export default Dashboard3;
+export default Dashboard5;

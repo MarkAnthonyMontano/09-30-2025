@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import '../styles/TempStyles.css';
 import { useParams } from "react-router-dom";
-import SortingIcon from "../components/SortingIcon";
 import axios from "axios";
 import {
   Table,

@@ -19,7 +19,7 @@ import HowToRegIcon from "@mui/icons-material/HowToReg";
 import ListAltIcon from "@mui/icons-material/ListAlt";
 import DescriptionIcon from "@mui/icons-material/Description";
 import FactCheckIcon from '@mui/icons-material/FactCheck';
-import ExamPermit from "../components/ExamPermit";
+import ExamPermit from "../applicant/ExamPermit";
 
 
 const AdminDashboard5 = () => {

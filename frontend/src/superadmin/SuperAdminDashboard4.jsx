@@ -13,8 +13,7 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { useNavigate } from 'react-router-dom';
 import { motion } from "framer-motion";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
-import ExamPermit from "../components/ExamPermit";
-
+import ExamPermit from "../applicant/ExamPermit";
 
 const Dashboard4 = () => {
     const navigate = useNavigate();

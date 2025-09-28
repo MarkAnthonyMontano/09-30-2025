@@ -14,7 +14,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from "framer-motion";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import { useLocation } from "react-router-dom";
-import ExamPermit from "../components/ExamPermit";
+import ExamPermit from "../applicant/ExamPermit";
 
 const Dashboard4 = (props) => {
   const navigate = useNavigate();

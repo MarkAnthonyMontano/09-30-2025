@@ -92,7 +92,7 @@ const PersonalDataForm = () => {
         setUserRole(storedRole);
 
         // Allow Applicant, Admin, SuperAdmin to view ECAT
-        const allowedRoles = ["registrar", "applicant", "superadmin"];
+        const allowedRoles = ["registrar", "applicant", "student"];
         if (allowedRoles.includes(storedRole)) {
             const targetId = searchedPersonId || queryPersonId || loggedInPersonId;
             setUserID(targetId);

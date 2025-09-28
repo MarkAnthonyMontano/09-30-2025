@@ -1,30 +1,85 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
-import { Button, Box, TextField, Container, Card, Typography, FormHelperText, FormControl, InputLabel, Select, MenuItem, Modal, FormControlLabel, Checkbox, IconButton } from "@mui/material";
+import { Button, Box, TextField, Container, Typography, Card, TableContainer, Paper, Table, TableHead, TableRow, TableCell, FormHelperText, FormControl, InputLabel, Select, MenuItem, Modal, FormControlLabel, Checkbox, IconButton } from "@mui/material";
 import { Link } from "react-router-dom";
-import PersonIcon from "@mui/icons-material/Person";
 import FamilyRestroomIcon from "@mui/icons-material/FamilyRestroom";
-import SchoolIcon from "@mui/icons-material/School";
 import HealthAndSafetyIcon from "@mui/icons-material/HealthAndSafety";
 import InfoIcon from "@mui/icons-material/Info";
 import PhotoCameraIcon from "@mui/icons-material/PhotoCamera";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import CloseIcon from "@mui/icons-material/Close";
 import ErrorIcon from "@mui/icons-material/Error";
+import Search from '@mui/icons-material/Search';
 import regions from "../data/region.json";
 import provinces from "../data/province.json";
 import cities from "../data/city.json";
 import barangays from "../data/barangay.json";
 import { useNavigate } from 'react-router-dom';
+import { useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
-import ExamPermit from "../components/ExamPermit";
+import PersonIcon from "@mui/icons-material/Person";
+import DescriptionIcon from "@mui/icons-material/Description";
+import AssignmentIcon from "@mui/icons-material/Assignment";
+import RecordVoiceOverIcon from "@mui/icons-material/RecordVoiceOver";
+import SchoolIcon from "@mui/icons-material/School";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import LocalHospitalIcon from "@mui/icons-material/LocalHospital";
+import HowToRegIcon from "@mui/icons-material/HowToReg";
+import ListAltIcon from "@mui/icons-material/ListAlt";
+import FactCheckIcon from '@mui/icons-material/FactCheck';
+import ExamPermit from "../applicant/ExamPermit";
 
+const AdminDashboard1 = () => {
+  const stepsData = [
+    { label: "Applicant List", to: "/applicant_list", icon: <ListAltIcon /> },
+    { label: "Applicant Form", to: "/admin_dashboard1", icon: <PersonIcon /> },
+    { label: "Documents Submitted", to: "/student_requirements", icon: <DescriptionIcon /> },
+    { label: "Entrance Examination Scores", to: "/applicant_scoring", icon: <SchoolIcon /> },
+    { label: "Qualifying / Interview Examination Scores", to: "/qualifying_exam_scores", icon: <FactCheckIcon /> },
+    { label: "Medical Clearance", to: "/medical_clearance", icon: <LocalHospitalIcon /> },
+    { label: "Student Numbering", to: "/student_numbering", icon: <HowToRegIcon /> },
+  ];
 
-const Dashboard1 = (props) => {
   const navigate = useNavigate();
+  const [explicitSelection, setExplicitSelection] = useState(false);
+
+  const fetchByPersonId = async (personID) => {
+    try {
+      const res = await axios.get(`http://localhost:5000/api/person_with_applicant/${personID}`);
+      setPerson(res.data);
+      setSelectedPerson(res.data);
+      if (res.data?.applicant_number) {
+      }
+    } catch (err) {
+      console.error("❌ person_with_applicant failed:", err);
+    }
+  };
+
+
+  const [currentStep, setCurrentStep] = useState(1);
+  const [visitedSteps, setVisitedSteps] = useState(Array(stepsData.length).fill(false));
+
+  const handleNavigateStep = (index, to) => {
+    setCurrentStep(index);
+
+    const pid = sessionStorage.getItem("admin_edit_person_id");
+    if (pid) {
+      navigate(`${to}?person_id=${pid}`);
+    } else {
+      navigate(to);
+    }
+  };
+
+
+
+
   const [userID, setUserID] = useState("");
   const [user, setUser] = useState("");
+
+  const location = useLocation();
+  const [selectedPerson, setSelectedPerson] = useState(null);
+  const [persons, setPersons] = useState([]);
   const [userRole, setUserRole] = useState("");
   const [person, setPerson] = useState({
     profile_img: "",
@@ -75,117 +130,190 @@ const Dashboard1 = (props) => {
     permanentDswdHouseholdNumber: "",
   });
 
-  // do not alter
+
+  const queryParams = new URLSearchParams(location.search);
+  const queryPersonId = queryParams.get("person_id")?.trim() || "";
+
   useEffect(() => {
     const storedUser = localStorage.getItem("email");
     const storedRole = localStorage.getItem("role");
-    const storedID = localStorage.getItem("person_id");
-    const keys = JSON.parse(localStorage.getItem("dashboardKeys") || "{}");
-    navigate(`/dashboard/${keys.step1}`);
-    const userId = localStorage.getItem("person_id");
+    const loggedInPersonId = localStorage.getItem("person_id");
+    const searchedPersonId = sessionStorage.getItem("admin_edit_person_id");
 
-
-    const overrideId = props?.adminOverridePersonId; // new
-
-    if (overrideId) {
-      // Admin editing other person
-      setUserRole("superadmin");
-      setUserID(overrideId);
-      fetchPersonData(overrideId);
+    if (!storedUser || !storedRole || !loggedInPersonId) {
+      window.location.href = "/login";
       return;
     }
 
-    if (storedUser && storedRole && storedID) {
-      setUser(storedUser);
-      setUserRole(storedRole);
-      setUserID(storedID);
+    setUser(storedUser);
+    setUserRole(storedRole);
 
-      if (storedRole === "applicant") {
-        fetchPersonData(storedID);
-      } else {
-        window.location.href = "/login";
-      }
-    } else {
-      window.location.href = "/login";
+    // Roles that can access
+    const allowedRoles = ["registrar", "applicant", "superadmin"];
+    if (allowedRoles.includes(storedRole)) {
+      // ✅ Always take URL param first
+      const targetId = queryPersonId || searchedPersonId || loggedInPersonId;
+
+      // Save it so other pages (ECAT, forms) can use it
+      sessionStorage.setItem("admin_edit_person_id", targetId);
+
+      setUserID(targetId);
+
+      return;
     }
+
+    window.location.href = "/login";
+  }, [queryPersonId]);
+
+
+  useEffect(() => {
+    let consumedFlag = false;
+
+    const tryLoad = async () => {
+      if (queryPersonId) {
+        await fetchByPersonId(queryPersonId);
+        setExplicitSelection(true);
+        consumedFlag = true;
+        return;
+      }
+
+      // fallback only if it's a fresh selection from Applicant List
+      const source = sessionStorage.getItem("admin_edit_person_id_source");
+      const tsStr = sessionStorage.getItem("admin_edit_person_id_ts");
+      const id = sessionStorage.getItem("admin_edit_person_id");
+      const ts = tsStr ? parseInt(tsStr, 10) : 0;
+      const isFresh = source === "applicant_list" && Date.now() - ts < 5 * 60 * 1000;
+
+      if (id && isFresh) {
+        await fetchByPersonId(id);
+        setExplicitSelection(true);
+        consumedFlag = true;
+      }
+    };
+
+    tryLoad().finally(() => {
+      // consume the freshness so it won't auto-load again later
+      if (consumedFlag) {
+        sessionStorage.removeItem("admin_edit_person_id_source");
+        sessionStorage.removeItem("admin_edit_person_id_ts");
+      }
+    });
+  }, [queryPersonId]);
+
+
+
+  // Fetch person by ID (when navigating with ?person_id=... or sessionStorage)
+  useEffect(() => {
+    const fetchPersonById = async () => {
+      if (!userID) return;
+
+      try {
+        const res = await axios.get(`http://localhost:5000/api/person_with_applicant/${userID}`);
+        if (res.data) {
+          setPerson(res.data);
+          setSelectedPerson(res.data);
+        } else {
+          console.warn("⚠️ No person found for ID:", userID);
+        }
+      } catch (err) {
+        console.error("❌ Failed to fetch person by ID:", err);
+      }
+    };
+
+    fetchPersonById();
+  }, [userID]);
+
+
+
+
+
+  useEffect(() => {
+    const fetchPersons = async () => {
+      try {
+        const res = await axios.get("http://localhost:5000/api/upload_documents");
+        setPersons(res.data);
+      } catch (err) {
+        console.error("❌ Failed to fetch persons list", err);
+      }
+    };
+
+    fetchPersons();
   }, []);
 
 
 
-  const keys = JSON.parse(localStorage.getItem("dashboardKeys") || "{}");
 
-  const steps = [
-    { label: "Personal Information", icon: <PersonIcon />, path: `/dashboard/${keys.step1}` },
-    { label: "Family Background", icon: <FamilyRestroomIcon />, path: `/dashboard/${keys.step2}` },
-    { label: "Educational Attainment", icon: <SchoolIcon />, path: `/dashboard/${keys.step3}` },
-    { label: "Health Medical Records", icon: <HealthAndSafetyIcon />, path: `/dashboard/${keys.step4}` },
-    { label: "Other Information", icon: <InfoIcon />, path: `/dashboard/${keys.step5}` },
 
-  ];
+
+  const steps = person.person_id
+    ? [
+      { label: "Personal Information", icon: <PersonIcon />, path: `/admin_dashboard1?person_id=${userID}` },
+      { label: "Family Background", icon: <FamilyRestroomIcon />, path: `/admin_dashboard2?person_id=${userID}` },
+      { label: "Educational Attainment", icon: <SchoolIcon />, path: `/admin_dashboard3?person_id=${userID}` },
+      { label: "Health Medical Records", icon: <HealthAndSafetyIcon />, path: `/admin_dashboard4?person_id=${userID}` },
+      { label: "Other Information", icon: <InfoIcon />, path: `/admin_dashboard5?person_id=${userID}` },
+    ]
+    : [];
 
 
   const [activeStep, setActiveStep] = useState(0);
   const [clickedSteps, setClickedSteps] = useState(Array(steps.length).fill(false));
 
-  const handleStepClick = (index) => {
-    if (isFormValid()) {
-      setActiveStep(index);
-      const newClickedSteps = [...clickedSteps];
-      newClickedSteps[index] = true;
-      setClickedSteps(newClickedSteps);
-      navigate(steps[index].path); // ✅ actually move to step
+  const handleStepClick = (index, to) => {
+    setActiveStep(index);
+
+    const pid = sessionStorage.getItem("admin_edit_person_id");
+    if (pid) {
+      navigate(`${to}?person_id=${pid}`);
     } else {
-      alert("Please fill all required fields before proceeding.");
+      navigate(to);
     }
   };
 
+
   // dot not alter
 
-  const fetchPersonData = async (id) => {
-    try {
-      const res = await axios.get(`http://localhost:5000/api/person/${id}`);
-      setPerson(res.data);
-    } catch (error) { }
-  };
+
+
 
   // Do not alter
-  const handleUpdate = async (updatedPerson) => {
+  const handleUpdate = async (updatedData) => {
+    if (!person || !person.person_id) return;
+
     try {
-      await axios.put(`http://localhost:5000/api/person/${userID}`, updatedPerson);
-      console.log("Auto-saved");
+      await axios.put(`http://localhost:5000/api/person/${person.person_id}`, updatedData);
+      console.log("✅ Auto-saved successfully");
     } catch (error) {
-      console.error("Auto-save failed:", error);
+      console.error("❌ Auto-save failed:", error);
     }
   };
 
   // Real-time save on every character typed
   const handleChange = (e) => {
     const { name, type, checked, value } = e.target;
+    const updatedValue = type === "checkbox" ? (checked ? 1 : 0) : value;
 
-    // Determine base update value
-    let updatedValue = type === "checkbox" ? (checked ? 1 : 0) : value;
-
-    // Create a copy of the person object with the updated field
     const updatedPerson = {
       ...person,
       [name]: updatedValue,
     };
 
-    // If classifiedAs is set to Freshman (First Year), set yearLevel automatically
     if (name === "classifiedAs" && value === "Freshman (First Year)") {
       updatedPerson.yearLevel = "First Year";
     }
 
     setPerson(updatedPerson);
-    handleUpdate(updatedPerson); // No delay, real-time save
+    handleUpdate(updatedPerson); // ✅ Real-time save
   };
+
 
 
 
   const handleBlur = async () => {
     try {
-      await axios.put(`http://localhost:5000/api/person/${userID}`, person);
-      console.log("Auto-saved");
+      const personIdToUpdate = selectedPerson?.person_id || userID;
+      await axios.put(`http://localhost:5000/api/person/${personIdToUpdate}`, person);
+      console.log("Auto-saved on blur");
     } catch (err) {
       console.error("Auto-save failed", err);
     }
@@ -193,7 +321,8 @@ const Dashboard1 = (props) => {
 
   const autoSave = async () => {
     try {
-      await axios.put(`http://localhost:5000/api/person/${userID}`, person);
+      const personIdToUpdate = selectedPerson?.person_id || userID;
+      await axios.put(`http://localhost:5000/api/person/${personIdToUpdate}`, person);
       console.log("Auto-saved.");
     } catch (err) {
       console.error("Auto-save failed.");
@@ -492,6 +621,41 @@ const Dashboard1 = (props) => {
     return isValid;
   };
 
+
+
+
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchError, setSearchError] = useState("");
+
+  useEffect(() => {
+    const delayDebounce = setTimeout(async () => {
+      if (searchQuery.trim() === "") return; // Don't search empty
+
+      try {
+        const res = await axios.get("http://localhost:5000/api/search-person", {
+          params: { query: searchQuery }
+        });
+
+        if (res.data && res.data.person_id) {
+          const details = await axios.get(`http://localhost:5000/api/person_with_applicant/${res.data.person_id}`);
+          setPerson(details.data);
+
+          sessionStorage.setItem("admin_edit_person_id", details.data.person_id);
+          setUserID(details.data.person_id);
+          setSearchError("");
+        } else {
+          console.error("No valid person ID found in search result");
+          setSearchError("Invalid search result");
+        }
+      } catch (err) {
+        console.error("Search failed:", err);
+        setSearchError("Applicant not found");
+      }
+    }, 500); // debounce
+
+    return () => clearTimeout(delayDebounce);
+  }, [searchQuery]);
+
   const divToPrintRef = useRef();
   const [showPrintView, setShowPrintView] = useState(false);
 
@@ -533,6 +697,7 @@ const Dashboard1 = (props) => {
     }
   };
 
+
   const [examPermitError, setExamPermitError] = useState("");
   const [examPermitModalOpen, setExamPermitModalOpen] = useState(false);
 
@@ -567,13 +732,14 @@ const Dashboard1 = (props) => {
 
 
   const links = [
-    { to: "/ecat_application_form", label: "ECAT Application Form" },
-    { to: "/admission_form_process", label: "Admission Form Process" },
-    { to: "/personal_data_form", label: "Personal Data Form" },
-    { to: "/office_of_the_registrar", label: "Application For EARIST College Admission" },
-    { to: "/admission_services", label: "Application/Student Satisfactory Survey" },
+    { to: `/admin_ecat_application_form?person_id=${userID}`, label: "ECAT Application Form" },
+    { to: `/admission_form_process?person_id=${userID}`, label: "Admission Form Process" },
+    { to: `/admin_personal_data_form?person_id=${userID}`, label: "Personal Data Form" },
+    { to: `/admin_office_of_the_registrar?person_id=${userID}`, label: "Application For EARIST College Admission" },
+    { to: `/admission_services?person_id=${userID}`, label: "Application/Student Satisfactory Survey" },
     { label: "Examination Permit", onClick: handleExamPermitClick }, // ✅
   ];
+
 
   const [canPrintPermit, setCanPrintPermit] = useState(false);
 
@@ -593,67 +759,209 @@ const Dashboard1 = (props) => {
   return (
     <Box sx={{ height: "calc(100vh - 150px)", overflowY: "auto", paddingRight: 1, backgroundColor: "transparent" }}>
 
-      {/* ✅ Hidden render of ExamPermit for printing */}
-      {showPrintView && (
-        <div ref={divToPrintRef} style={{ display: "block" }}>
-          <ExamPermit />
-        </div>
-      )}
-      {/* Notice Header */}
+{showPrintView && (
+  <div ref={divToPrintRef} style={{ display: "block" }}>
+    <ExamPermit personId={userID} />   {/* ✅ pass the searched person_id */}
+  </div>
+)}
+
+
+      {/* Top header: DOCUMENTS SUBMITTED + Search */}
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          mt: 2,
+          mb: 2,
+          px: 2,
+        }}
+      >
+        <Typography
+          variant="h4"
+          sx={{
+            fontWeight: 'bold',
+            color: 'maroon',
+            fontSize: '36px',
+          }}
+        >
+          ADMISSION SHIFTING FORM
+        </Typography>
+
+        <TextField
+          size="small"
+
+          placeholder="Search Applicant Name / Email / Applicant ID"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          InputProps={{ startAdornment: <Search sx={{ mr: 1 }} /> }}
+          sx={{ width: { xs: '100%', sm: '425px' }, mt: { xs: 2, sm: 0 } }}
+        />
+      </Box>
+      {searchError && <Typography color="error">{searchError}</Typography>}
+      <hr style={{ border: "1px solid #ccc", width: "100%" }} />
+      <br />
+
       <Box
         sx={{
           display: "flex",
+          justifyContent: "space-between",
           alignItems: "center",
-          justifyContent: "center",
           width: "100%",
           mt: 2,
         }}
       >
+        {stepsData.map((step, index) => (
+          <React.Fragment key={index}>
+            {/* Step Card */}
+            <Card
+              onClick={() => handleNavigateStep(index, step.to)}
+              sx={{
+                flex: 1,
+                maxWidth: `${100 / stepsData.length}%`, // evenly fit 100%
+                height: 100,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                borderRadius: 2,
+                border: "2px solid #6D2323",
+
+                backgroundColor: currentStep === index ? "#6D2323" : "#E8C999",
+                color: currentStep === index ? "#fff" : "#000",
+                boxShadow:
+                  currentStep === index
+                    ? "0px 4px 10px rgba(0,0,0,0.3)"
+                    : "0px 2px 6px rgba(0,0,0,0.15)",
+                transition: "0.3s ease",
+                "&:hover": {
+                  backgroundColor: currentStep === index ? "#5a1c1c" : "#f5d98f",
+                },
+              }}
+            >
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                }}
+              >
+                <Box sx={{ fontSize: 32, mb: 0.5 }}>{step.icon}</Box>
+                <Typography
+                  sx={{ fontSize: 14, fontWeight: "bold", textAlign: "center" }}
+                >
+                  {step.label}
+                </Typography>
+              </Box>
+            </Card>
+
+            {/* Spacer instead of line */}
+            {index < stepsData.length - 1 && (
+              <Box
+                sx={{
+                  flex: 0.1,
+                  mx: 1, // margin to keep spacing
+                }}
+              />
+            )}
+          </React.Fragment>
+        ))}
+      </Box>
+
+      <br />
+
+
+
+      <TableContainer component={Paper} sx={{ width: '100%', mb: 1 }}>
+        <Table>
+          <TableHead sx={{ backgroundColor: '#6D2323' }}>
+            <TableRow>
+              {/* Left cell: Applicant ID */}
+              <TableCell sx={{ color: 'white', fontSize: '20px', fontFamily: 'Arial Black', border: 'none' }}>
+                Applicant ID:&nbsp;
+                <span style={{ fontFamily: "Arial", fontWeight: "normal", textDecoration: "underline" }}>
+                  {person?.applicant_number || "N/A"}
+
+                </span>
+              </TableCell>
+
+              {/* Right cell: Applicant Name */}
+              <TableCell
+                align="right"
+                sx={{ color: 'white', fontSize: '20px', fontFamily: 'Arial Black', border: 'none' }}
+              >
+                Applicant Name:&nbsp;
+                <span style={{ fontFamily: "Arial", fontWeight: "normal", textDecoration: "underline" }}>
+                  {person?.last_name?.toUpperCase()}, {person?.first_name?.toUpperCase()}{" "}
+                  {person?.middle_name?.toUpperCase()} {person?.extension?.toUpperCase() || ""}
+                </span>
+              </TableCell>
+            </TableRow>
+          </TableHead>
+        </Table>
+      </TableContainer>
+
+
+      <Box sx={{ display: "flex", width: "100%" }}>
+        {/* Left side: Notice */}
         <Box
           sx={{
             display: "flex",
             alignItems: "center",
-            gap: 2,
-            p: 2,
-            borderRadius: "10px",
-            backgroundColor: "#fffaf5",
-            border: "1px solid #6D2323",
-            boxShadow: "0px 2px 8px rgba(0, 0, 0, 0.05)",
-            whiteSpace: "nowrap", // Prevent text wrapping
+            justifyContent: "center",
+            width: "100%",
+            mt: 2,
           }}
         >
-          {/* Icon */}
           <Box
             sx={{
               display: "flex",
               alignItems: "center",
-              justifyContent: "center",
-              backgroundColor: "#6D2323",
-              borderRadius: "8px",
-              width: 50,
-              height: 50,
-              flexShrink: 0,
+              gap: 2,
+              p: 2,
+              borderRadius: "10px",
+              backgroundColor: "#fffaf5",
+              border: "1px solid #6D2323",
+              boxShadow: "0px 2px 8px rgba(0, 0, 0, 0.05)",
+              whiteSpace: "nowrap", // Prevent text wrapping
             }}
           >
-            <ErrorIcon sx={{ color: "white", fontSize: 40 }} />
+            {/* Icon */}
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                backgroundColor: "#6D2323",
+                borderRadius: "8px",
+                width: 50,
+                height: 50,
+                flexShrink: 0,
+              }}
+            >
+              <ErrorIcon sx={{ color: "white", fontSize: 40 }} />
+            </Box>
+
+            {/* Text */}
+            <Typography
+              sx={{
+                fontSize: "15px",
+                fontFamily: "Arial",
+                color: "#3e3e3e",
+              }}
+            >
+              <strong style={{ color: "maroon" }}>Notice:</strong> &nbsp;
+
+              <strong>1.</strong> Kindly type <strong>'NA'</strong> in boxes where there are no possible answers to the information being requested. &nbsp; | &nbsp;
+              <strong>2.</strong> To use the letter <strong>'Ñ'</strong>, press <kbd>ALT</kbd> + <kbd>165</kbd>; for <strong>'ñ'</strong>, press <kbd>ALT</kbd> + <kbd>164</kbd>. &nbsp; | &nbsp;
+              <strong>3.</strong> List of all printable files
+            </Typography>
           </Box>
-
-          {/* Text */}
-          <Typography
-            sx={{
-              fontSize: "15px",
-              fontFamily: "Arial",
-              color: "#3e3e3e",
-            }}
-          >
-            <strong style={{ color: "maroon" }}>Notice:</strong> &nbsp;
-
-            <strong>1.</strong> Kindly type <strong>'NA'</strong> in boxes where there are no possible answers to the information being requested. &nbsp; | &nbsp;
-            <strong>2.</strong> To use the letter <strong>'Ñ'</strong>, press <kbd>ALT</kbd> + <kbd>165</kbd>; for <strong>'ñ'</strong>, press <kbd>ALT</kbd> + <kbd>164</kbd>. &nbsp; | &nbsp;
-            <strong>3.</strong> List of all printable files
-          </Typography>
         </Box>
+
       </Box>
+
 
       {/* Cards Section */}
       <Box
@@ -718,10 +1026,9 @@ const Dashboard1 = (props) => {
 
 
 
+
+
       <Container>
-
-
-
 
         <Container>
           <h1 style={{ fontSize: "50px", fontWeight: "bold", textAlign: "center", color: "maroon", marginTop: "25px" }}>APPLICANT FORM</h1>
@@ -730,57 +1037,67 @@ const Dashboard1 = (props) => {
 
         <br />
 
-        <Box sx={{ display: "flex", justifyContent: "center", width: "100%", px: 4 }}>
-          {steps.map((step, index) => (
-            <React.Fragment key={index}>
-              <Box
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  cursor: "pointer",
-                }}
-                onClick={() => handleStepClick(index)}
-              >
-                <Box
-                  sx={{
-                    width: 50,
-                    height: 50,
-                    borderRadius: "50%",
-                    backgroundColor: activeStep === index ? "#6D2323" : "#E8C999",
-                    color: activeStep === index ? "#fff" : "#000",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  {step.icon}
-                </Box>
-                <Typography
-                  sx={{
-                    mt: 1,
-                    color: activeStep === index ? "#6D2323" : "#000",
-                    fontWeight: activeStep === index ? "bold" : "normal",
-                    fontSize: 14,
-                  }}
-                >
-                  {step.label}
-                </Typography>
-              </Box>
-              {index < steps.length - 1 && (
-                <Box
-                  sx={{
-                    height: "2px",
-                    backgroundColor: "#6D2323",
-                    flex: 1,
-                    alignSelf: "center",
-                    mx: 2,
-                  }}
-                />
-              )}
-            </React.Fragment>
-          ))}
-        </Box>
+        {person.person_id && (
+          <Box sx={{ display: "flex", justifyContent: "center", width: "100%", px: 4 }}>
+            {steps.map((step, index) => (
+              <React.Fragment key={index}>
+                {/* Wrap the step with Link for routing */}
+                <Link to={step.path} style={{ textDecoration: "none" }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      cursor: "pointer",
+                    }}
+                    onClick={() => handleStepClick(index)}
+                  >
+                    {/* Step Icon */}
+                    <Box
+                      sx={{
+                        width: 50,
+                        height: 50,
+                        borderRadius: "50%",
+                        backgroundColor: activeStep === index ? "#6D2323" : "#E8C999",
+                        color: activeStep === index ? "#fff" : "#000",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      {step.icon}
+                    </Box>
+
+                    {/* Step Label */}
+                    <Typography
+                      sx={{
+                        mt: 1,
+                        color: activeStep === index ? "#6D2323" : "#000",
+                        fontWeight: activeStep === index ? "bold" : "normal",
+                        fontSize: 14,
+                      }}
+                    >
+                      {step.label}
+                    </Typography>
+                  </Box>
+                </Link>
+
+                {/* Connector Line */}
+                {index < steps.length - 1 && (
+                  <Box
+                    sx={{
+                      height: "2px",
+                      backgroundColor: "#6D2323",
+                      flex: 1,
+                      alignSelf: "center",
+                      mx: 2,
+                    }}
+                  />
+                )}
+              </React.Fragment>
+            ))}
+          </Box>
+        )}
 
         <br />
 
@@ -816,6 +1133,7 @@ const Dashboard1 = (props) => {
                   labelId="campus-label"
                   id="campus-select"
                   name="campus"
+                  readOnly
                   value={person.campus == null ? "" : String(person.campus)}
                   label="Campus (Manila/Cavite)"
                   onChange={(e) => {
@@ -849,6 +1167,7 @@ const Dashboard1 = (props) => {
                   labelId="academic-program-label"
                   id="academic-program-select"
                   name="academicProgram"
+                  readOnly
                   value={person.academicProgram || ""}
                   label="Academic Program"
                   onChange={handleChange}
@@ -873,6 +1192,7 @@ const Dashboard1 = (props) => {
                   labelId="classified-as-label"
                   id="classified-as-select"
                   name="classifiedAs"
+                  readOnly
                   value={person.classifiedAs || ""}
                   label="Classified As"
                   onChange={handleChange}
@@ -900,6 +1220,7 @@ const Dashboard1 = (props) => {
                   labelId="applying-as-label"
                   id="applying-as-select"
                   name="applyingAs"
+                  readOnly
                   value={person.applyingAs || ""}
                   label="Applying As"
                   onChange={handleChange}
@@ -1020,6 +1341,7 @@ const Dashboard1 = (props) => {
                   width: "5.08cm",
                   height: "5.08cm",
                   display: "flex",
+
                   justifyContent: "center",
                   alignItems: "center",
                   flexDirection: "column",
@@ -1032,6 +1354,7 @@ const Dashboard1 = (props) => {
                     alt="Profile"
                     style={{
                       width: "100%",
+
                       height: "100%",
                       objectFit: "cover",
                     }}
@@ -1062,6 +1385,7 @@ const Dashboard1 = (props) => {
                   labelId="year-level-label"
                   id="year-level-select"
                   name="yearLevel"
+                  readOnly
                   value={person.yearLevel || ""}
                   label="Year Level"
                   onChange={handleChange}
@@ -1093,6 +1417,8 @@ const Dashboard1 = (props) => {
                   size="small"
                   name="last_name"
                   required
+                  InputProps={{ readOnly: true }}
+
                   value={person.last_name}
                   onChange={handleChange}
                   onBlur={handleBlur}
@@ -1111,6 +1437,8 @@ const Dashboard1 = (props) => {
                   size="small"
                   name="first_name"
                   required
+                  InputProps={{ readOnly: true }}
+
                   value={person.first_name}
                   onChange={handleChange}
                   onBlur={handleBlur}
@@ -1128,6 +1456,8 @@ const Dashboard1 = (props) => {
                   size="small"
                   name="middle_name"
                   required
+                  InputProps={{ readOnly: true }}
+
                   value={person.middle_name}
                   onChange={handleChange}
                   onBlur={handleBlur}
@@ -1145,6 +1475,7 @@ const Dashboard1 = (props) => {
                   <Select
                     labelId="extension-label"
                     id="extension-select"
+                    readOnly
                     name="extension"
                     value={person.extension || ""}
                     label="Extension"
@@ -1173,9 +1504,11 @@ const Dashboard1 = (props) => {
                   fullWidth
                   size="small"
                   name="nickname"
-                  required
+                  InputProps={{ readOnly: true }}
+
                   value={person.nickname}
                   onChange={handleChange}
+                  readOnly
                   onBlur={handleBlur}
                   placeholder="Enter your Nickname"
                   error={errors.nickname}
@@ -1194,6 +1527,8 @@ const Dashboard1 = (props) => {
                     size="small"
                     name="height"
                     value={person.height}
+                    InputProps={{ readOnly: true }}
+
                     onChange={handleChange}
                     onBlur={handleBlur}
                     placeholder="Enter your Height"
@@ -1219,6 +1554,8 @@ const Dashboard1 = (props) => {
                     size="small"
                     name="weight"
                     value={person.weight}
+                    InputProps={{ readOnly: true }}
+
                     onChange={handleChange}
                     onBlur={handleBlur}
                     placeholder="Enter your Weight"
@@ -1249,11 +1586,12 @@ const Dashboard1 = (props) => {
                 label="Enter your LRN Number"
                 value={person.lrnNumber === "No LRN Number" ? "" : person.lrnNumber || ""}
                 onChange={handleChange}
+                readOnly
                 onBlur={handleBlur}
                 disabled={person.lrnNumber === "No LRN Number"}
                 size="small"
                 sx={{ width: 220 }}
-                InputProps={{ sx: { height: 40 } }}
+                InputProps={{ sx: { height: 40, readOnly: true } }}
                 inputProps={{ style: { height: 40, padding: "10.5px 14px" } }}
                 error={errors.lrnNumber}
                 helperText={errors.lrnNumber ? "This field is required." : ""}
@@ -1291,6 +1629,7 @@ const Dashboard1 = (props) => {
                 size="small"
                 label="Gender"
                 name="gender"
+                readOnly
                 required
                 value={person.gender == null ? "" : String(person.gender)}
                 onChange={(e) => {
@@ -1340,6 +1679,7 @@ const Dashboard1 = (props) => {
                     select
                     size="small"
                     label="PWD Type"
+                    readOnly
                     name="pwdType"
                     value={person.pwdType || ""}
                     onChange={handleChange}
@@ -1382,6 +1722,7 @@ const Dashboard1 = (props) => {
                     size="small"
                     label="PWD ID"
                     name="pwdId"
+                    disabled
                     value={person.pwdId || ""}
                     onChange={handleChange}
                     onBlur={handleBlur}
@@ -1408,7 +1749,7 @@ const Dashboard1 = (props) => {
                 <Typography mb={1} fontWeight="medium">
                   Birth of Date
                 </Typography>
-                <TextField fullWidth size="small" type="date" name="birthOfDate" required onBlur={handleBlur} value={person.birthOfDate} onChange={handleChange} error={!!errors.birthOfDate}
+                <TextField fullWidth size="small" type="date" name="birthOfDate" disabled required onBlur={handleBlur} value={person.birthOfDate} onChange={handleChange} error={!!errors.birthOfDate}
                   helperText={errors.birthOfDate ? "This field is required." : ""} />
               </Box>
               <Box flex={1}>
@@ -1422,6 +1763,8 @@ const Dashboard1 = (props) => {
                   value={person.age === 0 ? "" : person.age}
                   placeholder="Enter your Age"
                   required
+                  InputProps={{ readOnly: true }}
+
                   onBlur={handleBlur}
                   onChange={handleChange}
                   error={!!errors.age}
@@ -1433,14 +1776,16 @@ const Dashboard1 = (props) => {
                 <Typography mb={1} fontWeight="medium">
                   Birth Place
                 </Typography>
-                <TextField fullWidth size="small" name="birthPlace" placeholder="Enter your Birth Place" value={person.birthPlace} required onBlur={handleBlur} onChange={handleChange} error={!!errors.birthPlace}
+                <TextField fullWidth size="small" name="birthPlace" InputProps={{ readOnly: true }}
+                  placeholder="Enter your Birth Place" value={person.birthPlace} required onBlur={handleBlur} onChange={handleChange} error={!!errors.birthPlace}
                   helperText={errors.birthPlace ? "This field is required." : ""} />
               </Box>
               <Box flex={1} >
                 <Typography mb={1} fontWeight="medium">
                   Language/Dialect Spoken
                 </Typography>
-                <TextField fullWidth size="small" name="languageDialectSpoken" placeholder="Enter your Language Spoken" value={person.languageDialectSpoken || ""} required onBlur={handleBlur} onChange={handleChange} error={!!errors.languageDialectSpoken}
+                <TextField fullWidth size="small" InputProps={{ readOnly: true }}
+                  name="languageDialectSpoken" placeholder="Enter your Language Spoken" value={person.languageDialectSpoken || ""} required onBlur={handleBlur} onChange={handleChange} error={!!errors.languageDialectSpoken}
                   helperText={errors.languageDialectSpoken ? "This field is required." : ""}
                 />
               </Box>
@@ -1460,6 +1805,7 @@ const Dashboard1 = (props) => {
                     labelId="citizenship-label"
                     id="citizenship"
                     name="citizenship"
+                    readOnly
                     value={person.citizenship || ""}
                     onChange={handleChange}
                     onBlur={handleBlur}
@@ -1600,6 +1946,7 @@ const Dashboard1 = (props) => {
                   <Select
                     labelId="religion-label"
                     id="religion"
+                    readOnly
                     name="religion"
                     value={person.religion || ""}
                     onChange={handleChange}
@@ -1648,6 +1995,7 @@ const Dashboard1 = (props) => {
                   <Select
                     labelId="civil-status-label"
                     id="civilStatus"
+                    readOnly
                     name="civilStatus"
                     value={person.civilStatus || ""}
                     onChange={handleChange}
@@ -1678,6 +2026,7 @@ const Dashboard1 = (props) => {
                   <Select
                     labelId="tribe-label"
                     id="tribeEthnicGroup"
+                    readOnly
                     name="tribeEthnicGroup"
                     value={person.tribeEthnicGroup || ""}
                     onChange={handleChange}
@@ -1759,6 +2108,8 @@ const Dashboard1 = (props) => {
                   name="cellphoneNumber"
                   placeholder="Enter your Cellphone Number +63"
                   required
+                  InputProps={{ readOnly: true }}
+
                   value={person.cellphoneNumber}
                   onBlur={handleBlur}
                   onChange={handleChange}
@@ -1776,6 +2127,8 @@ const Dashboard1 = (props) => {
                   fullWidth
                   size="small"
                   name="emailAddress"
+                  InputProps={{ readOnly: true }}
+
                   required
                   value={person.emailAddress}
                   placeholder="Enter your Email Address (e.g., username@gmail.com)"
@@ -1801,6 +2154,8 @@ const Dashboard1 = (props) => {
                 <TextField
                   fullWidth
                   size="small"
+                  InputProps={{ readOnly: true }}
+
                   name="presentStreet"
                   value={person.presentStreet}
                   onBlur={handleBlur}
@@ -1816,6 +2171,8 @@ const Dashboard1 = (props) => {
                 <TextField
                   fullWidth
                   size="small"
+                  InputProps={{ readOnly: true }}
+
                   name="presentZipCode"
                   placeholder="Enter your Zip Code"
                   value={person.presentZipCode}
@@ -1835,6 +2192,7 @@ const Dashboard1 = (props) => {
                 <Select
                   labelId="present-region-label"
                   name="presentRegion"
+                  readOnly
                   value={person.presentRegion || ""}
                   onBlur={handleBlur}
                   onChange={(e) => {
@@ -1870,6 +2228,7 @@ const Dashboard1 = (props) => {
                 <Select
                   labelId="present-province-label"
                   name="presentProvince"
+                  readOnly
                   value={person.presentProvince || ""}
                   onBlur={handleBlur}
                   onChange={(e) => {
@@ -1907,6 +2266,7 @@ const Dashboard1 = (props) => {
                 <Select
                   labelId="present-municipality-label"
                   name="presentMunicipality"
+                  readOnly
                   value={person.presentMunicipality || ""}
                   onBlur={handleBlur}
                   onChange={(e) => {
@@ -1939,6 +2299,7 @@ const Dashboard1 = (props) => {
                 <Select
                   labelId="present-barangay-label"
                   name="presentBarangay"
+                  readOnly
                   value={person.presentBarangay || ""}
                   onBlur={handleBlur}
                   onChange={(e) => {
@@ -1972,6 +2333,8 @@ const Dashboard1 = (props) => {
                 fullWidth
                 size="small"
                 name="presentDswdHouseholdNumber"
+                InputProps={{ readOnly: true }}
+
                 value={person.presentDswdHouseholdNumber}
                 onBlur={handleBlur}
                 onChange={handleChange}
@@ -1988,6 +2351,7 @@ const Dashboard1 = (props) => {
               control={
                 <Checkbox
                   name="same_as_present_address"
+                  disabled
                   checked={person.same_as_present_address === 1}
                   onChange={(e) => {
                     const checked = e.target.checked;
@@ -2030,6 +2394,8 @@ const Dashboard1 = (props) => {
                   fullWidth
                   size="small"
                   name="permanentStreet"
+                  InputProps={{ readOnly: true }}
+
                   placeholder="Enter your Permanent Street"
                   value={person.permanentStreet}
                   onBlur={handleBlur}
@@ -2045,6 +2411,8 @@ const Dashboard1 = (props) => {
                   fullWidth
                   size="small"
                   name="permanentZipCode"
+                  InputProps={{ readOnly: true }}
+
                   placeholder="Enter your Permanent Zip Code"
                   value={person.permanentZipCode}
                   onBlur={handleBlur}
@@ -2064,6 +2432,7 @@ const Dashboard1 = (props) => {
                   <Select
                     labelId="permanent-region-label"
                     id="permanentRegion"
+                    readOnly
                     name="permanentRegion"
                     value={person.permanentRegion || ""}
                     label="Select Region"
@@ -2103,6 +2472,7 @@ const Dashboard1 = (props) => {
                   <Select
                     labelId="permanent-province-label"
                     id="permanentProvince"
+                    readOnly
                     name="permanentProvince"
                     value={person.permanentProvince || ""}
                     label="Select Province"
@@ -2144,6 +2514,7 @@ const Dashboard1 = (props) => {
                   <Select
                     labelId="permanent-municipality-label"
                     id="permanentMunicipality"
+                    readOnly
                     name="permanentMunicipality"
                     value={person.permanentMunicipality || ""}
                     label="Select Municipality"
@@ -2180,6 +2551,7 @@ const Dashboard1 = (props) => {
                   <Select
                     labelId="permanent-barangay-label"
                     id="permanentBarangay"
+                    readOnly
                     name="permanentBarangay"
                     value={person.permanentBarangay || ""}
                     label="Select Barangay"
@@ -2217,6 +2589,8 @@ const Dashboard1 = (props) => {
                 variant="outlined"
                 placeholder="Enter your Permanent DSWD Household Number"
                 name="permanentDswdHouseholdNumber"
+                InputProps={{ readOnly: true }}
+
                 value={person.permanentDswdHouseholdNumber || ""}
                 onBlur={handleBlur}
                 onChange={handleChange}
@@ -2450,6 +2824,9 @@ const Dashboard1 = (props) => {
             </Modal>
 
 
+
+
+
             <Box display="flex" justifyContent="right" mt={4}>
               {/* Previous Page Button */}
               <Button
@@ -2475,8 +2852,7 @@ const Dashboard1 = (props) => {
                   handleUpdate();
 
                   if (isFormValid()) {
-                    navigate(`/dashboard/${keys.step2}`);
-
+                    navigate("/admin_dashboard2");
                   } else {
                     alert("Please complete all required fields before proceeding.");
                   }
@@ -2513,4 +2889,4 @@ const Dashboard1 = (props) => {
   );
 };
 
-export default Dashboard1;
+export default AdminDashboard1;

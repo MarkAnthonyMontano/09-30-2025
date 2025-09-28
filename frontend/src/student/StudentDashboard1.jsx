@@ -1,32 +1,65 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Button, Box, TextField, Container, Typography, Card, TableContainer, Paper, Table, TableHead, TableRow, TableCell, FormHelperText, FormControl, InputLabel, Select, MenuItem, Modal, FormControlLabel, Checkbox, IconButton } from "@mui/material";
-import { Link, useLocation } from "react-router-dom";
-import PersonIcon from "@mui/icons-material/Person";
+import { Link } from "react-router-dom";
 import FamilyRestroomIcon from "@mui/icons-material/FamilyRestroom";
-import SchoolIcon from "@mui/icons-material/School";
 import HealthAndSafetyIcon from "@mui/icons-material/HealthAndSafety";
 import InfoIcon from "@mui/icons-material/Info";
 import PhotoCameraIcon from "@mui/icons-material/PhotoCamera";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import CloseIcon from "@mui/icons-material/Close";
 import ErrorIcon from "@mui/icons-material/Error";
+import Search from '@mui/icons-material/Search';
 import regions from "../data/region.json";
 import provinces from "../data/province.json";
 import cities from "../data/city.json";
 import barangays from "../data/barangay.json";
 import { useNavigate } from 'react-router-dom';
-import Search from '@mui/icons-material/Search';
+import { useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
-import { FaFileExcel } from "react-icons/fa";
-import ExamPermit from "../components/ExamPermit";
+import PersonIcon from "@mui/icons-material/Person";
 
+import SchoolIcon from "@mui/icons-material/School";
+import AdminECATApplicationForm from "../registrar/AdminECATApplicationForm";
+import AdminOfficeOfTheRegistrar from "../registrar/AdminOfficeOfTheRegistrar";
+import AdminPersonalDataForm from "../registrar/AdminPersonalDataForm";
 
-const SuperAdminDashboard1 = () => {
+const StudentDashboard1 = () => {
     const navigate = useNavigate();
+
+    const fetchByPersonId = async (personID) => {
+        try {
+            const res = await axios.get(`http://localhost:5000/api/person_with_applicant/${personID}`);
+            setPerson(res.data);
+            setSelectedPerson(res.data);
+            if (res.data?.applicant_number) {
+            }
+        } catch (err) {
+            console.error("❌ person_with_applicant failed:", err);
+        }
+    };
+
+    const handleNavigateStep = (index, to) => {
+        setCurrentStep(index);
+
+        const sn = sessionStorage.getItem("student_number");
+        if (sn) {
+            navigate(`${to}?student_number=${sn}`);
+        } else {
+            navigate(to);
+        }
+    };
+
+
+
+
     const [userID, setUserID] = useState("");
     const [user, setUser] = useState("");
+
+    const location = useLocation();
+    const [selectedPerson, setSelectedPerson] = useState(null);
+    const [persons, setPersons] = useState([]);
     const [userRole, setUserRole] = useState("");
     const [person, setPerson] = useState({
         profile_img: "",
@@ -76,11 +109,29 @@ const SuperAdminDashboard1 = () => {
         permanentMunicipality: "",
         permanentDswdHouseholdNumber: "",
     });
+    const [studentNumber, setStudentNumber] = useState("");
 
-    // do not alter
-    const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
     const queryPersonId = queryParams.get("person_id");
+
+    // Always pull student_number from sessionStorage
+    const queryStudentNumber = sessionStorage.getItem("student_number");
+
+    // If we have a student_number in session, fetch person_id + person data
+    useEffect(() => {
+        if (!queryStudentNumber) return;
+        const fetchPersonId = async () => {
+            try {
+                const res = await axios.get(`http://localhost:5000/api/person_id/${queryStudentNumber}`);
+                setUserID(res.data.person_id);          // person_id used for DB queries
+                setStudentNumber(queryStudentNumber);   // keep student_number internally
+                fetchByPersonId(res.data.person_id);    // ✅ actually load the person’s data
+            } catch (err) {
+                console.error("❌ Failed to fetch person_id:", err);
+            }
+        };
+        fetchPersonId();
+    }, [queryStudentNumber]);
 
     useEffect(() => {
         const storedUser = localStorage.getItem("email");
@@ -97,34 +148,23 @@ const SuperAdminDashboard1 = () => {
         setUserRole(storedRole);
 
         // Roles that can access
-        const allowedRoles = ["registrar", "applicant", "superadmin"];
+        const allowedRoles = ["student", "registrar"];
+
         if (allowedRoles.includes(storedRole)) {
-            // ✅ Always take URL param first
+            // ✅ Prefer URL param if admin is editing, otherwise logged-in student
             const targetId = queryPersonId || searchedPersonId || loggedInPersonId;
 
-            // Save it so other pages (ECAT, forms) can use it
-            sessionStorage.setItem("admin_edit_person_id", targetId);
+            // Make sure student_number is in sessionStorage for later steps
+            if (studentNumber) {
+                sessionStorage.setItem("student_number", studentNumber);
+            }
 
             setUserID(targetId);
-            fetchByPersonId(targetId);
             return;
         }
 
         window.location.href = "/login";
-    }, [queryPersonId]);
-
-
-    const fetchByPersonId = async (personID) => {
-        try {
-            const res = await axios.get(`http://localhost:5000/api/person_with_applicant/${personID}`);
-            setPerson(res.data);
-            setSelectedPerson(res.data);
-            if (res.data?.applicant_number) {
-            }
-        } catch (err) {
-            console.error("❌ person_with_applicant failed:", err);
-        }
-    };
+    }, [queryPersonId, studentNumber]);
 
     useEffect(() => {
         let consumedFlag = false;
@@ -152,7 +192,6 @@ const SuperAdminDashboard1 = () => {
         };
 
         tryLoad().finally(() => {
-            // consume the freshness so it won't auto-load again later
             if (consumedFlag) {
                 sessionStorage.removeItem("admin_edit_person_id_source");
                 sessionStorage.removeItem("admin_edit_person_id_ts");
@@ -161,73 +200,128 @@ const SuperAdminDashboard1 = () => {
     }, [queryPersonId]);
 
 
+    // Fetch person by ID (when navigating with ?person_id=... or sessionStorage)
+    useEffect(() => {
+        const fetchPersonById = async () => {
+            if (!userID) return;
 
-    const [activeStep, setActiveStep] = useState(0);
-    const [clickedSteps, setClickedSteps] = useState([]);
+            try {
+                const res = await axios.get(`http://localhost:5000/api/person_with_applicant/${userID}`);
+                if (res.data) {
+                    setPerson(res.data);
+                    setSelectedPerson(res.data);
+                } else {
+                    console.warn("⚠️ No person found for ID:", userID);
+                }
+            } catch (err) {
+                console.error("❌ Failed to fetch person by ID:", err);
+            }
+        };
+
+        fetchPersonById();
+    }, [userID]);
+
+
+
+
+    useEffect(() => {
+        const fetchPersons = async () => {
+            try {
+                const res = await axios.get("http://localhost:5000/api/enrollment_upload_documents");
+                setPersons(res.data);
+            } catch (err) {
+                console.error("❌ Failed to fetch persons list", err);
+            }
+        };
+
+        fetchPersons();
+    }, []);
+
+
+
+
 
     const steps = [
-        { label: "Personal Information", icon: <PersonIcon />, path: "/super_admin_dashboard1" },
-        { label: "Family Background", icon: <FamilyRestroomIcon />, path: "/super_admin_dashboard2" },
-        { label: "Educational Attainment", icon: <SchoolIcon />, path: "/super_admin_dashboard3" },
-        { label: "Health Medical Records", icon: <HealthAndSafetyIcon />, path: "/super_admin_dashboard4" },
-        { label: "Other Information", icon: <InfoIcon />, path: "/super_admin_dashboard5" },
+        { label: "Personal Information", icon: <PersonIcon />, path: `/student_dashboard1` },
+        { label: "Family Background", icon: <FamilyRestroomIcon />, path: `/student_dashboard2` },
+        { label: "Educational Attainment", icon: <SchoolIcon />, path: `/student_dashboard3` },
+        { label: "Health Medical Records", icon: <HealthAndSafetyIcon />, path: `/student_dashboard4` },
+        { label: "Other Information", icon: <InfoIcon />, path: `/student_dashboard5` },
     ];
 
-    const handleStepClick = (index) => {
+
+
+    const [activeStep, setActiveStep] = useState(0);
+    const [clickedSteps, setClickedSteps] = useState(Array(steps.length).fill(false));
+    const [currentStep, setCurrentStep] = useState(0);
+
+    const handleStepClick = (index, to) => {
         setActiveStep(index);
-        setClickedSteps((prev) => [...new Set([...prev, index])]);
-        navigate(steps[index].path); // Go to the clicked step’s page
+        navigate(to);
     };
-
-
-
 
     // Do not alter
-    const handleUpdate = async (updatedPerson) => {
+    const handleUpdate = async (updatedData) => {
+        if (!person || !person.person_id) return;
+
         try {
-            await axios.put(`http://localhost:5000/api/person/${userID}`, updatedPerson);
-            console.log("Auto-saved");
+            await axios.put(
+                `http://localhost:5000/api/enrollment_person/${person.person_id}`, // ✅ use new API
+                updatedData
+            );
+            console.log("✅ Auto-saved successfully");
         } catch (error) {
-            console.error("Auto-save failed:", error);
+            console.error("❌ Auto-save failed:", error);
         }
     };
+
 
     // Real-time save on every character typed
     const handleChange = (e) => {
         const { name, type, checked, value } = e.target;
+        const updatedValue = type === "checkbox" ? (checked ? 1 : 0) : value;
 
-        // Determine base update value
-        let updatedValue = type === "checkbox" ? (checked ? 1 : 0) : value;
-
-        // Create a copy of the person object with the updated field
         const updatedPerson = {
             ...person,
             [name]: updatedValue,
         };
 
-        // If classifiedAs is set to Freshman (First Year), set yearLevel automatically
         if (name === "classifiedAs" && value === "Freshman (First Year)") {
             updatedPerson.yearLevel = "First Year";
         }
 
         setPerson(updatedPerson);
-        handleUpdate(updatedPerson); // No delay, real-time save
+        handleUpdate(updatedPerson); // ✅ Real-time save
     };
 
 
 
     const handleBlur = async () => {
         try {
-            await axios.put(`http://localhost:5000/api/person/${userID}`, person);
-            console.log("Auto-saved");
+            const personIdToUpdate = selectedPerson?.person_id || userID;
+
+            // clone without person_id
+            const { person_id, ...updatePayload } = person;
+
+            await axios.put(
+                `http://localhost:5000/api/enrollment_person/${personIdToUpdate}`,
+                updatePayload
+            );
+
+            console.log("Auto-saved on blur");
         } catch (err) {
             console.error("Auto-save failed", err);
         }
     };
 
+
     const autoSave = async () => {
         try {
-            await axios.put(`http://localhost:5000/api/person/${userID}`, person);
+            const personIdToUpdate = selectedPerson?.person_id || userID;
+            await axios.put(
+                `http://localhost:5000/api/enrollment_person/${personIdToUpdate}`,
+                person
+            );
             console.log("Auto-saved.");
         } catch (err) {
             console.error("Auto-save failed.");
@@ -469,6 +563,74 @@ const SuperAdminDashboard1 = () => {
 
 
     const [errors, setErrors] = useState({});
+
+    const isFormValid = () => {
+        const requiredFields = [
+            "campus", "academicProgram", "classifiedAs", "applyingAs", "program", "program2", "program3",
+            "yearLevel", "profile_img", "last_name", "first_name", "middle_name", "nickname",
+            "height", "weight", "gender", "birthOfDate", "age", "birthPlace",
+            "languageDialectSpoken", "citizenship", "religion", "civilStatus", "tribeEthnicGroup",
+            "cellphoneNumber", "emailAddress",
+            "presentStreet", "presentZipCode", "presentRegion", "presentProvince",
+            "presentMunicipality", "presentBarangay", "presentDswdHouseholdNumber",
+            "permanentStreet", "permanentZipCode", "permanentRegion", "permanentProvince",
+            "permanentMunicipality", "permanentBarangay", "permanentDswdHouseholdNumber"
+        ];
+
+        let newErrors = {};
+        let isValid = true;
+
+        // Generic required fields
+        requiredFields.forEach((field) => {
+            const value = person[field];
+            const stringValue = value?.toString().trim();
+
+            if (!stringValue) {
+                newErrors[field] = true;
+                isValid = false;
+            }
+        });
+
+        // ✅ LRN Number: required only if N/A is NOT checked
+        if (!isLrnNA) {
+            const lrnValue = person.lrnNumber?.toString().trim();
+            if (!lrnValue) {
+                newErrors.lrnNumber = true;
+                isValid = false;
+            }
+        }
+
+        // ✅ PWD fields: required only if PWD checkbox is checked
+        if (person.pwdMember === 1) {
+            const pwdTypeValue = person.pwdType?.toString().trim();
+            const pwdIdValue = person.pwdId?.toString().trim();
+
+            if (!pwdTypeValue) {
+                newErrors.pwdType = true;
+                isValid = false;
+            }
+
+            if (!pwdIdValue) {
+                newErrors.pwdId = true;
+                isValid = false;
+            }
+        }
+
+        setErrors(newErrors);
+        return isValid;
+    };
+
+    const links = [
+        { to: `/registrar/admin_ecat_application_form?person_id=${userID}`, label: "ECAT Application Form" },
+        { to: `/admission_form_process?person_id=${userID}`, label: "Admission Form Process" },
+        { to: `/registrar/admin_personal_data_form?person_id=${userID}`, label: "Personal Data Form" },
+        { to: `/registrar/admin_office_of_the_registrar?person_id=${userID}`, label: "Application For EARIST College Admission" },
+        { to: `/admission_services?person_id=${userID}`, label: "Application/Student Satisfactory Survey" },
+    ];
+
+
+
+
     const [searchQuery, setSearchQuery] = useState("");
     const [searchError, setSearchError] = useState("");
 
@@ -481,237 +643,41 @@ const SuperAdminDashboard1 = () => {
                     params: { query: searchQuery }
                 });
 
-                console.log("Search result data:", res.data); // See what the backend returns
+                if (res.data && res.data.person_id) {
+                    const details = await axios.get(`http://localhost:5000/api/person_with_applicant/${res.data.person_id}`);
+                    setPerson(details.data);
 
-                setPerson(res.data);
-
-                // ✅ Adjust key based on backend response
-                const idToStore = res.data.person_id || res.data.id;
-                if (!idToStore) {
+                    sessionStorage.setItem("admin_edit_person_id", details.data.person_id);
+                    setUserID(details.data.person_id);
+                    setSearchError("");
+                } else {
                     console.error("No valid person ID found in search result");
                     setSearchError("Invalid search result");
-                    return;
                 }
-
-                // Store globally for ECAT and other dashboards
-                sessionStorage.setItem("admin_edit_person_id", idToStore);
-                setUserID(idToStore);
-
-                setSearchError("");
             } catch (err) {
                 console.error("Search failed:", err);
                 setSearchError("Applicant not found");
             }
-        }, 500); // debounce so it doesn't search on every keystroke instantly
+        }, 500); // debounce
 
         return () => clearTimeout(delayDebounce);
     }, [searchQuery]);
 
 
 
-
-    const [selectedPerson, setSelectedPerson] = useState(null);
-    const [persons, setPersons] = useState([]);
-
-    useEffect(() => {
-        if (!searchQuery.trim()) {
-            // 🔹 If search is empty, clear everything
-            setSelectedPerson(null);
-            setPerson({
-                profile_img: "",
-                generalAverage1: "",
-                height: "",
-                applyingAs: "",
-                document_status: "",
-                last_name: "",
-                first_name: "",
-                middle_name: "",
-                extension: "",
-            });
-            return;
-        }
-
-        // 🔹 Try to find a matching applicant from the list
-        const match = persons.find((p) =>
-            `${p.first_name} ${p.middle_name} ${p.last_name} ${p.emailAddress} ${p.applicant_number || ''}`
-                .toLowerCase()
-                .includes(searchQuery.toLowerCase())
-        );
-
-        if (match) {
-            // ✅ If found, set this as the "selectedPerson"
-            setSelectedPerson(match);
-        } else {
-            // ❌ If not found, clear again
-            setSelectedPerson(null);
-            setPerson({
-                profile_img: "",
-                generalAverage1: "",
-                height: "",
-                applyingAs: "",
-                document_status: "",
-                last_name: "",
-                first_name: "",
-                middle_name: "",
-                extension: "",
-            });
-        }
-    }, [searchQuery, persons]);
-
-
-    // ✅ For Excel Import
-    const [excelFile, setExcelFile] = useState(null);
-
-    const handleExcelChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            setExcelFile(file);
-        }
-    };
-
-    const handleImportExcel = async () => {
-        try {
-            if (!excelFile) {
-                alert("⚠️ Please select an Excel file first.");
-                return;
-            }
-
-            const formData = new FormData();
-            formData.append("file", excelFile);
-
-            const res = await axios.post("http://localhost:5000/api/person/import", formData, {
-                headers: { "Content-Type": "multipart/form-data" },
-            });
-
-            if (res.data.success) {
-                alert("✅ Excel imported successfully!");
-                window.location.reload();
-            } else {
-                alert("❌ Failed: " + (res.data.error || "Unknown error"));
-            }
-        } catch (err) {
-            console.error("❌ Import failed:", err);
-            alert("❌ Import failed: " + (err.response?.data?.error || err.message));
-        }
-    };
-
-    const divToPrintRef = useRef();
-    const [showPrintView, setShowPrintView] = useState(false);
-
-    const printDiv = () => {
-        const divToPrint = divToPrintRef.current;
-        if (divToPrint) {
-            const newWin = window.open("", "Print-Window");
-            newWin.document.open();
-            newWin.document.write(`
-        <html>
-          <head>
-            <title>Examination Permit</title>
-            <style>
-              @page { size: A4; margin: 0; }
-              body {
-                margin: 0;
-                padding: 0;
-                display: flex;
-                margin-left: "
-                justify-content: center;
-                align-items: center;
-                min-height: 100vh;
-              }
-              .print-container {
-                width: 8.5in;
-                min-height: 11in;
-                margin: auto;
-                background: white;
-              }
-              * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-            </style>
-          </head>
-          <body onload="window.print(); setTimeout(() => window.close(), 100);">
-            <div class="print-container">${divToPrint.innerHTML}</div>
-          </body>
-        </html>
-      `);
-            newWin.document.close();
-        }
-    };
-
-
-    const [examPermitError, setExamPermitError] = useState("");
-    const [examPermitModalOpen, setExamPermitModalOpen] = useState(false);
-
-    const handleCloseExamPermitModal = () => {
-        setExamPermitModalOpen(false);
-        setExamPermitError("");
-    };
-
-    const handleExamPermitClick = async () => {
-        try {
-            const res = await axios.get("http://localhost:5000/api/verified-exam-applicants");
-            const verified = res.data.some(a => a.person_id === parseInt(userID));
-
-            if (!verified) {
-                setExamPermitError("❌ You cannot print the Exam Permit until all required documents are verified.");
-                setExamPermitModalOpen(true);
-                return;
-            }
-
-            // ✅ Render permit and print
-            setShowPrintView(true);
-            setTimeout(() => {
-                printDiv();
-                setShowPrintView(false);
-            }, 500);
-        } catch (err) {
-            console.error("Error verifying exam permit eligibility:", err);
-            setExamPermitError("⚠️ Unable to check document verification status right now.");
-            setExamPermitModalOpen(true);
-        }
-    };
-
-
-    const links = [
-        { to: `/admin_ecat_application_form?person_id=${userID}`, label: "ECAT Application Form" },
-        { to: `/admission_form_process?person_id=${userID}`, label: "Admission Form Process" },
-        { to: `/admin_personal_data_form?person_id=${userID}`, label: "Personal Data Form" },
-        { to: `/admin_office_of_the_registrar?person_id=${userID}`, label: "Application For EARIST College Admission" },
-        { to: `/admission_services?person_id=${userID}`, label: "Application/Student Satisfactory Survey" },
-        { label: "Examination Permit", onClick: handleExamPermitClick }, // ✅
-    ];
-
-
-    const [canPrintPermit, setCanPrintPermit] = useState(false);
-
-    useEffect(() => {
-        if (!userID) return;
-        axios.get("http://localhost:5000/api/verified-exam-applicants")
-            .then(res => {
-                const verified = res.data.some(a => a.person_id === parseInt(userID));
-                setCanPrintPermit(verified);
-            });
-    }, [userID]);
-
-
-
-
     // dot not alter
     return (
         <Box sx={{ height: "calc(100vh - 150px)", overflowY: "auto", paddingRight: 1, backgroundColor: "transparent" }}>
-      {showPrintView && (
-  <div ref={divToPrintRef} style={{ display: "block" }}>
-    <ExamPermit personId={userID} />   {/* ✅ pass the searched person_id */}
-  </div>
-)}
 
 
-            {/* Top header: DOCUMENTS SUBMITTED + Search + Import */}
             <Box
                 sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    flexWrap: "wrap",
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    flexWrap: 'wrap',
                     mt: 2,
+
                     mb: 2,
                     px: 2,
                 }}
@@ -719,107 +685,27 @@ const SuperAdminDashboard1 = () => {
                 <Typography
                     variant="h4"
                     sx={{
-                        fontWeight: "bold",
-                        color: "maroon",
-                        fontSize: "36px",
+                        fontWeight: 'bold',
+                        color: 'maroon',
+                        fontSize: '36px',
                     }}
                 >
-                    APPLICANT FORM
+                    STUDENT PROFILE
                 </Typography>
 
-                {/* ✅ Right side: Search + Excel Import side by side */}
-                <Box display="flex" alignItems="center" gap={2}>
-                    <TextField
-                        size="small"
-                        placeholder="Search Applicant Name / Email / Applicant ID"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        InputProps={{ startAdornment: <Search sx={{ mr: 1 }} /> }}
-                        sx={{ width: { xs: "100%", sm: "425px" } }}
-                    />
 
-                    {/* Excel Import Section */}
-                    <Box display="flex" alignItems="center" gap={1}>
-                        <input
-                            type="file"
-                            accept=".xlsx,.xls"
-                            onChange={handleExcelChange}
-                            style={{ display: "none" }}
-                            id="excel-upload"
-                        />
 
-                        <button
-                            onClick={() => document.getElementById("excel-upload").click()}
-                            style={{
-                                padding: "5px 20px",
-                                border: "2px solid green",
-                                backgroundColor: "#f0fdf4",
-                                color: "green",
-                                borderRadius: "5px",
-                                cursor: "pointer",
-                                fontSize: "14px",
-                                fontWeight: "bold",
-                                height: "50px",
-                                display: "flex",
-                                alignItems: "center",
-                                gap: "8px",
-                                userSelect: "none",
-                                width: "200px",
-                            }}
-                            type="button"
-                        >
-                            <FaFileExcel size={20} />
-                            Choose Excel
-                        </button>
 
-                        <Button
-                            onClick={handleImportExcel}
-                            variant="contained"
-                            sx={{ backgroundColor: "maroon", color: "white", height: "50px" }}
-                        >
-                            Import
-                        </Button>
-                    </Box>
-                </Box>
             </Box>
-
-            {searchError && <Typography color="error">{searchError}</Typography>}
-
             <hr style={{ border: "1px solid #ccc", width: "100%" }} />
+
             <br />
 
 
-            <TableContainer component={Paper} sx={{ width: '100%', mb: 1 }}>
-                <Table>
-                    <TableHead sx={{ backgroundColor: '#6D2323' }}>
-                        <TableRow>
-                            {/* Left cell: Applicant ID */}
-                            <TableCell sx={{ color: 'white', fontSize: '20px', fontFamily: 'Arial Black', border: 'none' }}>
-                                Applicant ID:&nbsp;
-                                <span style={{ fontFamily: "Arial", fontWeight: "normal", textDecoration: "underline" }}>
-                                    {person?.applicant_number || "N/A"}
 
-                                </span>
-                            </TableCell>
 
-                            {/* Right cell: Applicant Name */}
-                            <TableCell
-                                align="right"
-                                sx={{ color: 'white', fontSize: '20px', fontFamily: 'Arial Black', border: 'none' }}
-                            >
-                                Applicant Name:&nbsp;
-                                <span style={{ fontFamily: "Arial", fontWeight: "normal", textDecoration: "underline" }}>
-                                    {person?.last_name?.toUpperCase()}, {person?.first_name?.toUpperCase()}{" "}
-                                    {person?.middle_name?.toUpperCase()} {person?.extension?.toUpperCase() || ""}
-                                </span>
-                            </TableCell>
-                        </TableRow>
-                    </TableHead>
-                </Table>
-            </TableContainer>
-
-            <Container>
-
+            <Box sx={{ display: "flex", width: "100%" }}>
+                {/* Left side: Notice */}
                 <Box
                     sx={{
                         display: "flex",
@@ -875,67 +761,66 @@ const SuperAdminDashboard1 = () => {
                     </Box>
                 </Box>
 
-                {/* Cards Section */}
-                <Box
-                    sx={{
-                        display: "flex",
-                        flexWrap: "wrap",
-                        gap: 2,
-                        mt: 2,
-                        pb: 1,
-                        justifyContent: "center", // Centers all cards horizontally
-                    }}
-                >
-                    {links.map((lnk, i) => (
-                        <motion.div
-                            key={i}
-                            style={{ flex: "0 0 calc(30% - 16px)" }}
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: i * 0.1, duration: 0.4 }}
+            </Box>
+
+            {/* PDF Cards Section */}
+            <Box
+                sx={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    gap: 2,
+                    mt: 2,
+                    pb: 1,
+                    justifyContent: "center",
+                }}
+            >
+                {links.map((lnk, i) => (
+                    <motion.div
+                        key={i}
+                        style={{ flex: "0 0 calc(30% - 16px)" }}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: i * 0.1, duration: 0.4 }}
+                    >
+                        <Card
+                            sx={{
+                                minHeight: 60,
+                                borderRadius: 2,
+                                border: "2px solid #6D2323",
+                                backgroundColor: "#fff",
+                                display: "flex",
+                                flexDirection: "row",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                textAlign: "center",
+                                p: 1.5,
+                                "&:hover": {
+                                    transform: "scale(1.05)",
+                                    transition: "0.3s ease-in-out",
+                                },
+                            }}
                         >
-                            <Card
-                                sx={{
-                                    minHeight: 60,
-                                    borderRadius: 2,
-                                    border: "2px solid #6D2323",
-                                    backgroundColor: "#fff",
-                                    display: "flex",
-                                    flexDirection: "row",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    textAlign: "center",
-                                    p: 1.5,
-                                    cursor: "pointer",
-                                    "&:hover": {
-                                        transform: "scale(1.05)",
-                                        transition: "0.3s ease-in-out",
-                                    },
-                                }}
-                                onClick={() => {
-                                    if (lnk.onClick) {
-                                        lnk.onClick();       // ✅ run handler for Examination Permit
-                                    } else if (lnk.to) {
-                                        navigate(lnk.to);    // ✅ navigate if it has a `to`
-                                    }
+                            <PictureAsPdfIcon sx={{ fontSize: 35, color: "#6D2323", mr: 1.5 }} />
+                            <Link
+                                to={lnk.to}
+                                style={{
+                                    textDecoration: "none",
+                                    color: "#6D2323",
+                                    fontFamily: "Arial",
+                                    fontWeight: "bold",
+                                    fontSize: "0.85rem",
                                 }}
                             >
-                                <PictureAsPdfIcon sx={{ fontSize: 35, color: "#6D2323", mr: 1.5 }} />
-                                <Typography
-                                    sx={{
-                                        color: "#6D2323",
-                                        fontFamily: "Arial",
-                                        fontWeight: "bold",
-                                        fontSize: "0.85rem",
-                                    }}
-                                >
-                                    {lnk.label}
-                                </Typography>
-                            </Card>
-                        </motion.div>
-                    ))}
-                </Box>
+                                {lnk.label}
+                            </Link>
+                        </Card>
+                    </motion.div>
+                ))}
+            </Box>
 
+
+
+            <Container>
 
                 <Container>
                     <h1 style={{ fontSize: "50px", fontWeight: "bold", textAlign: "center", color: "maroon", marginTop: "25px" }}>APPLICANT FORM</h1>
@@ -944,57 +829,67 @@ const SuperAdminDashboard1 = () => {
 
                 <br />
 
-                <Box sx={{ display: "flex", justifyContent: "center", width: "100%", px: 4 }}>
-                    {steps.map((step, index) => (
-                        <React.Fragment key={index}>
-                            <Box
-                                sx={{
-                                    display: "flex",
-                                    flexDirection: "column",
-                                    alignItems: "center",
-                                    cursor: "pointer",
-                                }}
-                                onClick={() => handleStepClick(index)}
-                            >
-                                <Box
-                                    sx={{
-                                        width: 50,
-                                        height: 50,
-                                        borderRadius: "50%",
-                                        backgroundColor: activeStep === index ? "#6D2323" : "#E8C999",
-                                        color: activeStep === index ? "#fff" : "#000",
-                                        display: "flex",
-                                        alignItems: "center",
-                                        justifyContent: "center",
-                                    }}
-                                >
-                                    {step.icon}
-                                </Box>
-                                <Typography
-                                    sx={{
-                                        mt: 1,
-                                        color: activeStep === index ? "#6D2323" : "#000",
-                                        fontWeight: activeStep === index ? "bold" : "normal",
-                                        fontSize: 14,
-                                    }}
-                                >
-                                    {step.label}
-                                </Typography>
-                            </Box>
-                            {index < steps.length - 1 && (
-                                <Box
-                                    sx={{
-                                        height: "2px",
-                                        backgroundColor: "#6D2323",
-                                        flex: 1,
-                                        alignSelf: "center",
-                                        mx: 2,
-                                    }}
-                                />
-                            )}
-                        </React.Fragment>
-                    ))}
-                </Box>
+                {person.person_id && (
+                    <Box sx={{ display: "flex", justifyContent: "center", width: "100%", px: 4 }}>
+                        {steps.map((step, index) => (
+                            <React.Fragment key={index}>
+                                {/* Wrap the step with Link for routing */}
+                                <Link to={step.path} style={{ textDecoration: "none" }}>
+                                    <Box
+                                        sx={{
+                                            display: "flex",
+                                            flexDirection: "column",
+                                            alignItems: "center",
+                                            cursor: "pointer",
+                                        }}
+                                        onClick={() => handleStepClick(index)}
+                                    >
+                                        {/* Step Icon */}
+                                        <Box
+                                            sx={{
+                                                width: 50,
+                                                height: 50,
+                                                borderRadius: "50%",
+                                                backgroundColor: activeStep === index ? "#6D2323" : "#E8C999",
+                                                color: activeStep === index ? "#fff" : "#000",
+                                                display: "flex",
+                                                alignItems: "center",
+                                                justifyContent: "center",
+                                            }}
+                                        >
+                                            {step.icon}
+                                        </Box>
+
+                                        {/* Step Label */}
+                                        <Typography
+                                            sx={{
+                                                mt: 1,
+                                                color: activeStep === index ? "#6D2323" : "#000",
+                                                fontWeight: activeStep === index ? "bold" : "normal",
+                                                fontSize: 14,
+                                            }}
+                                        >
+                                            {step.label}
+                                        </Typography>
+                                    </Box>
+                                </Link>
+
+                                {/* Connector Line */}
+                                {index < steps.length - 1 && (
+                                    <Box
+                                        sx={{
+                                            height: "2px",
+                                            backgroundColor: "#6D2323",
+                                            flex: 1,
+                                            alignSelf: "center",
+                                            mx: 2,
+                                        }}
+                                    />
+                                )}
+                            </React.Fragment>
+                        ))}
+                    </Box>
+                )}
 
                 <br />
 
@@ -1030,6 +925,7 @@ const SuperAdminDashboard1 = () => {
                                     labelId="campus-label"
                                     id="campus-select"
                                     name="campus"
+                                    readOnly
                                     value={person.campus == null ? "" : String(person.campus)}
                                     label="Campus (Manila/Cavite)"
                                     onChange={(e) => {
@@ -1060,10 +956,12 @@ const SuperAdminDashboard1 = () => {
                             <FormControl fullWidth size="small" required error={!!errors.academicProgram} className="mb-4">
                                 <InputLabel id="academic-program-label">Academic Program</InputLabel>
                                 <Select
+
                                     labelId="academic-program-label"
                                     id="academic-program-select"
                                     name="academicProgram"
-                                    value={person.academicProgram ?? ""}
+                                    readOnly
+                                    value={person.academicProgram || ""}
                                     label="Academic Program"
                                     onChange={handleChange}
                                     onBlur={handleBlur}
@@ -1087,7 +985,8 @@ const SuperAdminDashboard1 = () => {
                                     labelId="classified-as-label"
                                     id="classified-as-select"
                                     name="classifiedAs"
-                                    value={person.classifiedAs ?? ""}
+                                    readOnly
+                                    value={person.classifiedAs || ""}
                                     label="Classified As"
                                     onChange={handleChange}
                                     onBlur={handleBlur}
@@ -1114,7 +1013,8 @@ const SuperAdminDashboard1 = () => {
                                     labelId="applying-as-label"
                                     id="applying-as-select"
                                     name="applyingAs"
-                                    value={person.applyingAs ?? ""}
+                                    readOnly
+                                    value={person.applyingAs || ""}
                                     label="Applying As"
                                     onChange={handleChange}
                                     onBlur={handleBlur}
@@ -1153,8 +1053,9 @@ const SuperAdminDashboard1 = () => {
                                         <FormControl fullWidth size="small" required error={!!errors.program}>
                                             <InputLabel>Program</InputLabel>
                                             <Select
+                                                readOnly
                                                 name="program"
-                                                value={person.program ?? ""}
+                                                value={person.program || ""}
                                                 onBlur={handleBlur}
                                                 onChange={handleChange}
                                                 label="Program"
@@ -1178,8 +1079,9 @@ const SuperAdminDashboard1 = () => {
                                         <FormControl fullWidth size="small" required error={!!errors.program2}>
                                             <InputLabel>Program 2</InputLabel>
                                             <Select
+                                                readOnly
                                                 name="program2"
-                                                value={person.program2 ?? ""}
+                                                value={person.program2 || ""}
                                                 onBlur={handleBlur}
                                                 onChange={handleChange}
                                                 label="Program 2"
@@ -1203,8 +1105,9 @@ const SuperAdminDashboard1 = () => {
                                         <FormControl fullWidth size="small" required error={!!errors.program3}>
                                             <InputLabel>Program 3</InputLabel>
                                             <Select
+                                                readOnly
                                                 name="program3"
-                                                value={person.program3 ?? ""}
+                                                value={person.program3 || ""}
                                                 onBlur={handleBlur}
                                                 onChange={handleChange}
                                                 label="Program 3"
@@ -1234,6 +1137,7 @@ const SuperAdminDashboard1 = () => {
                                     width: "5.08cm",
                                     height: "5.08cm",
                                     display: "flex",
+
                                     justifyContent: "center",
                                     alignItems: "center",
                                     flexDirection: "column",
@@ -1246,6 +1150,7 @@ const SuperAdminDashboard1 = () => {
                                         alt="Profile"
                                         style={{
                                             width: "100%",
+
                                             height: "100%",
                                             objectFit: "cover",
                                         }}
@@ -1276,7 +1181,8 @@ const SuperAdminDashboard1 = () => {
                                     labelId="year-level-label"
                                     id="year-level-select"
                                     name="yearLevel"
-                                    value={person.yearLevel ?? ""}
+                                    readOnly
+                                    value={person.yearLevel || ""}
                                     label="Year Level"
                                     onChange={handleChange}
                                     onBlur={handleBlur}
@@ -1307,7 +1213,9 @@ const SuperAdminDashboard1 = () => {
                                     size="small"
                                     name="last_name"
                                     required
-                                    value={person.last_name ?? ""}
+                                    InputProps={{ readOnly: true }}
+
+                                    value={person.last_name}
                                     onChange={handleChange}
                                     onBlur={handleBlur}
                                     placeholder="Enter your Last Name"
@@ -1325,7 +1233,9 @@ const SuperAdminDashboard1 = () => {
                                     size="small"
                                     name="first_name"
                                     required
-                                    value={person.first_name ?? ""}
+                                    InputProps={{ readOnly: true }}
+
+                                    value={person.first_name}
                                     onChange={handleChange}
                                     onBlur={handleBlur}
                                     placeholder="Enter your First Name"
@@ -1342,7 +1252,9 @@ const SuperAdminDashboard1 = () => {
                                     size="small"
                                     name="middle_name"
                                     required
-                                    value={person.middle_name ?? ""}
+                                    InputProps={{ readOnly: true }}
+
+                                    value={person.middle_name}
                                     onChange={handleChange}
                                     onBlur={handleBlur}
                                     placeholder="Enter your Middle Name"
@@ -1359,8 +1271,9 @@ const SuperAdminDashboard1 = () => {
                                     <Select
                                         labelId="extension-label"
                                         id="extension-select"
+                                        readOnly
                                         name="extension"
-                                        value={person.extension ?? ""}
+                                        value={person.extension || ""}
                                         label="Extension"
                                         onChange={handleChange}
                                         onBlur={handleBlur}
@@ -1387,9 +1300,11 @@ const SuperAdminDashboard1 = () => {
                                     fullWidth
                                     size="small"
                                     name="nickname"
-                                    required
-                                    value={person.nickname ?? ""}
+                                    InputProps={{ readOnly: true }}
+
+                                    value={person.nickname}
                                     onChange={handleChange}
+                                    readOnly
                                     onBlur={handleBlur}
                                     placeholder="Enter your Nickname"
                                     error={errors.nickname}
@@ -1407,7 +1322,9 @@ const SuperAdminDashboard1 = () => {
                                     <TextField
                                         size="small"
                                         name="height"
-                                        value={person.height ?? ""}
+                                        value={person.height}
+                                        InputProps={{ readOnly: true }}
+
                                         onChange={handleChange}
                                         onBlur={handleBlur}
                                         placeholder="Enter your Height"
@@ -1432,7 +1349,9 @@ const SuperAdminDashboard1 = () => {
                                     <TextField
                                         size="small"
                                         name="weight"
-                                        value={person.weight ?? ""}
+                                        value={person.weight}
+                                        InputProps={{ readOnly: true }}
+
                                         onChange={handleChange}
                                         onBlur={handleBlur}
                                         placeholder="Enter your Weight"
@@ -1461,13 +1380,14 @@ const SuperAdminDashboard1 = () => {
                                 name="lrnNumber"
                                 required={person.lrnNumber !== "No LRN Number"}
                                 label="Enter your LRN Number"
-                                value={person.lrnNumber === "No LRN Number" ? "" : person.lrnNumber ?? ""}
+                                value={person.lrnNumber === "No LRN Number" ? "" : person.lrnNumber || ""}
                                 onChange={handleChange}
+                                readOnly
                                 onBlur={handleBlur}
                                 disabled={person.lrnNumber === "No LRN Number"}
                                 size="small"
                                 sx={{ width: 220 }}
-                                InputProps={{ sx: { height: 40 } }}
+                                InputProps={{ sx: { height: 40, readOnly: true } }}
                                 inputProps={{ style: { height: 40, padding: "10.5px 14px" } }}
                                 error={errors.lrnNumber}
                                 helperText={errors.lrnNumber ? "This field is required." : ""}
@@ -1477,6 +1397,7 @@ const SuperAdminDashboard1 = () => {
                             <FormControlLabel
                                 control={
                                     <Checkbox
+                                        disabled
                                         name="lrn_na"
                                         checked={person.lrnNumber === "No LRN Number"}
                                         onChange={(e) => {
@@ -1505,6 +1426,7 @@ const SuperAdminDashboard1 = () => {
                                 size="small"
                                 label="Gender"
                                 name="gender"
+                                readOnly
                                 required
                                 value={person.gender == null ? "" : String(person.gender)}
                                 onChange={(e) => {
@@ -1537,7 +1459,9 @@ const SuperAdminDashboard1 = () => {
                             {/* PWD Checkbox */}
                             <FormControlLabel
                                 control={
+
                                     <Checkbox
+                                        disabled
                                         checked={person.pwdMember === 1}
                                         onChange={handlePwdCheck}
                                         inputProps={{ "aria-label": "PWD Checkbox" }}
@@ -1554,8 +1478,9 @@ const SuperAdminDashboard1 = () => {
                                         select
                                         size="small"
                                         label="PWD Type"
+                                        readOnly
                                         name="pwdType"
-                                        value={person.pwdType ?? ""}
+                                        value={person.pwdType || ""}
                                         onChange={handleChange}
                                         onBlur={handleBlur}
                                         required={person.pwdMember === 1}
@@ -1596,7 +1521,8 @@ const SuperAdminDashboard1 = () => {
                                         size="small"
                                         label="PWD ID"
                                         name="pwdId"
-                                        value={person.pwdId ?? ""}
+                                        disabled
+                                        value={person.pwdId || ""}
                                         onChange={handleChange}
                                         onBlur={handleBlur}
                                         required={person.pwdMember === 1}
@@ -1622,7 +1548,7 @@ const SuperAdminDashboard1 = () => {
                                 <Typography mb={1} fontWeight="medium">
                                     Birth of Date
                                 </Typography>
-                                <TextField fullWidth size="small" type="date" name="birthOfDate" required onBlur={handleBlur} value={person.birthOfDate} onChange={handleChange} error={!!errors.birthOfDate}
+                                <TextField fullWidth size="small" type="date" name="birthOfDate" disabled required onBlur={handleBlur} value={person.birthOfDate} onChange={handleChange} error={!!errors.birthOfDate}
                                     helperText={errors.birthOfDate ? "This field is required." : ""} />
                             </Box>
                             <Box flex={1}>
@@ -1636,6 +1562,8 @@ const SuperAdminDashboard1 = () => {
                                     value={person.age === 0 ? "" : person.age}
                                     placeholder="Enter your Age"
                                     required
+                                    InputProps={{ readOnly: true }}
+
                                     onBlur={handleBlur}
                                     onChange={handleChange}
                                     error={!!errors.age}
@@ -1647,14 +1575,16 @@ const SuperAdminDashboard1 = () => {
                                 <Typography mb={1} fontWeight="medium">
                                     Birth Place
                                 </Typography>
-                                <TextField fullWidth size="small" name="birthPlace" placeholder="Enter your Birth Place" value={person.birthPlace ?? ""} required onBlur={handleBlur} onChange={handleChange} error={!!errors.birthPlace}
+                                <TextField fullWidth size="small" name="birthPlace" InputProps={{ readOnly: true }}
+                                    placeholder="Enter your Birth Place" value={person.birthPlace} required onBlur={handleBlur} onChange={handleChange} error={!!errors.birthPlace}
                                     helperText={errors.birthPlace ? "This field is required." : ""} />
                             </Box>
                             <Box flex={1} >
                                 <Typography mb={1} fontWeight="medium">
                                     Language/Dialect Spoken
                                 </Typography>
-                                <TextField fullWidth size="small" name="languageDialectSpoken" placeholder="Enter your Language Spoken" value={person.languageDialectSpoken ?? ""} required onBlur={handleBlur} onChange={handleChange} error={!!errors.languageDialectSpoken}
+                                <TextField fullWidth size="small" InputProps={{ readOnly: true }}
+                                    name="languageDialectSpoken" placeholder="Enter your Language Spoken" value={person.languageDialectSpoken || ""} required onBlur={handleBlur} onChange={handleChange} error={!!errors.languageDialectSpoken}
                                     helperText={errors.languageDialectSpoken ? "This field is required." : ""}
                                 />
                             </Box>
@@ -1674,7 +1604,8 @@ const SuperAdminDashboard1 = () => {
                                         labelId="citizenship-label"
                                         id="citizenship"
                                         name="citizenship"
-                                        value={person.citizenship ?? ""}
+                                        readOnly
+                                        value={person.citizenship || ""}
                                         onChange={handleChange}
                                         onBlur={handleBlur}
                                         label="Citizenship" // Required for floating label
@@ -1814,8 +1745,9 @@ const SuperAdminDashboard1 = () => {
                                     <Select
                                         labelId="religion-label"
                                         id="religion"
+                                        readOnly
                                         name="religion"
-                                        value={person.religion ?? ""}
+                                        value={person.religion || ""}
                                         onChange={handleChange}
                                         onBlur={handleBlur}
                                         label="Religion" // Enables floating label
@@ -1862,8 +1794,9 @@ const SuperAdminDashboard1 = () => {
                                     <Select
                                         labelId="civil-status-label"
                                         id="civilStatus"
+                                        readOnly
                                         name="civilStatus"
-                                        value={person.civilStatus ?? ""}
+                                        value={person.civilStatus || ""}
                                         onChange={handleChange}
                                         onBlur={handleBlur}
                                         label="Civil Status"
@@ -1892,8 +1825,9 @@ const SuperAdminDashboard1 = () => {
                                     <Select
                                         labelId="tribe-label"
                                         id="tribeEthnicGroup"
+                                        readOnly
                                         name="tribeEthnicGroup"
-                                        value={person.tribeEthnicGroup ?? ""}
+                                        value={person.tribeEthnicGroup || ""}
                                         onChange={handleChange}
                                         onBlur={handleBlur}
                                         label="Tribe/Ethnic Group"
@@ -1973,7 +1907,9 @@ const SuperAdminDashboard1 = () => {
                                     name="cellphoneNumber"
                                     placeholder="Enter your Cellphone Number +63"
                                     required
-                                    value={person.cellphoneNumber ?? ""}
+                                    InputProps={{ readOnly: true }}
+
+                                    value={person.cellphoneNumber}
                                     onBlur={handleBlur}
                                     onChange={handleChange}
                                     error={!!errors.cellphoneNumber}
@@ -1990,8 +1926,10 @@ const SuperAdminDashboard1 = () => {
                                     fullWidth
                                     size="small"
                                     name="emailAddress"
+                                    InputProps={{ readOnly: true }}
+
                                     required
-                                    value={person.emailAddress ?? ""}
+                                    value={person.emailAddress}
                                     placeholder="Enter your Email Address (e.g., username@gmail.com)"
                                     onBlur={handleBlur}
                                     onChange={handleChange}
@@ -2015,8 +1953,10 @@ const SuperAdminDashboard1 = () => {
                                 <TextField
                                     fullWidth
                                     size="small"
+                                    InputProps={{ readOnly: true }}
+
                                     name="presentStreet"
-                                    value={person.presentStreet ?? ""}
+                                    value={person.presentStreet}
                                     onBlur={handleBlur}
                                     placeholder="Enter your Present Street"
                                     onChange={handleChange}
@@ -2030,9 +1970,11 @@ const SuperAdminDashboard1 = () => {
                                 <TextField
                                     fullWidth
                                     size="small"
+                                    InputProps={{ readOnly: true }}
+
                                     name="presentZipCode"
                                     placeholder="Enter your Zip Code"
-                                    value={person.presentZipCode ?? ""}
+                                    value={person.presentZipCode}
                                     onBlur={handleBlur}
                                     onChange={handleChange}
                                     error={!!errors.presentZipCode}
@@ -2049,7 +1991,8 @@ const SuperAdminDashboard1 = () => {
                                 <Select
                                     labelId="present-region-label"
                                     name="presentRegion"
-                                    value={person.presentRegion ?? ""}
+                                    readOnly
+                                    value={person.presentRegion || ""}
                                     onBlur={handleBlur}
                                     onChange={(e) => {
                                         handleChange(e);
@@ -2084,7 +2027,8 @@ const SuperAdminDashboard1 = () => {
                                 <Select
                                     labelId="present-province-label"
                                     name="presentProvince"
-                                    value={person.presentProvince ?? ""}
+                                    readOnly
+                                    value={person.presentProvince || ""}
                                     onBlur={handleBlur}
                                     onChange={(e) => {
                                         handleChange(e);
@@ -2121,7 +2065,8 @@ const SuperAdminDashboard1 = () => {
                                 <Select
                                     labelId="present-municipality-label"
                                     name="presentMunicipality"
-                                    value={person.presentMunicipality ?? ""}
+                                    readOnly
+                                    value={person.presentMunicipality || ""}
                                     onBlur={handleBlur}
                                     onChange={(e) => {
                                         handleChange(e);
@@ -2153,7 +2098,8 @@ const SuperAdminDashboard1 = () => {
                                 <Select
                                     labelId="present-barangay-label"
                                     name="presentBarangay"
-                                    value={person.presentBarangay ?? ""}
+                                    readOnly
+                                    value={person.presentBarangay || ""}
                                     onBlur={handleBlur}
                                     onChange={(e) => {
                                         handleChange(e);
@@ -2186,7 +2132,9 @@ const SuperAdminDashboard1 = () => {
                                 fullWidth
                                 size="small"
                                 name="presentDswdHouseholdNumber"
-                                value={person.presentDswdHouseholdNumber ?? ""}
+                                InputProps={{ readOnly: true }}
+
+                                value={person.presentDswdHouseholdNumber}
                                 onBlur={handleBlur}
                                 onChange={handleChange}
                                 placeholder="Enter your Present DSWD Household Number"
@@ -2202,6 +2150,7 @@ const SuperAdminDashboard1 = () => {
                             control={
                                 <Checkbox
                                     name="same_as_present_address"
+                                    disabled
                                     checked={person.same_as_present_address === 1}
                                     onChange={(e) => {
                                         const checked = e.target.checked;
@@ -2244,8 +2193,10 @@ const SuperAdminDashboard1 = () => {
                                     fullWidth
                                     size="small"
                                     name="permanentStreet"
+                                    InputProps={{ readOnly: true }}
+
                                     placeholder="Enter your Permanent Street"
-                                    value={person.permanentStreet ?? ""}
+                                    value={person.permanentStreet}
                                     onBlur={handleBlur}
                                     onChange={handleChange}
                                     error={!!errors.permanentStreet}
@@ -2259,8 +2210,10 @@ const SuperAdminDashboard1 = () => {
                                     fullWidth
                                     size="small"
                                     name="permanentZipCode"
+                                    InputProps={{ readOnly: true }}
+
                                     placeholder="Enter your Permanent Zip Code"
-                                    value={person.permanentZipCode ?? ""}
+                                    value={person.permanentZipCode}
                                     onBlur={handleBlur}
                                     onChange={handleChange}
                                     error={!!errors.permanentZipCode}
@@ -2278,8 +2231,9 @@ const SuperAdminDashboard1 = () => {
                                     <Select
                                         labelId="permanent-region-label"
                                         id="permanentRegion"
+                                        readOnly
                                         name="permanentRegion"
-                                        value={person.permanentRegion ?? ""}
+                                        value={person.permanentRegion || ""}
                                         label="Select Region"
                                         onBlur={handleBlur}
                                         onChange={(e) => {
@@ -2317,8 +2271,9 @@ const SuperAdminDashboard1 = () => {
                                     <Select
                                         labelId="permanent-province-label"
                                         id="permanentProvince"
+                                        readOnly
                                         name="permanentProvince"
-                                        value={person.permanentProvince ?? ""}
+                                        value={person.permanentProvince || ""}
                                         label="Select Province"
                                         onBlur={handleBlur}
                                         onChange={(e) => {
@@ -2358,8 +2313,9 @@ const SuperAdminDashboard1 = () => {
                                     <Select
                                         labelId="permanent-municipality-label"
                                         id="permanentMunicipality"
+                                        readOnly
                                         name="permanentMunicipality"
-                                        value={person.permanentMunicipality ?? ""}
+                                        value={person.permanentMunicipality || ""}
                                         label="Select Municipality"
                                         onBlur={handleBlur}
                                         onChange={(e) => {
@@ -2394,8 +2350,9 @@ const SuperAdminDashboard1 = () => {
                                     <Select
                                         labelId="permanent-barangay-label"
                                         id="permanentBarangay"
+                                        readOnly
                                         name="permanentBarangay"
-                                        value={person.permanentBarangay ?? ""}
+                                        value={person.permanentBarangay || ""}
                                         label="Select Barangay"
                                         onBlur={handleBlur}
                                         onChange={(e) => {
@@ -2431,7 +2388,9 @@ const SuperAdminDashboard1 = () => {
                                 variant="outlined"
                                 placeholder="Enter your Permanent DSWD Household Number"
                                 name="permanentDswdHouseholdNumber"
-                                value={person.permanentDswdHouseholdNumber ?? ""}
+                                InputProps={{ readOnly: true }}
+
+                                value={person.permanentDswdHouseholdNumber || ""}
                                 onBlur={handleBlur}
                                 onChange={handleChange}
                                 error={!!errors.permanentDswdHouseholdNumber}
@@ -2625,49 +2584,6 @@ const SuperAdminDashboard1 = () => {
                             </Box>
                         </Modal>
 
-
-                        <Modal
-                            open={examPermitModalOpen}
-                            onClose={handleCloseExamPermitModal}
-                            aria-labelledby="exam-permit-error-title"
-                            aria-describedby="exam-permit-error-description"
-                        >
-                            <Box
-                                sx={{
-                                    position: "absolute",
-                                    top: "50%",
-                                    left: "50%",
-                                    transform: "translate(-50%, -50%)",
-                                    width: 400,
-                                    bgcolor: "background.paper",
-                                    border: "2px solid #6D2323",
-                                    boxShadow: 24,
-                                    p: 4,
-                                    borderRadius: 2,
-                                    textAlign: "center",
-                                }}
-                            >
-                                <ErrorIcon sx={{ color: "#6D2323", fontSize: 50, mb: 2 }} />
-                                <Typography id="exam-permit-error-title" variant="h6" component="h2" color="maroon">
-                                    Exam Permit Notice
-                                </Typography>
-                                <Typography id="exam-permit-error-description" sx={{ mt: 2 }}>
-                                    {examPermitError}
-                                </Typography>
-                                <Button
-                                    onClick={handleCloseExamPermitModal}
-                                    variant="contained"
-                                    sx={{ mt: 3, backgroundColor: "#6D2323", "&:hover": { backgroundColor: "#8B0000" } }}
-                                >
-                                    Close
-                                </Button>
-                            </Box>
-                        </Modal>
-
-
-
-
-
                         <Box display="flex" justifyContent="right" mt={4}>
                             {/* Previous Page Button */}
                             <Button
@@ -2689,26 +2605,31 @@ const SuperAdminDashboard1 = () => {
                             </Button>
                             <Button
                                 variant="contained"
-                                onClick={() => {
+                                onClick={(e) => {
                                     handleUpdate();
-                                    navigate("/super_admin_dashboard2");
+
+                                    if (isFormValid()) {
+                                        navigate("/student_dashboard2");
+                                    } else {
+                                        alert("Please complete all required fields before proceeding.");
+                                    }
                                 }}
                                 endIcon={
                                     <ArrowForwardIcon
                                         sx={{
-                                            color: "#fff",
-                                            transition: "color 0.3s",
+                                            color: '#fff',
+                                            transition: 'color 0.3s',
                                         }}
                                     />
                                 }
                                 sx={{
-                                    backgroundColor: "#6D2323",
-                                    color: "#fff",
-                                    "&:hover": {
-                                        backgroundColor: "#E8C999",
-                                        color: "#000",
-                                        "& .MuiSvgIcon-root": {
-                                            color: "#000",
+                                    backgroundColor: '#6D2323',
+                                    color: '#fff',
+                                    '&:hover': {
+                                        backgroundColor: '#E8C999',
+                                        color: '#000',
+                                        '& .MuiSvgIcon-root': {
+                                            color: '#000',
                                         },
                                     },
                                 }}
@@ -2717,6 +2638,7 @@ const SuperAdminDashboard1 = () => {
                             </Button>
                         </Box>
 
+
                     </Container>
                 </form>
             </Container >
@@ -2724,4 +2646,4 @@ const SuperAdminDashboard1 = () => {
     );
 };
 
-export default SuperAdminDashboard1;
+export default StudentDashboard1;
