@@ -21,28 +21,7 @@ import DescriptionIcon from "@mui/icons-material/Description";
 import FactCheckIcon from '@mui/icons-material/FactCheck';
 
 const StudentDashboard2 = () => {
-    const fetchByEnrollmentPersonId = async (personID) => {
-        try {
-            const res = await axios.get(`http://localhost:5000/api/enrollment_person/${personID}`);
-            setPerson(res.data);
-            setSelectedPerson(res.data);
-        } catch (err) {
-            console.error("❌ enrollment_person fetch failed:", err);
-        }
-    };
 
-    const handleNavigateStep = (index, to) => {
-        setCurrentStep(index);
-
-        // get student_number from session storage instead of person_id
-        const sn = sessionStorage.getItem("student_number");
-
-        if (sn) {
-            navigate(`${to}?student_number=${sn}`);
-        } else {
-            navigate(to);
-        }
-    };
 
 
     const navigate = useNavigate();
@@ -64,18 +43,17 @@ const StudentDashboard2 = () => {
     const queryParams = new URLSearchParams(location.search);
     const queryPersonId = queryParams.get("person_id");
 
-    // Always pull student_number from sessionStorage
     const queryStudentNumber = sessionStorage.getItem("student_number");
 
-    // If we have a student_number in session, fetch person_id + person data
     useEffect(() => {
         if (!queryStudentNumber) return;
         const fetchPersonId = async () => {
             try {
                 const res = await axios.get(`http://localhost:5000/api/person_id/${queryStudentNumber}`);
-                setUserID(res.data.person_id);          // person_id used for DB queries
-                setStudentNumber(queryStudentNumber);   // keep student_number internally
-                fetchByEnrollmentPersonId(res.data.person_id);   // ✅ actually load the person’s data
+                setUserID(res.data.person_id);
+                setStudentNumber(queryStudentNumber);
+                setPerson(res.data);
+                setSelectedPerson(res.data);
             } catch (err) {
                 console.error("❌ Failed to fetch person_id:", err);
             }
@@ -83,11 +61,12 @@ const StudentDashboard2 = () => {
         fetchPersonId();
     }, [queryStudentNumber]);
 
+
     useEffect(() => {
         const storedUser = localStorage.getItem("email");
         const storedRole = localStorage.getItem("role");
         const loggedInPersonId = localStorage.getItem("person_id");
-        const searchedPersonId = sessionStorage.getItem("admin_edit_person_id");
+        const searchedPersonId = sessionStorage.getItem("student_edit_person_id");
 
         if (!storedUser || !storedRole || !loggedInPersonId) {
             window.location.href = "/login";
@@ -100,7 +79,7 @@ const StudentDashboard2 = () => {
         // Roles that can access
         const allowedRoles = ["student"];
         if (allowedRoles.includes(storedRole)) {
-            // ✅ Prefer URL param if admin is editing, otherwise logged-in student
+            // ✅ Prefer URL param if student is editing, otherwise logged-in student
             const targetId = queryPersonId || searchedPersonId || loggedInPersonId;
 
             // Make sure student_number is in sessionStorage for later steps
@@ -127,9 +106,9 @@ const StudentDashboard2 = () => {
             }
 
             // fallback only if it's a fresh selection from Applicant List
-            const source = sessionStorage.getItem("admin_edit_person_id_source");
-            const tsStr = sessionStorage.getItem("admin_edit_person_id_ts");
-            const id = sessionStorage.getItem("admin_edit_person_id");
+            const source = sessionStorage.getItem("student_edit_person_id_source");
+            const tsStr = sessionStorage.getItem("student_edit_person_id_ts");
+            const id = sessionStorage.getItem("student_edit_person_id");
             const ts = tsStr ? parseInt(tsStr, 10) : 0;
             const isFresh = source === "applicant_list" && Date.now() - ts < 5 * 60 * 1000;
 
@@ -142,13 +121,32 @@ const StudentDashboard2 = () => {
 
         tryLoad().finally(() => {
             if (consumedFlag) {
-                sessionStorage.removeItem("admin_edit_person_id_source");
-                sessionStorage.removeItem("admin_edit_person_id_ts");
+                sessionStorage.removeItem("student_edit_person_id_source");
+                sessionStorage.removeItem("student_edit_person_id_ts");
             }
         });
     }, [queryPersonId]);
 
+    // Fetch person by ID (when navigating with ?person_id=... or sessionStorage)
+    useEffect(() => {
+        const fetchPersonById = async () => {
+            if (!userID) return;
 
+            try {
+                const res = await axios.get(`http://localhost:5000/api/person_with_applicant/${userID}`);
+                if (res.data) {
+                    setPerson(res.data);
+                    setSelectedPerson(res.data);
+                } else {
+                    console.warn("⚠️ No person found for ID:", userID);
+                }
+            } catch (err) {
+                console.error("❌ Failed to fetch person by ID:", err);
+            }
+        };
+
+        fetchPersonById();
+    }, [userID]);
 
     const steps = [
         { label: "Personal Information", icon: <PersonIcon />, path: `/student_dashboard1` },
@@ -158,7 +156,17 @@ const StudentDashboard2 = () => {
         { label: "Other Information", icon: <InfoIcon />, path: `/student_dashboard5` },
     ];
 
+
     const [activeStep, setActiveStep] = useState(1);
+    const [clickedSteps, setClickedSteps] = useState(Array(steps.length).fill(false));
+    const [currentStep, setCurrentStep] = useState(0);
+
+    const handleStepClick = (index, to) => {
+        setActiveStep(index);
+        navigate(to);
+    };
+
+
 
 
 
@@ -291,20 +299,14 @@ const StudentDashboard2 = () => {
 
 
     const [soloParentChoice, setSoloParentChoice] = useState("");
-    const [clickedSteps, setClickedSteps] = useState(Array(steps.length).fill(false));
-    const [currentStep, setCurrentStep] = useState(0);
 
-    const handleStepClick = (index, to) => {
-        setActiveStep(index);
-        navigate(to);
-    };
 
 
     const links = [
-        { to: `/admin_ecat_application_form?person_id=${userID}`, label: "ECAT Application Form" },
+        { to: `/student_ecat_application_form?person_id=${userID}`, label: "ECAT Application Form" },
         { to: `/admission_form_process?person_id=${userID}`, label: "Admission Form Process" },
-        { to: `/admin_personal_data_form?person_id=${userID}`, label: "Personal Data Form" },
-        { to: `/admin_office_of_the_registrar?person_id=${userID}`, label: "Application For EARIST College Admission" },
+        { to: `/student_personal_data_form?person_id=${userID}`, label: "Personal Data Form" },
+        { to: `/student_office_of_the_registrar?person_id=${userID}`, label: "Application For EARIST College Admission" },
         { to: `/admission_services?person_id=${userID}`, label: "Application/Student Satisfactory Survey" },
     ];
 
@@ -312,37 +314,37 @@ const StudentDashboard2 = () => {
     // dot not alter
     return (
         <Box sx={{ height: "calc(100vh - 140px)", overflowY: "auto", paddingRight: 1, backgroundColor: "transparent" }}>
- <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          flexWrap: 'wrap',
-          mt: 2,
-          mb: 2,
-          px: 2,
-        }}
-      >
-        <Typography
-          variant="h4"
-          sx={{
-            fontWeight: 'bold',
-            color: 'maroon',
-            fontSize: '36px',
-          }}
-        >
-        STUDENT PROFILE
-        </Typography>
-
-      
+            <Box
+                sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    flexWrap: 'wrap',
+                    mt: 2,
+                    mb: 2,
+                    px: 2,
+                }}
+            >
+                <Typography
+                    variant="h4"
+                    sx={{
+                        fontWeight: 'bold',
+                        color: 'maroon',
+                        fontSize: '36px',
+                    }}
+                >
+                    STUDENT PROFILE
+                </Typography>
 
 
-      </Box>
-      <hr style={{ border: "1px solid #ccc", width: "100%" }} />
 
-      <br />
 
-      
+            </Box>
+            <hr style={{ border: "1px solid #ccc", width: "100%" }} />
+
+            <br />
+
+
 
             <Box sx={{ display: "flex", width: "100%" }}>
                 {/* Left side: Notice */}
@@ -460,67 +462,60 @@ const StudentDashboard2 = () => {
                 </Container>
                 <br />
 
-                {person.person_id && (
-                    <Box sx={{ display: "flex", justifyContent: "center", width: "100%", px: 4 }}>
-                        {steps.map((step, index) => (
-                            <React.Fragment key={index}>
-                                {/* Wrap the step with Link for routing */}
-                                <Link to={step.path} style={{ textDecoration: "none" }}>
+                <Box sx={{ display: "flex", justifyContent: "center", width: "100%", px: 4 }}>
+                    {steps.map((step, index) => (
+                        <React.Fragment key={index}>
+                            <Link to={step.path} style={{ textDecoration: "none" }}>
+                                <Box
+                                    sx={{
+                                        display: "flex",
+                                        flexDirection: "column",
+                                        alignItems: "center",
+                                        cursor: "pointer",
+                                    }}
+                                 onClick={() => handleStepClick(index, step.path)}
+
+                                >
                                     <Box
                                         sx={{
+                                            width: 50,
+                                            height: 50,
+                                            borderRadius: "50%",
+                                            backgroundColor: activeStep === index ? "#6D2323" : "#E8C999",
+                                            color: activeStep === index ? "#fff" : "#000",
                                             display: "flex",
-                                            flexDirection: "column",
                                             alignItems: "center",
-                                            cursor: "pointer",
+                                            justifyContent: "center",
                                         }}
-                                        onClick={() => handleStepClick(index)}
                                     >
-                                        {/* Step Icon */}
-                                        <Box
-                                            sx={{
-                                                width: 50,
-                                                height: 50,
-                                                borderRadius: "50%",
-                                                backgroundColor: activeStep === index ? "#6D2323" : "#E8C999",
-                                                color: activeStep === index ? "#fff" : "#000",
-                                                display: "flex",
-                                                alignItems: "center",
-                                                justifyContent: "center",
-                                            }}
-                                        >
-                                            {step.icon}
-                                        </Box>
-
-                                        {/* Step Label */}
-                                        <Typography
-                                            sx={{
-                                                mt: 1,
-                                                color: activeStep === index ? "#6D2323" : "#000",
-                                                fontWeight: activeStep === index ? "bold" : "normal",
-                                                fontSize: 14,
-                                            }}
-                                        >
-                                            {step.label}
-                                        </Typography>
+                                        {step.icon}
                                     </Box>
-                                </Link>
-
-                                {/* Connector Line */}
-                                {index < steps.length - 1 && (
-                                    <Box
+                                    <Typography
                                         sx={{
-                                            height: "2px",
-                                            backgroundColor: "#6D2323",
-                                            flex: 1,
-                                            alignSelf: "center",
-                                            mx: 2,
+                                            mt: 1,
+                                            color: activeStep === index ? "#6D2323" : "#000",
+                                            fontWeight: activeStep === index ? "bold" : "normal",
+                                            fontSize: 14,
                                         }}
-                                    />
-                                )}
-                            </React.Fragment>
-                        ))}
-                    </Box>
-                )}
+                                    >
+                                        {step.label}
+                                    </Typography>
+                                </Box>
+                            </Link>
+                            {index < steps.length - 1 && (
+                                <Box
+                                    sx={{
+                                        height: "2px",
+                                        backgroundColor: "#6D2323",
+                                        flex: 1,
+                                        alignSelf: "center",
+                                        mx: 2,
+                                    }}
+                                />
+                            )}
+                        </React.Fragment>
+                    ))}
+                </Box>
 
                 <br />
 

@@ -2238,7 +2238,6 @@ app.post("/api/person/import", upload.single("file"), async (req, res) => {
         remarks: row[144] || "",
         termsOfAgreement: row[145] || "",
         created_at: row[146] || new Date(),
-        id: row[147] || null,
       };
 
       await db3.query(`INSERT INTO person_table SET ?`, [newPerson]);
@@ -10694,12 +10693,13 @@ app.get("/api/person_id/:student_number", async (req, res) => {
       return res.status(404).json({ message: "Person not found" });
     }
 
-    res.json(rows[0]); // return full person data + student_number
+    res.json(rows[0]); // ✅ full person data + student_number
   } catch (err) {
     console.error("Error fetching person by student_number:", err);
     res.status(500).json({ message: "Server error" });
   }
 });
+
 
 
 // ✅ NEW: Get persons (Enrollment DB) with student_number
@@ -10776,8 +10776,6 @@ app.put("/api/enrollment_person/:id", async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
-
-
 
 http.listen(5000, () => {
   console.log("Server with Socket.IO running on port 5000");

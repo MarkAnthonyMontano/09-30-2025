@@ -461,7 +461,7 @@ const CourseTagging = () => {
                 gap: "8px",
                 justifyContent: "center",
                 userSelect: "none",
-                width: "230px", // ✅ same width as Print
+                width: "200px", // ✅ same width as Print
               }}
               type="button"
             >
@@ -474,7 +474,7 @@ const CourseTagging = () => {
             <Button
               variant="contained"
               fullWidth
-               sx={{ backgroundColor: "maroon", color: "white", height: "50px" }}
+               sx={{ backgroundColor: "maroon", color: "white", height: "50px", width: "200px", }}
               onClick={handleImport}
             >
               Upload

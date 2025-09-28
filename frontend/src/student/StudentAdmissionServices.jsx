@@ -8,13 +8,12 @@ import SentimentVeryDissatisfiedIcon from '@mui/icons-material/SentimentVeryDiss
 import SentimentSatisfiedIcon from '@mui/icons-material/SentimentSatisfied';
 import { FcPrint } from "react-icons/fc";
 
-const AdmissionServices = () => {
+const StudentAdmissionServices = () => {
 
     const [userID, setUserID] = useState("");
     const [user, setUser] = useState("");
     const [userRole, setUserRole] = useState("");
 
-    // do not alter
     useEffect(() => {
         const storedUser = localStorage.getItem("email");
         const storedRole = localStorage.getItem("role");
@@ -25,8 +24,8 @@ const AdmissionServices = () => {
             setUserRole(storedRole);
             setUserID(storedID);
 
-            if (storedRole === "applicant" || storedRole === "registrar") {
-                // ✅ allowed roles
+            if (storedRole === "student") {
+
             } else {
                 window.location.href = "/login";
             }
@@ -34,6 +33,7 @@ const AdmissionServices = () => {
             window.location.href = "/login";
         }
     }, []);
+
 
 
 
@@ -109,23 +109,23 @@ const AdmissionServices = () => {
         }
     };
 
- // 🔒 Disable right-click
-  document.addEventListener('contextmenu', (e) => e.preventDefault());
+    // 🔒 Disable right-click
+    document.addEventListener('contextmenu', (e) => e.preventDefault());
 
-  // 🔒 Block DevTools shortcuts + Ctrl+P silently
-  document.addEventListener('keydown', (e) => {
-    const isBlockedKey =
-      e.key === 'F12' || // DevTools
-      e.key === 'F11' || // Fullscreen
-      (e.ctrlKey && e.shiftKey && (e.key.toLowerCase() === 'i' || e.key.toLowerCase() === 'j')) || // Ctrl+Shift+I/J
-      (e.ctrlKey && e.key.toLowerCase() === 'u') || // Ctrl+U (View Source)
-      (e.ctrlKey && e.key.toLowerCase() === 'p');   // Ctrl+P (Print)
+    // 🔒 Block DevTools shortcuts + Ctrl+P silently
+    document.addEventListener('keydown', (e) => {
+        const isBlockedKey =
+            e.key === 'F12' || // DevTools
+            e.key === 'F11' || // Fullscreen
+            (e.ctrlKey && e.shiftKey && (e.key.toLowerCase() === 'i' || e.key.toLowerCase() === 'j')) || // Ctrl+Shift+I/J
+            (e.ctrlKey && e.key.toLowerCase() === 'u') || // Ctrl+U (View Source)
+            (e.ctrlKey && e.key.toLowerCase() === 'p');   // Ctrl+P (Print)
 
-    if (isBlockedKey) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
-  });
+        if (isBlockedKey) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+    });
 
 
 
@@ -255,7 +255,7 @@ const AdmissionServices = () => {
                                                 letterSpacing: '1px',
                                                 fontWeight: "normal"
                                             }}>
-                                                Nagtahan, Sampaloc, Manila 1008<br/>
+                                                Nagtahan, Sampaloc, Manila 1008<br />
                                                 Blk. 3 Lot 2, 5 Congressional Rd, General Mariano Alvarez
                                             </div>
 
@@ -1507,4 +1507,4 @@ const AdmissionServices = () => {
     );
 };
 
-export default AdmissionServices;
+export default StudentAdmissionServices;

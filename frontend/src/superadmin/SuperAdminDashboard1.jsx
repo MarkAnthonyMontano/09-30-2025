@@ -775,7 +775,7 @@ const SuperAdminDashboard1 = () => {
                         <Button
                             onClick={handleImportExcel}
                             variant="contained"
-                            sx={{ backgroundColor: "maroon", color: "white", height: "50px" }}
+                            sx={{ backgroundColor: "maroon", color: "white", height: "50px", width: "200px", }}
                         >
                             Import
                         </Button>

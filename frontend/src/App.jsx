@@ -117,6 +117,11 @@ import StudentDashboard4 from './student/StudentDashboard4';
 import StudentDashboard5 from './student/StudentDashboard5';
 import StudentResetPassword from './student/StudentResetPassword';
 import CertificateOfRegistration from './student/CertificateOfRegistration';
+import StudentECATApplicationForm from './student/StudentECATApplicationForm';
+import StudentOfficeOfTheRegistrar from './student/StudentOfficeOfTheRegistrar';
+import StudentPersonalDataForm from './student/StudentPersonalDataForm';
+import StudentAdmissionServices from './student/StudentAdmissionServices';
+import StudentAdmissionFormProcess from './student/StudentAdmissionFormProcess';
 
 
 // SUPERADMIN FOLDER
@@ -274,11 +279,11 @@ function App() {
               <Route path="/admin_dashboard5" element={<ProtectedRoute><AdminDashboard5 /></ProtectedRoute>} />
 
 
-              <Route path="/student_dashboard1" element={<ProtectedRoute><StudentDashboard1 allowedRoles={'student'}/></ProtectedRoute>} />
-              <Route path="/student_dashboard2" element={<ProtectedRoute><StudentDashboard2 allowedRoles={'student'}/></ProtectedRoute>} />
-              <Route path="/student_dashboard3" element={<ProtectedRoute><StudentDashboard3 allowedRoles={'student'}/></ProtectedRoute>} />
-              <Route path="/student_dashboard4" element={<ProtectedRoute><StudentDashboard4 allowedRoles={'student'}/></ProtectedRoute>} />
-              <Route path="/student_dashboard5" element={<ProtectedRoute><StudentDashboard5 allowedRoles={'student'}/></ProtectedRoute>} />
+              <Route path="/student_dashboard1" element={<ProtectedRoute><StudentDashboard1 allowedRoles={'student'} /></ProtectedRoute>} />
+              <Route path="/student_dashboard2" element={<ProtectedRoute><StudentDashboard2 allowedRoles={'student'} /></ProtectedRoute>} />
+              <Route path="/student_dashboard3" element={<ProtectedRoute><StudentDashboard3 allowedRoles={'student'} /></ProtectedRoute>} />
+              <Route path="/student_dashboard4" element={<ProtectedRoute><StudentDashboard4 allowedRoles={'student'} /></ProtectedRoute>} />
+              <Route path="/student_dashboard5" element={<ProtectedRoute><StudentDashboard5 allowedRoles={'student'} /></ProtectedRoute>} />
 
               <Route path="/super_admin_dashboard1" element={<ProtectedRoute><SuperAdminDashboard1 /></ProtectedRoute>} />
               <Route path="/super_admin_dashboard2" element={<ProtectedRoute><SuperAdminDashboard2 /></ProtectedRoute>} />
@@ -356,10 +361,6 @@ function App() {
               />
 
               <Route path="/student_requirements" element={<ProtectedRoute ><StudentRequirements /></ProtectedRoute>} />
-
-              <Route path="/student_requirements" element={<ProtectedRoute ><StudentRequirements /></ProtectedRoute>} />
-              <Route path="/student_requirements" element={<ProtectedRoute ><StudentRequirements /></ProtectedRoute>} />
-
               <Route path="/admin_ecat_application_form" element={<ProtectedRoute allowedRoles={['registrar', 'applicant']}><AdminECATApplicationForm /></ProtectedRoute>} />
               <Route path="/admin_personal_data_form" element={<ProtectedRoute allowedRoles={['registrar']} ><AdminPersonalDataForm /></ProtectedRoute>} />
               <Route path="/admin_office_of_the_registrar" element={<ProtectedRoute allowedRoles={['registrar']}><AdminOfficeOfTheRegistrar /></ProtectedRoute>} />
@@ -416,6 +417,13 @@ function App() {
               <Route path="/email_template_manager" element={<ProtectedRoute><EmailTemplateManager /></ProtectedRoute>} />
               <Route path="/announcement" element={<ProtectedRoute><Announcement /></ProtectedRoute>} />
               <Route path="/exam_permit" element={<ExamPermit />} />
+
+              <Route path="/student_ecat_application_form" element={<ProtectedRoute allowedRoles={['student',]}><StudentECATApplicationForm /></ProtectedRoute>} />
+              <Route path="/student_personal_data_form" element={<ProtectedRoute allowedRoles={['student']} ><StudentPersonalDataForm /></ProtectedRoute>} />
+              <Route path="/student_office_of_the_registrar" element={<ProtectedRoute allowedRoles={['student']}><StudentOfficeOfTheRegistrar /></ProtectedRoute>} />
+              <Route path="/student_admission_services" element={<ProtectedRoute allowedRoles={['student']} ><StudentAdmissionFormProcess /></ProtectedRoute>} />
+              <Route path="/student_form_process" element={<ProtectedRoute allowedRoles={['student']}><StudentAdmissionServices /></ProtectedRoute>} />
+
 
 
             </Routes>

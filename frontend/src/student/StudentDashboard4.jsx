@@ -24,15 +24,6 @@ import FactCheckIcon from '@mui/icons-material/FactCheck';
 const StudentDashboard4 = () => {
     const navigate = useNavigate();
 
-const fetchByEnrollmentPersonId = async (personID) => {
-  try {
-    const res = await axios.get(`http://localhost:5000/api/enrollment_person/${personID}`);
-    setPerson(res.data);
-    setSelectedPerson(res.data);
-  } catch (err) {
-    console.error("❌ enrollment_person failed:", err);
-  }
-};
 
 
     const [explicitSelection, setExplicitSelection] = useState(false);
@@ -56,24 +47,24 @@ const fetchByEnrollmentPersonId = async (personID) => {
     const queryParams = new URLSearchParams(location.search);
     const queryPersonId = queryParams.get("person_id");
 
-    // Always pull student_number from sessionStorage
     const queryStudentNumber = sessionStorage.getItem("student_number");
 
-    // If we have a student_number in session, fetch person_id + person data
     useEffect(() => {
         if (!queryStudentNumber) return;
         const fetchPersonId = async () => {
             try {
                 const res = await axios.get(`http://localhost:5000/api/person_id/${queryStudentNumber}`);
-                setUserID(res.data.person_id);          // person_id used for DB queries
-                setStudentNumber(queryStudentNumber);   // keep student_number internally
-            fetchByEnrollmentPersonId(res.data.person_id);   // ✅ actually load the person’s data
+                setUserID(res.data.person_id);
+                setStudentNumber(queryStudentNumber);
+                setPerson(res.data);
+                setSelectedPerson(res.data);
             } catch (err) {
                 console.error("❌ Failed to fetch person_id:", err);
             }
         };
         fetchPersonId();
     }, [queryStudentNumber]);
+
 
     useEffect(() => {
         const storedUser = localStorage.getItem("email");
@@ -141,31 +132,41 @@ const fetchByEnrollmentPersonId = async (personID) => {
     }, [queryPersonId]);
 
     // Do not alter
-const handleUpdate = async (updatedData) => {
-  if (!person || !person.person_id) return;
+    const handleUpdate = async (updatedData) => {
+        if (!person || !person.person_id) return;
 
-  try {
-    await axios.put(
-      `http://localhost:5000/api/enrollment_person/${person.person_id}`, // ✅ enrollment DB
-      updatedData
-    );
-    console.log("✅ Auto-saved successfully");
-  } catch (error) {
-    console.error("❌ Auto-save failed:", error);
-  }
-};
-
-    // Real-time save on every character typed
-    const handleChange = (e) => {
-        const { name, type, checked, value } = e.target;
-        const updatedPerson = {
-            ...person,
-            [name]: type === "checkbox" ? (checked ? 1 : 0) : value,
-        };
-        setPerson(updatedPerson);
-        handleUpdate(updatedPerson); // No delay, real-time save
+        try {
+            await axios.put(
+                `http://localhost:5000/api/enrollment_person/${person.person_id}`, // ✅ enrollment DB
+                updatedData
+            );
+            console.log("✅ Auto-saved successfully");
+        } catch (error) {
+            console.error("❌ Auto-save failed:", error);
+        }
     };
 
+
+    // Fetch person by ID (when navigating with ?person_id=... or sessionStorage)
+    useEffect(() => {
+        const fetchPersonById = async () => {
+            if (!userID) return;
+
+            try {
+                const res = await axios.get(`http://localhost:5000/api/person_with_applicant/${userID}`);
+                if (res.data) {
+                    setPerson(res.data);
+                    setSelectedPerson(res.data);
+                } else {
+                    console.warn("⚠️ No person found for ID:", userID);
+                }
+            } catch (err) {
+                console.error("❌ Failed to fetch person by ID:", err);
+            }
+        };
+
+        fetchPersonById();
+    }, [userID]);
 
 
     const handleBlur = async () => {
@@ -244,37 +245,37 @@ const handleUpdate = async (updatedData) => {
     return (
         <Box sx={{ height: "calc(100vh - 140px)", overflowY: "auto", paddingRight: 1, backgroundColor: "transparent" }}>
 
-         <Box
+            <Box
                 sx={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  flexWrap: 'wrap',
-                  mt: 2,
-                  mb: 2,
-                  px: 2,
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    flexWrap: 'wrap',
+                    mt: 2,
+                    mb: 2,
+                    px: 2,
                 }}
-              >
+            >
                 <Typography
-                  variant="h4"
-                  sx={{
-                    fontWeight: 'bold',
-                    color: 'maroon',
-                    fontSize: '36px',
-                  }}
+                    variant="h4"
+                    sx={{
+                        fontWeight: 'bold',
+                        color: 'maroon',
+                        fontSize: '36px',
+                    }}
                 >
-                STUDENT PROFILE
+                    STUDENT PROFILE
                 </Typography>
-        
-              
-        
-        
-              </Box>
-              <hr style={{ border: "1px solid #ccc", width: "100%" }} />
-        
-              <br />
-        
-              
+
+
+
+
+            </Box>
+            <hr style={{ border: "1px solid #ccc", width: "100%" }} />
+
+            <br />
+
+
 
 
             <Box sx={{ display: "flex", width: "100%" }}>
@@ -390,68 +391,61 @@ const handleUpdate = async (updatedData) => {
                     <div style={{ textAlign: "center" }}>Complete the applicant form to secure your place for the upcoming academic year at EARIST.</div>
                 </Container>
                 <br />
+                <Box sx={{ display: "flex", justifyContent: "center", width: "100%", px: 4 }}>
+                    {steps.map((step, index) => (
+                        <React.Fragment key={index}>
+                            <Link to={step.path} style={{ textDecoration: "none" }}>
+                                <Box
+                                    sx={{
+                                        display: "flex",
+                                        flexDirection: "column",
+                                        alignItems: "center",
+                                        cursor: "pointer",
+                                    }}
+                              onClick={() => handleStepClick(index, step.path)}
 
-                {person.person_id && (
-                    <Box sx={{ display: "flex", justifyContent: "center", width: "100%", px: 4 }}>
-                        {steps.map((step, index) => (
-                            <React.Fragment key={index}>
-                                {/* Wrap the step with Link for routing */}
-                                <Link to={step.path} style={{ textDecoration: "none" }}>
+                                >
                                     <Box
                                         sx={{
+                                            width: 50,
+                                            height: 50,
+                                            borderRadius: "50%",
+                                            backgroundColor: activeStep === index ? "#6D2323" : "#E8C999",
+                                            color: activeStep === index ? "#fff" : "#000",
                                             display: "flex",
-                                            flexDirection: "column",
                                             alignItems: "center",
-                                            cursor: "pointer",
+                                            justifyContent: "center",
                                         }}
-                                        onClick={() => handleStepClick(index)}
                                     >
-                                        {/* Step Icon */}
-                                        <Box
-                                            sx={{
-                                                width: 50,
-                                                height: 50,
-                                                borderRadius: "50%",
-                                                backgroundColor: activeStep === index ? "#6D2323" : "#E8C999",
-                                                color: activeStep === index ? "#fff" : "#000",
-                                                display: "flex",
-                                                alignItems: "center",
-                                                justifyContent: "center",
-                                            }}
-                                        >
-                                            {step.icon}
-                                        </Box>
-
-                                        {/* Step Label */}
-                                        <Typography
-                                            sx={{
-                                                mt: 1,
-                                                color: activeStep === index ? "#6D2323" : "#000",
-                                                fontWeight: activeStep === index ? "bold" : "normal",
-                                                fontSize: 14,
-                                            }}
-                                        >
-                                            {step.label}
-                                        </Typography>
+                                        {step.icon}
                                     </Box>
-                                </Link>
-
-                                {/* Connector Line */}
-                                {index < steps.length - 1 && (
-                                    <Box
+                                    <Typography
                                         sx={{
-                                            height: "2px",
-                                            backgroundColor: "#6D2323",
-                                            flex: 1,
-                                            alignSelf: "center",
-                                            mx: 2,
+                                            mt: 1,
+                                            color: activeStep === index ? "#6D2323" : "#000",
+                                            fontWeight: activeStep === index ? "bold" : "normal",
+                                            fontSize: 14,
                                         }}
-                                    />
-                                )}
-                            </React.Fragment>
-                        ))}
-                    </Box>
-                )}
+                                    >
+                                        {step.label}
+                                    </Typography>
+                                </Box>
+                            </Link>
+                            {index < steps.length - 1 && (
+                                <Box
+                                    sx={{
+                                        height: "2px",
+                                        backgroundColor: "#6D2323",
+                                        flex: 1,
+                                        alignSelf: "center",
+                                        mx: 2,
+                                    }}
+                                />
+                            )}
+                        </React.Fragment>
+                    ))}
+                </Box>
+
                 <br />
 
                 <form>
@@ -683,7 +677,7 @@ const handleUpdate = async (updatedData) => {
                             <TextField
                                 fullWidth
                                 name="hospitalizationDetails"
-                              readOnly
+                                readOnly
 
                                 placeholder=""
                                 variant="outlined"
@@ -716,7 +710,7 @@ const handleUpdate = async (updatedData) => {
                                 multiline
                                 minRows={3}
                                 name="medications"
-                               readOnly
+                                readOnly
 
                                 variant="outlined"
                                 size="small"
@@ -943,7 +937,7 @@ const handleUpdate = async (updatedData) => {
                                             type="text"
                                             name="chestXray"
                                             value={person.chestXray || ""}
-                                         readOnly
+                                            readOnly
                                             onChange={(e) => {
                                                 const { name, value } = e.target;
                                                 const updatedPerson = { ...person, [name]: value };
@@ -964,7 +958,7 @@ const handleUpdate = async (updatedData) => {
                                             type="text"
                                             name="cbc"
                                             value={person.cbc || ""}
-                                       readOnly
+                                            readOnly
                                             onChange={(e) => {
                                                 const { name, value } = e.target;
                                                 const updatedPerson = { ...person, [name]: value };
@@ -985,7 +979,7 @@ const handleUpdate = async (updatedData) => {
                                             type="text"
                                             name="urinalysis"
                                             value={person.urinalysis || ""}
-                                       readOnly
+                                            readOnly
                                             onChange={(e) => {
                                                 const { name, value } = e.target;
                                                 const updatedPerson = { ...person, [name]: value };
@@ -1006,7 +1000,7 @@ const handleUpdate = async (updatedData) => {
                                             type="text"
                                             name="otherworkups"
                                             value={person.otherworkups || ""}
-                                      readOnly
+                                            readOnly
                                             onChange={(e) => {
                                                 const { name, value } = e.target;
                                                 const updatedPerson = { ...person, [name]: value };
