@@ -1231,41 +1231,41 @@ const ApplicantList = () => {
                 <Table size="small">
                     <TableHead sx={{ backgroundColor: "#6D2323" }}>
                         <TableRow>
-                            <TableCell sx={{ color: "white", textAlign: "center", width: "2%", py: 0.5, fontSize: "12px", border: "1px solid maroon", borderLeft: "2px solid maroon" }}>
+                            <TableCell sx={{ color: "white", textAlign: "center", width: "2%", py: 0.5, fontSize: "12px", border: "2px solid maroon"}}>
                                 #
                             </TableCell>
 
-                            <TableCell sx={{ color: "white", textAlign: "center", width: "8%", py: 0.5, fontSize: "12px", border: "1px solid maroon" }}>
+                            <TableCell sx={{ color: "white", textAlign: "center", width: "8%", py: 0.5, fontSize: "12px", border: "2px solid maroon" }}>
                                 Applicant ID
                             </TableCell>
-                            <TableCell sx={{ color: "white", textAlign: "center", width: "25%", py: 0.5, fontSize: "12px", border: "1px solid maroon" }}>
+                            <TableCell sx={{ color: "white", textAlign: "center", width: "25%", py: 0.5, fontSize: "12px", border: "2px solid maroon" }}>
                                 Name
                             </TableCell>
-                            <TableCell sx={{ color: "white", textAlign: "center", width: "10%", py: 0.5, fontSize: "12px", border: "1px solid maroon" }}>
+                            <TableCell sx={{ color: "white", textAlign: "center", width: "10%", py: 0.5, fontSize: "12px", border: "2px solid maroon" }}>
                                 Program
                             </TableCell>
 
                             {/* Exam Columns */}
-                            <TableCell sx={{ color: "white", textAlign: "center", width: "6%", py: 0.5, fontSize: "12px", border: "1px solid maroon" }}>
+                            <TableCell sx={{ color: "white", textAlign: "center", width: "6%", py: 0.5, fontSize: "12px", border: "2px solid maroon" }}>
                                 English
                             </TableCell>
-                            <TableCell sx={{ color: "white", textAlign: "center", width: "6%", py: 0.5, fontSize: "12px", border: "1px solid maroon" }}>
+                            <TableCell sx={{ color: "white", textAlign: "center", width: "6%", py: 0.5, fontSize: "12px", border: "2px solid maroon" }}>
                                 Science
                             </TableCell>
-                            <TableCell sx={{ color: "white", textAlign: "center", width: "6%", py: 0.5, fontSize: "12px", border: "1px solid maroon" }}>
+                            <TableCell sx={{ color: "white", textAlign: "center", width: "6%", py: 0.5, fontSize: "12px", border: "2px solid maroon" }}>
                                 Filipino
                             </TableCell>
-                            <TableCell sx={{ color: "white", textAlign: "center", width: "6%", py: 0.5, fontSize: "12px", border: "1px solid maroon" }}>
+                            <TableCell sx={{ color: "white", textAlign: "center", width: "6%", py: 0.5, fontSize: "12px", border: "2px solid maroon" }}>
                                 Math
                             </TableCell>
-                            <TableCell sx={{ color: "white", textAlign: "center", width: "6%", py: 0.5, fontSize: "12px", border: "1px solid maroon" }}>
+                            <TableCell sx={{ color: "white", textAlign: "center", width: "6%", py: 0.5, fontSize: "12px", border: "2px solid maroon" }}>
                                 Abstract
                             </TableCell>
-                            <TableCell sx={{ color: "white", textAlign: "center", width: "6%", py: 0.5, fontSize: "12px", border: "1px solid maroon" }}>
+                            <TableCell sx={{ color: "white", textAlign: "center", width: "6%", py: 0.5, fontSize: "12px", border: "2px solid maroon" }}>
                                 Final Rating
                             </TableCell>
 
-                            <TableCell sx={{ color: "white", textAlign: "center", width: "12%", py: 0.5, fontSize: "12px", border: "1px solid maroon", borderRight: "2px solid maroon" }}>
+                            <TableCell sx={{ color: "white", textAlign: "center", width: "12%", py: 0.5, fontSize: "12px", border: "2px solid maroon" }}>
                                 User
                             </TableCell>
                         </TableRow>
@@ -1295,7 +1295,7 @@ const ApplicantList = () => {
                                         sx={{
                                             color: "black",
                                             textAlign: "center",
-                                            border: "1px solid maroon",
+                                            border: "2px solid maroon",
                                             borderLeft: "2px solid maroon",
                                             py: 0.5,
                                             fontSize: "12px",
@@ -1309,7 +1309,7 @@ const ApplicantList = () => {
                                         sx={{
                                             color: "blue",
                                             textAlign: "center",
-                                            border: "1px solid maroon",
+                                            border: "2px solid maroon",
                                             py: 0.5,
                                             fontSize: "12px",
                                             cursor: "pointer",
@@ -1324,7 +1324,7 @@ const ApplicantList = () => {
                                         sx={{
                                             color: "blue",
                                             textAlign: "left",
-                                            border: "1px solid maroon",
+                                            border: "2px solid maroon",
                                             py: 0.5,
                                             fontSize: "12px",
                                             cursor: "pointer",
@@ -1340,7 +1340,7 @@ const ApplicantList = () => {
                                         sx={{
                                             color: "black",
                                             textAlign: "center",
-                                            border: "1px solid maroon",
+                                            border: "2px solid maroon",
                                             py: 0.5,
                                             fontSize: "12px",
                                         }}
@@ -1352,7 +1352,7 @@ const ApplicantList = () => {
                                     </TableCell>
 
                                     {/* Editable Exam Scores */}
-                                    <TableCell sx={{ border: "1px solid maroon", textAlign: "center" }}>
+                                    <TableCell sx={{ border: "2px solid maroon", textAlign: "center" }}>
                                         <TextField
                                             value={editScores[person.person_id]?.english ?? english}
                                             onChange={(e) =>
@@ -1364,7 +1364,7 @@ const ApplicantList = () => {
                                         />
                                     </TableCell>
 
-                                    <TableCell sx={{ border: "1px solid maroon", textAlign: "center" }}>
+                                    <TableCell sx={{ border: "2px solid maroon", textAlign: "center" }}>
                                         <TextField
                                             value={editScores[person.person_id]?.science ?? science}
                                             onChange={(e) =>
@@ -1376,7 +1376,7 @@ const ApplicantList = () => {
                                         />
                                     </TableCell>
 
-                                    <TableCell sx={{ border: "1px solid maroon", textAlign: "center" }}>
+                                    <TableCell sx={{ border: "2px solid maroon", textAlign: "center" }}>
                                         <TextField
                                             value={editScores[person.person_id]?.filipino ?? filipino}
                                             onChange={(e) =>
@@ -1388,7 +1388,7 @@ const ApplicantList = () => {
                                         />
                                     </TableCell>
 
-                                    <TableCell sx={{ border: "1px solid maroon", textAlign: "center" }}>
+                                    <TableCell sx={{ border: "2px solid maroon", textAlign: "center" }}>
                                         <TextField
                                             value={editScores[person.person_id]?.math ?? math}
                                             onChange={(e) =>
@@ -1400,7 +1400,7 @@ const ApplicantList = () => {
                                         />
                                     </TableCell>
 
-                                    <TableCell sx={{ border: "1px solid maroon", textAlign: "center" }}>
+                                    <TableCell sx={{ border: "2px solid maroon", textAlign: "center" }}>
                                         <TextField
                                             value={editScores[person.person_id]?.abstract ?? abstract}
                                             onChange={(e) =>
@@ -1417,7 +1417,7 @@ const ApplicantList = () => {
                                         sx={{
                                             color: "black",
                                             textAlign: "center",
-                                            border: "1px solid maroon",
+                                            border: "2px solid maroon",
                                             py: 0.5,
                                             fontSize: "15px",
                                         }}
@@ -1431,7 +1431,7 @@ const ApplicantList = () => {
                                         sx={{
                                             color: "black",
                                             textAlign: "center",
-                                            border: "1px solid maroon",
+                                            border: "2px solid maroon",
                                             borderRight: "2px solid maroon",
                                             py: 0.5,
                                             fontSize: "12px",

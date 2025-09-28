@@ -77,7 +77,7 @@ const StudentDashboard5 = () => {
         setUserRole(storedRole);
 
         // Roles that can access
-        const allowedRoles = ["student"];
+        const allowedRoles = ["student", "registrar"];
         if (allowedRoles.includes(storedRole)) {
             // ✅ Prefer URL param if admin is editing, otherwise logged-in student
             const targetId = queryPersonId || searchedPersonId || loggedInPersonId;

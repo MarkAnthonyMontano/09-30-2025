@@ -1307,37 +1307,37 @@ const ApplicantList = () => {
                 <Table size="small">
                     <TableHead sx={{ backgroundColor: "#6D2323", }}>
                         <TableRow>
-                            <TableCell sx={{ color: "white", textAlign: "center", width: "2%", py: 0.5, fontSize: "12px", border: "1px solid maroon", borderLeft: "2px solid maroon" }}>
+                            <TableCell sx={{ color: "white", textAlign: "center", width: "2%", py: 0.5, fontSize: "12px", border: "2px solid maroon"}}>
                                 #
                             </TableCell>
-                            <TableCell sx={{ color: "white", textAlign: "center", width: "3%", py: 0.5, fontSize: "12px", border: "1px solid maroon" }}>
+                            <TableCell sx={{ color: "white", textAlign: "center", width: "3%", py: 0.5, fontSize: "12px", border: "2px solid maroon" }}>
                                 Submitted Orig Documents
                             </TableCell>
-                            <TableCell sx={{ color: "white", textAlign: "center", width: "4%", py: 0.5, fontSize: "12px", border: "1px solid maroon" }}>
+                            <TableCell sx={{ color: "white", textAlign: "center", width: "4%", py: 0.5, fontSize: "12px", border: "2px solid maroon" }}>
                                 Applicant ID
                             </TableCell>
-                            <TableCell sx={{ color: "white", textAlign: "center", width: "25%", py: 0.5, fontSize: "12px", border: "1px solid maroon" }}>
+                            <TableCell sx={{ color: "white", textAlign: "center", width: "25%", py: 0.5, fontSize: "12px", border: "2px solid maroon" }}>
                                 Name
                             </TableCell>
-                            <TableCell sx={{ color: "white", textAlign: "center", width: "10%", py: 0.5, fontSize: "12px", border: "1px solid maroon" }}>
+                            <TableCell sx={{ color: "white", textAlign: "center", width: "10%", py: 0.5, fontSize: "12px", border: "2px solid maroon" }}>
                                 Program
                             </TableCell>
-                            <TableCell sx={{ color: "white", textAlign: "center", width: "6%", py: 0.5, fontSize: "12px", border: "1px solid maroon" }}>
+                            <TableCell sx={{ color: "white", textAlign: "center", width: "6%", py: 0.5, fontSize: "12px", border: "2px solid maroon" }}>
                                 SHS GWA
                             </TableCell>
-                            <TableCell sx={{ color: "white", textAlign: "center", width: "8%", py: 0.5, fontSize: "12px", border: "1px solid maroon" }}>
+                            <TableCell sx={{ color: "white", textAlign: "center", width: "8%", py: 0.5, fontSize: "12px", border: "2px solid maroon" }}>
                                 Date Applied
                             </TableCell>
-                            <TableCell sx={{ color: "white", textAlign: "center", width: "8%", py: 0.5, fontSize: "12px", border: "1px solid maroon" }}>
+                            <TableCell sx={{ color: "white", textAlign: "center", width: "8%", py: 0.5, fontSize: "12px", border: "2px solid maroon" }}>
                                 Date Last Updated
                             </TableCell>
-                            <TableCell sx={{ color: "white", textAlign: "center", width: "16%", py: 0.5, fontSize: "12px", border: "1px solid maroon" }}>
+                            <TableCell sx={{ color: "white", textAlign: "center", width: "16%", py: 0.5, fontSize: "12px", border: "2px solid maroon" }}>
                                 Applicant Status
                             </TableCell>
-                            <TableCell sx={{ color: "white", textAlign: "center", width: "15%", py: 0.5, fontSize: "12px", border: "1px solid maroon" }}>
+                            <TableCell sx={{ color: "white", textAlign: "center", width: "15%", py: 0.5, fontSize: "12px", border: "2px solid maroon" }}>
                                 Remarks
                             </TableCell>
-                            <TableCell sx={{ color: "white", textAlign: "center", width: "8%", py: 0.5, fontSize: "12px", border: "1px solid maroon", borderRight: "2px solid maroon" }}>
+                            <TableCell sx={{ color: "white", textAlign: "center", width: "8%", py: 0.5, fontSize: "12px", border: "2px solid maroon" }}>
                                 Registrar Status
                             </TableCell>
                         </TableRow>
@@ -1370,12 +1370,12 @@ const ApplicantList = () => {
                         {currentPersons.map((person, index) => (
                             <TableRow key={person.person_id}>
                                 {/* # */}
-                                <TableCell sx={{ textAlign: "center", border: "1px solid maroon" }}>
+                                <TableCell sx={{ textAlign: "center", border: "2px solid maroon" }}>
                                     {index + 1}
                                 </TableCell>
 
                                 {/* ✅ Submitted Checkbox */}
-                                <TableCell sx={{ textAlign: "center", border: "1px solid maroon" }}>
+                                <TableCell sx={{ textAlign: "center", border: "2px solid maroon" }}>
                                     <Checkbox
                                         checked={Number(person.submitted_documents) === 1}
                                         onChange={(e) => {
@@ -1414,7 +1414,7 @@ const ApplicantList = () => {
                                 <TableCell
                                     sx={{
                                         textAlign: "center",
-                                        border: "1px solid maroon",
+                                        border: "2px solid maroon",
                                         color: "blue",
                                         cursor: "pointer",
                                     }}
@@ -1427,7 +1427,7 @@ const ApplicantList = () => {
                                 <TableCell
                                     sx={{
                                         textAlign: "left",
-                                        border: "1px solid maroon",
+                                        border: "2px solid maroon",
                                         color: "blue",
                                         cursor: "pointer",
                                     }}
@@ -1437,7 +1437,7 @@ const ApplicantList = () => {
                                 </TableCell>
 
                                 {/* Program */}
-                                <TableCell sx={{ textAlign: "center", border: "1px solid maroon" }}>
+                                <TableCell sx={{ textAlign: "center", border: "2px solid maroon" }}>
                                     {curriculumOptions.find(
                                         (item) =>
                                             item.curriculum_id?.toString() === person.program?.toString()
@@ -1445,17 +1445,17 @@ const ApplicantList = () => {
                                 </TableCell>
 
                                 {/* SHS GWA */}
-                                <TableCell sx={{ textAlign: "center", border: "1px solid maroon" }}>
+                                <TableCell sx={{ textAlign: "center", border: "2px solid maroon" }}>
                                     {person.generalAverage1}
                                 </TableCell>
 
                                 {/* Created Date */}
-                                <TableCell sx={{ textAlign: "center", border: "1px solid maroon" }}>
+                                <TableCell sx={{ textAlign: "center", border: "2px solid maroon" }}>
                                     {person.created_at}
                                 </TableCell>
 
                                 {/* Last Updated */}
-                                <TableCell sx={{ textAlign: "center", border: "1px solid maroon" }}>
+                                <TableCell sx={{ textAlign: "center", border: "2px solid maroon" }}>
                                     {person.last_updated
                                         ? new Date(person.last_updated).toLocaleDateString("en-PH", {
                                             year: "numeric",
@@ -1466,13 +1466,13 @@ const ApplicantList = () => {
                                 </TableCell>
 
                                 {/* Status */}
-                                <TableCell sx={{ textAlign: "center", border: "1px solid maroon" }}>
+                                <TableCell sx={{ textAlign: "center", border: "2px solid maroon" }}>
                                     {person.document_status || "On process"}
                                 </TableCell>
 
                                 <TableCell
                                     sx={{
-                                        border: "1px solid maroon",
+                                        border: "2px solid maroon",
                                         textAlign: "center",
                                         verticalAlign: "middle",   // 🔑 force cell content to middle
                                         p: 0,
@@ -1541,7 +1541,7 @@ const ApplicantList = () => {
 
 
                                 {/* Registrar Status */}
-                                <TableCell sx={{ textAlign: "center", border: "1px solid maroon" }}>
+                                <TableCell sx={{ textAlign: "center", border: "2px solid maroon" }}>
                                     {person.registrar_status === 1 ? (
                                         <Box
                                             sx={{

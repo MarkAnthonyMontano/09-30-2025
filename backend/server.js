@@ -4183,65 +4183,65 @@ WHERE proctor LIKE ?
   });
 
   // ======================= EMAIL NOTIFICATION LOGGER =======================
-app.post("/api/log-email", async (req, res) => {
-  try {
-    const { applicant_number, user_person_id, subject, customMessage } = req.body;
+  app.post("/api/log-email", async (req, res) => {
+    try {
+      const { applicant_number, user_person_id, subject, customMessage } = req.body;
 
-    if (!applicant_number) {
-      return res.status(400).json({ error: "Applicant number is required" });
-    }
+      if (!applicant_number) {
+        return res.status(400).json({ error: "Applicant number is required" });
+      }
 
-    // 1️⃣ Get applicant’s person_id
-    const personId = await getPersonIdByApplicantNumber(applicant_number);
-    if (!personId) {
-      return res.status(404).json({ error: "Applicant not found" });
-    }
+      // 1️⃣ Get applicant’s person_id
+      const personId = await getPersonIdByApplicantNumber(applicant_number);
+      if (!personId) {
+        return res.status(404).json({ error: "Applicant not found" });
+      }
 
-    // 2️⃣ Get actor info (email + role) from user_accounts in db3
-    let actorEmail = "system@earist.edu.ph";
-    let actorFullName = "System";
+      // 2️⃣ Get actor info (email + role) from user_accounts in db3
+      let actorEmail = "system@earist.edu.ph";
+      let actorFullName = "System";
 
-    if (user_person_id) {
-      const [actorRows] = await db3.query(
-        "SELECT email, role FROM user_accounts WHERE person_id = ? LIMIT 1",
-        [user_person_id]
+      if (user_person_id) {
+        const [actorRows] = await db3.query(
+          "SELECT email, role FROM user_accounts WHERE person_id = ? LIMIT 1",
+          [user_person_id]
+        );
+
+        if (actorRows.length > 0) {
+          const actor = actorRows[0];
+          actorEmail = actor.email;
+          actorFullName = actor.role ? actor.role.toUpperCase() : actor.email;
+        }
+      }
+
+      // 3️⃣ Build message
+      const message =
+        customMessage ||
+        `📧 ${subject || "Email"} sent for Applicant #${applicant_number}`;
+
+      // 4️⃣ Insert into notifications
+      await db.query(
+        `INSERT INTO notifications (type, message, applicant_number, actor_email, actor_name, timestamp)
+       VALUES (?, ?, ?, ?, ?, NOW())`,
+        ["email", message, applicant_number, actorEmail, actorFullName]
       );
 
-      if (actorRows.length > 0) {
-        const actor = actorRows[0];
-        actorEmail = actor.email;
-        actorFullName = actor.role ? actor.role.toUpperCase() : actor.email;
-      }
+      // 5️⃣ Emit via socket
+      io.emit("notification", {
+        type: "email",
+        message,
+        applicant_number,
+        actor_email: actorEmail,
+        actor_name: actorFullName,
+        timestamp: new Date().toISOString(),
+      });
+
+      res.json({ success: true, message: "Email notification logged" });
+    } catch (err) {
+      console.error("❌ Email log error:", err);
+      res.status(500).json({ error: "Failed to log email notification" });
     }
-
-    // 3️⃣ Build message
-    const message =
-      customMessage ||
-      `📧 ${subject || "Email"} sent for Applicant #${applicant_number}`;
-
-    // 4️⃣ Insert into notifications
-    await db.query(
-      `INSERT INTO notifications (type, message, applicant_number, actor_email, actor_name, timestamp)
-       VALUES (?, ?, ?, ?, ?, NOW())`,
-      ["email", message, applicant_number, actorEmail, actorFullName]
-    );
-
-    // 5️⃣ Emit via socket
-    io.emit("notification", {
-      type: "email",
-      message,
-      applicant_number,
-      actor_email: actorEmail,
-      actor_name: actorFullName,
-      timestamp: new Date().toISOString(),
-    });
-
-    res.json({ success: true, message: "Email notification logged" });
-  } catch (err) {
-    console.error("❌ Email log error:", err);
-    res.status(500).json({ error: "Failed to log email notification" });
-  }
-});
+  });
 
 
 
@@ -4583,12 +4583,38 @@ app.post("/api/log-email", async (req, res) => {
         return res.status(404).json({ success: false, message: "Record not found" });
       }
 
+      // ✅ Log each update into notifications
+      await db.query(
+        `INSERT INTO notifications (type, message, applicant_number, actor_email, actor_name, timestamp)
+       VALUES (?, ?, ?, ?, ?, NOW())`,
+        [
+          "update",
+          `📝 Qualifying Exam Result updated for Applicant #${applicant_number} → Score: ${qExam}`,
+          applicant_number,
+          req.user?.email || "system@earist.edu.ph",
+          req.user?.role?.toUpperCase() || "SYSTEM",
+        ]
+      );
+
+      await db.query(
+        `INSERT INTO notifications (type, message, applicant_number, actor_email, actor_name, timestamp)
+       VALUES (?, ?, ?, ?, ?, NOW())`,
+        [
+          "update",
+          `📝 Interview Result updated for Applicant #${applicant_number} → Score: ${qInterview}`,
+          applicant_number,
+          req.user?.email || "system@earist.edu.ph",
+          req.user?.role?.toUpperCase() || "SYSTEM",
+        ]
+      );
+
       res.json({ success: true, message: "Scores updated successfully" });
     } catch (err) {
       console.error("❌ Error updating scores:", err);
       res.status(500).json({ success: false, message: "Server error" });
     }
   });
+
 
   // ---------------------- Assign Student Number ----------------------
   socket.on("assign-student-number", async (person_id) => {
@@ -5009,6 +5035,7 @@ app.put("/api/interview_applicants/assign/:applicant_number", async (req, res) =
   }
 });
 
+
 app.put("/api/interview_applicants/unassign/:applicant_number", async (req, res) => {
   const { applicant_number } = req.params;  
 
@@ -5151,30 +5178,33 @@ io.on("connection", (socket) => {
   }
 
   // 📩 Handle sending interview schedule emails
+  // 📩 Handle sending interview schedule emails
   socket.on("send_interview_emails", async ({ schedule_id, applicant_numbers, subject, senderName, message, user_person_id }) => {
     try {
       const [rows] = await db.query(
         `SELECT 
-         ia.schedule_id,
-         s.day_description,
-         s.room_description,
-         s.start_time,
-         s.end_time,
-         an.applicant_number,
-         p.person_id,
-         p.first_name,
-         p.last_name,
-         p.emailAddress
-       FROM interview_applicants ia
-       JOIN interview_schedule s 
-         ON ia.schedule_id = s.schedule_id
-       JOIN applicant_numbering_table an 
-         ON ia.applicant_id = an.applicant_number
-       JOIN person_table p 
-         ON an.person_id = p.person_id
-       WHERE ia.schedule_id = ? AND an.applicant_number IN (?)`,
+     ia.schedule_id,
+     s.day_description,
+     s.building_description,
+     s.room_description,
+     s.start_time,
+     s.end_time,
+     an.applicant_number,
+     p.person_id,
+     p.first_name,
+     p.last_name,
+     p.emailAddress
+   FROM interview_applicants ia
+   JOIN interview_exam_schedule s   -- ✅ correct table
+     ON ia.schedule_id = s.schedule_id
+   JOIN applicant_numbering_table an 
+     ON ia.applicant_id = an.applicant_number
+   JOIN person_table p 
+     ON an.person_id = p.person_id
+   WHERE ia.schedule_id = ? AND an.applicant_number IN (?)`,
         [schedule_id, applicant_numbers]
       );
+
 
       if (rows.length === 0) {
         return socket.emit("send_schedule_emails_result", {
@@ -5222,6 +5252,13 @@ io.on("connection", (socket) => {
         try {
           await transporter.sendMail(mailOptions);
 
+          // ✅ Update interview_applicants table
+          await db.query(
+            "UPDATE interview_applicants SET email_sent = 1 WHERE applicant_id = ?",
+            [row.applicant_number]   // correct key
+          );
+
+          // ✅ Log to notifications
           await db.query(
             `INSERT INTO notifications (type, message, applicant_number, actor_email, actor_name, timestamp)
            VALUES (?, ?, ?, ?, ?, NOW())`,
@@ -5237,10 +5274,18 @@ io.on("connection", (socket) => {
           sent.push(row.applicant_number);
         } catch (err) {
           console.error(`❌ Failed to send interview email to ${row.emailAddress}:`, err.message);
+
+          // ❌ Mark as failed
+          await db.query(
+            "UPDATE interview_applicants SET email_sent = -1 WHERE applicant_id = ?",
+            [row.applicant_number]
+          );
+
           failed.push(row.applicant_number);
         }
       }
 
+      // ✅ Send result back
       socket.emit("send_schedule_emails_result", {
         success: true,
         sent,
@@ -5248,6 +5293,7 @@ io.on("connection", (socket) => {
         message: `Interview emails processed: Sent=${sent.length}, Failed=${failed.length}`,
       });
 
+      // 🔄 Notify all clients to refresh schedules
       io.emit("schedule_updated", { schedule_id });
 
     } catch (err) {
@@ -7219,7 +7265,7 @@ app.post("/api/insert-schedule", async (req, res) => {
         conflict: true,
         message: "This subject is already assigned in this section and school year on the same day."
       });
-    }    
+    }
 
     // Check for time conflicts (prof, section, room)
     const checkTimeQuery = `

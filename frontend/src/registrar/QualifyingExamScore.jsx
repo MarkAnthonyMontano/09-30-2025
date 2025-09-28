@@ -55,7 +55,7 @@ const QualifyingExamScore = () => {
         sessionStorage.setItem("admin_edit_person_id_ts", String(Date.now()));
 
         // ✅ Always pass person_id in the URL
-        navigate(`/admin_dashboard1?person_id=${person_id}`);
+        navigate(`/student_dashboard1?person_id=${person_id}`);
     };
 
     const tabs = [
@@ -1102,7 +1102,7 @@ EARIST Registrar's Office
 
 
     // Email fields - start empty
-    const [emailSubject, setEmailSubject] = useState("Submission of Admission Documents");
+    const [emailSubject, setEmailSubject] = useState("Submission of Original Documents");
 
 
     const [schedules, setSchedules] = useState([]);
@@ -1867,7 +1867,7 @@ EARIST Registrar's Office
                                 variant="contained"
                                 color="success"
                                 onClick={() => handleOpenDialog(null)} // for batch mode
-                                sx={{ width: "110px", height: "40px" }}
+                                sx={{ width: "130px", height: "37px" }}
                             >
                                 Send Email
                             </Button>
@@ -1886,40 +1886,40 @@ EARIST Registrar's Office
                 <Table size="small">
                     <TableHead sx={{ backgroundColor: "#6D2323" }}>
                         <TableRow>
-                            <TableCell sx={{ color: "white", textAlign: "center", width: "2%", py: 0.5, fontSize: "12px", border: "1px solid maroon", borderLeft: "2px solid maroon" }}>
+                            <TableCell sx={{ color: "white", textAlign: "center", width: "2%", py: 0.5, fontSize: "12px", border: "2px solid maroon"}}>
                                 #
                             </TableCell>
 
-                            <TableCell sx={{ color: "white", textAlign: "center", width: "8%", py: 0.5, fontSize: "12px", border: "1px solid maroon" }}>
+                            <TableCell sx={{ color: "white", textAlign: "center", width: "8%", py: 0.5, fontSize: "12px", border: "2px solid maroon" }}>
                                 Applicant ID
                             </TableCell>
-                            <TableCell sx={{ color: "white", textAlign: "center", width: "25%", py: 0.5, fontSize: "12px", border: "1px solid maroon" }}>
+                            <TableCell sx={{ color: "white", textAlign: "center", width: "25%", py: 0.5, fontSize: "12px", border: "2px solid maroon" }}>
                                 Name
                             </TableCell>
-                            <TableCell sx={{ color: "white", textAlign: "center", width: "20%", py: 0.5, fontSize: "12px", border: "1px solid maroon" }}>
+                            <TableCell sx={{ color: "white", textAlign: "center", width: "20%", py: 0.5, fontSize: "12px", border: "2px solid maroon" }}>
                                 Program
                             </TableCell>
 
                             {/* Exam Columns */}
-                            <TableCell sx={{ color: "white", textAlign: "center", width: "10%", py: 0.5, fontSize: "12px", border: "1px solid maroon" }}>
+                            <TableCell sx={{ color: "white", textAlign: "center", width: "10%", py: 0.5, fontSize: "12px", border: "2px solid maroon" }}>
                                 Qualifying Exam Score
                             </TableCell>
-                            <TableCell sx={{ color: "white", textAlign: "center", width: "10%", py: 0.5, fontSize: "12px", border: "1px solid maroon" }}>
+                            <TableCell sx={{ color: "white", textAlign: "center", width: "10%", py: 0.5, fontSize: "12px", border: "2px solid maroon" }}>
                                 Qualifying Interview Score
                             </TableCell>
-                            <TableCell sx={{ color: "white", textAlign: "center", width: "10%", py: 0.5, fontSize: "12px", border: "1px solid maroon" }}>
+                            <TableCell sx={{ color: "white", textAlign: "center", width: "10%", py: 0.5, fontSize: "12px", border: "2px solid maroon" }}>
                                 Total Ave.
                             </TableCell>
-                            <TableCell sx={{ color: "white", textAlign: "center", width: "10%", py: 0.5, fontSize: "12px", border: "1px solid maroon" }}>
+                            <TableCell sx={{ color: "white", textAlign: "center", width: "10%", py: 0.5, fontSize: "12px", border: "2px solid maroon" }}>
                                 Status
                             </TableCell>
-                            <TableCell sx={{ color: "white", textAlign: "center", width: "10%", py: 0.5, fontSize: "12px", border: "1px solid maroon" }}>
+                            <TableCell sx={{ color: "white", textAlign: "center", width: "10%", py: 0.5, fontSize: "12px", border: "2px solid maroon" }}>
                                 Date
                             </TableCell>
-                            <TableCell sx={{ color: "white", textAlign: "center", width: "10%", py: 0.5, fontSize: "12px", border: "1px solid maroon" }}>
+                            <TableCell sx={{ color: "white", textAlign: "center", width: "10%", py: 0.5, fontSize: "12px", border: "2px solid maroon" }}>
                                 Action
                             </TableCell>
-                            <TableCell sx={{ color: "white", textAlign: "center", width: "15%", py: 0.5, fontSize: "12px", border: "1px solid maroon" }}>
+                            <TableCell sx={{ color: "white", textAlign: "center", width: "15%", py: 0.5, fontSize: "12px", border: "2px solid maroon" }}>
                                 User
                             </TableCell>
 
@@ -1943,7 +1943,7 @@ EARIST Registrar's Office
                                         sx={{
                                             color: "black",
                                             textAlign: "center",
-                                            border: "1px solid maroon",
+                                            border: "2px solid maroon",
                                             borderLeft: "2px solid maroon",
                                             py: 0.5,
                                             fontSize: "12px",
@@ -1957,10 +1957,10 @@ EARIST Registrar's Office
                                         sx={{
                                             color: "blue",
                                             textAlign: "center",
-                                            border: "1px solid maroon",
+                                            border: "2px solid maroon",
+                                            borderLeft: "2px solid maroon",
                                             py: 0.5,
                                             fontSize: "12px",
-                                            cursor: "pointer",
                                         }}
                                         onClick={() => handleRowClick(person.person_id)}
                                     >
@@ -1972,15 +1972,14 @@ EARIST Registrar's Office
                                         sx={{
                                             color: "blue",
                                             textAlign: "left",
-                                            border: "1px solid maroon",
+                                            border: "2px solid maroon",
+                                            borderLeft: "2px solid maroon",
                                             py: 0.5,
                                             fontSize: "12px",
-                                            cursor: "pointer",
                                         }}
                                         onClick={() => handleRowClick(person.person_id)}
                                     >
-                                        {`${person.last_name}, ${person.first_name} ${person.middle_name ?? ""
-                                            } ${person.extension ?? ""}`}
+                                        {`${person.last_name}, ${person.first_name} ${person.middle_name ?? ""} ${person.extension ?? ""}`}
                                     </TableCell>
 
                                     {/* Program */}
@@ -1988,7 +1987,7 @@ EARIST Registrar's Office
                                         sx={{
                                             color: "black",
                                             textAlign: "center",
-                                            border: "1px solid maroon",
+                                            border: "2px solid maroon",
                                             py: 0.5,
                                             fontSize: "12px",
                                         }}
@@ -2000,7 +1999,7 @@ EARIST Registrar's Office
                                     </TableCell>
 
                                     {/* Qualifying Exam Score */}
-                                    <TableCell sx={{ border: "1px solid maroon", textAlign: "center" }}>
+                                    <TableCell sx={{ border: "2px solid maroon", textAlign: "center" }}>
                                         <TextField
                                             value={qualifyingExam}
                                             onChange={(e) =>
@@ -2013,7 +2012,7 @@ EARIST Registrar's Office
                                     </TableCell>
 
                                     {/* Qualifying Interview Score */}
-                                    <TableCell sx={{ border: "1px solid maroon", textAlign: "center" }}>
+                                    <TableCell sx={{ border: "2px solid maroon", textAlign: "center" }}>
                                         <TextField
                                             value={qualifyingInterview}
                                             onChange={(e) =>
@@ -2030,7 +2029,7 @@ EARIST Registrar's Office
                                         sx={{
                                             color: "black",
                                             textAlign: "center",
-                                            border: "1px solid maroon",
+                                            border: "2px solid maroon",
                                             py: 0.5,
                                             fontSize: "15px",
                                         }}
@@ -2040,7 +2039,7 @@ EARIST Registrar's Office
                                     <TableCell
                                         sx={{
                                             textAlign: "center",
-                                            border: "1px solid maroon",
+                                            border: "2px solid maroon",
                                             fontSize: "12px",
                                         }}
                                     >
@@ -2068,8 +2067,8 @@ EARIST Registrar's Office
                                         sx={{
                                             color: "black",
                                             textAlign: "center",
-                                            border: "1px solid maroon",
-                                            borderRight: "1px solid maroon",
+                                            border: "2px solid maroon",
+    
                                             py: 0.5,
                                             fontSize: "12px",
                                         }}
@@ -2080,8 +2079,8 @@ EARIST Registrar's Office
                                     <TableCell
                                         sx={{
                                             textAlign: "center",
-                                            border: "1px solid maroon",
-                                            borderRight: "2px solid maroon",
+                                            border: "2px solid maroon",
+                                      
                                             verticalAlign: "middle",
                                         }}
                                     >
@@ -2131,8 +2130,8 @@ EARIST Registrar's Office
                                         sx={{
                                             color: "black",
                                             textAlign: "center",
-                                            border: "1px solid maroon",
-                                            borderRight: "2px solid maroon",
+                                            border: "2px solid maroon",
+                                        
                                             py: 0.5,
                                             fontSize: "12px",
                                         }}

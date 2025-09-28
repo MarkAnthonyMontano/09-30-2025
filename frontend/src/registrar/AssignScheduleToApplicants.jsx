@@ -455,6 +455,17 @@ const AssignScheduleToApplicants = () => {
     fetchSchedules();
   }, []);
 
+  const handleRowClick = (person_id) => {
+    if (!person_id) return;
+
+    sessionStorage.setItem("admin_edit_person_id", String(person_id));
+    sessionStorage.setItem("admin_edit_person_id_source", "applicant_list");
+    sessionStorage.setItem("admin_edit_person_id_ts", String(Date.now()));
+
+    // ✅ Always pass person_id in the URL
+    navigate(`/admin_dashboard1?person_id=${person_id}`);
+  };
+
 
   const [itemsPerPage, setItemsPerPage] = useState(100);
 
@@ -1224,29 +1235,49 @@ const AssignScheduleToApplicants = () => {
                 return (
                   <TableRow key={person.person_id}>
                     {/* Auto-increment # */}
-                    <TableCell sx={{ textAlign: "center", border: "1px solid maroon",  borderLeft: "2px solid maroon", fontSize: "12px" }}>
+                    <TableCell sx={{ textAlign: "center", border: "2px solid maroon", fontSize: "12px" }}>
                       {indexOfFirstItem + index + 1}
                     </TableCell>
 
-                    {/* Applicant ID */}
-                    <TableCell sx={{ textAlign: "center", border: "1px solid maroon", fontSize: "12px", color: "blue" }}>
+                    <TableCell
+                      sx={{
+                        color: "blue",
+                        textAlign: "center",
+                        border: "2px solid maroon",
+                        borderLeft: "2px solid maroon",
+                        py: 0.5,
+                        fontSize: "12px",
+                      }}
+                      onClick={() => handleRowClick(person.person_id)}
+                    >
                       {person.applicant_number ?? "N/A"}
                     </TableCell>
 
                     {/* Applicant Name */}
-                    <TableCell sx={{ textAlign: "left", border: "1px solid maroon", fontSize: "12px", color: "blue"  }}>
+                    <TableCell
+                      sx={{
+                        color: "blue",
+                        textAlign: "left",
+                        border: "2px solid maroon",
+                        borderLeft: "2px solid maroon",
+                        py: 0.5,
+                        fontSize: "12px",
+                      }}
+                      onClick={() => handleRowClick(person.person_id)}
+                    >
                       {`${person.last_name}, ${person.first_name} ${person.middle_name ?? ""} ${person.extension ?? ""}`}
                     </TableCell>
 
+
                     {/* Program */}
-                    <TableCell sx={{ textAlign: "center", border: "1px solid maroon", fontSize: "12px" }}>
+                    <TableCell sx={{ textAlign: "center", border: "2px solid maroon", fontSize: "12px" }}>
                       {curriculumOptions.find(
                         (item) => item.curriculum_id?.toString() === person.program?.toString()
                       )?.program_code ?? "N/A"}
                     </TableCell>
 
                     {/* Email */}
-                    <TableCell sx={{ textAlign: "center", border: "1px solid maroon", fontSize: "12px" }}>
+                    <TableCell sx={{ textAlign: "center", border: "2px solid maroon", fontSize: "12px" }}>
                       {person.emailAddress ?? "N/A"}
                     </TableCell>
 
@@ -1255,8 +1286,7 @@ const AssignScheduleToApplicants = () => {
                     <TableCell
                       sx={{
                         textAlign: "center",
-                        border: "1px solid maroon",
-                        borderRight: "2px solid maroon",
+                        border: "2px solid maroon",
                       }}
                     >
                       {!isAssigned ? (

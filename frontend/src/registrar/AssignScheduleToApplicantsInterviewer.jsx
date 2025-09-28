@@ -36,12 +36,15 @@ const AssignScheduleToApplicantsInterviewer = () => {
     const [user, setUser] = useState(null);
     const [adminData, setAdminData] = useState({ dprtmnt_id: "" });
     const [emailSender, setEmailSender] = useState("");
+    const [loggedInPersonId, setLoggedInPersonId] = useState(null);
+
 
     useEffect(() => {
         const storedEmail = localStorage.getItem("email");
-        if (storedEmail) {
-            setUser(storedEmail);
-        }
+        const storedPersonId = localStorage.getItem("person_id") || sessionStorage.getItem("person_id");
+
+        if (storedEmail) setUser(storedEmail);
+        if (storedPersonId) setLoggedInPersonId(storedPersonId);
     }, []);
 
     const fetchPersonData = async () => {
@@ -238,9 +241,20 @@ const AssignScheduleToApplicantsInterviewer = () => {
             });
         } catch (err) {
             console.error("Error fetching all-applicants:", err);
+
         }
     };
 
+    const handleRowClick = (person_id) => {
+        if (!person_id) return;
+
+        sessionStorage.setItem("admin_edit_person_id", String(person_id));
+        sessionStorage.setItem("admin_edit_person_id_source", "applicant_list");
+        sessionStorage.setItem("admin_edit_person_id_ts", String(Date.now()));
+
+        // ✅ Always pass person_id in the URL
+        navigate(`/student_dashboard1?person_id=${person_id}`);
+    };
 
 
     // ================= FUNCTIONS =================
@@ -489,28 +503,35 @@ Please bring the following requirements:`
     };
 
 
-    const confirmSendEmails = () => {
-        setConfirmOpen(false);
+  const confirmSendEmails = () => {
+  setConfirmOpen(false);
 
-        const assignedApplicants = Array.from(selectedApplicants);
+  const assignedApplicants = Array.from(selectedApplicants);
 
-        socket.emit("send_interview_emails", {
-            schedule_id: selectedSchedule,
-            applicant_numbers: assignedApplicants,
-            subject: emailSubject,
-            senderName: emailSender,
-            message: emailMessage,
-            user_person_id: loggedInPersonId,
-        });
+  socket.emit("send_interview_emails", {
+    schedule_id: selectedSchedule,
+    applicant_numbers: assignedApplicants,
+    subject: emailSubject,
+    senderName: emailSender,
+    message: emailMessage,
+    user_person_id: loggedInPersonId, // ✅ now comes from state
+  });
 
-        socket.once("send_schedule_emails_result", (emailRes) => {
-            setSnack({
-                open: true,
-                message: emailRes.success ? emailRes.message : emailRes.error,
-                severity: emailRes.success ? "success" : "error"
-            });
-        });
-    };
+  socket.once("send_schedule_emails_result", (emailRes) => {
+    setSnack({
+      open: true,
+      message: emailRes.success ? emailRes.message : emailRes.error,
+      severity: emailRes.success ? "success" : "error"
+    });
+
+    if (emailRes.success) {
+      fetchAllApplicants();
+    }
+  });
+};
+
+
+
 
 
     // Email fields - start empty
@@ -1348,43 +1369,49 @@ Please bring the following requirements:`
                                         <TableCell
                                             sx={{
                                                 textAlign: "center",
-                                                border: "1px solid maroon",
-                                                borderLeft: "2px solid maroon",
+                                                border: "2px solid maroon",
+
                                                 fontSize: "12px",
                                             }}
                                         >
                                             {indexOfFirstItem + idx + 1}
                                         </TableCell>
 
-                                        {/* Applicant ID */}
                                         <TableCell
                                             sx={{
+                                                color: "blue",
                                                 textAlign: "center",
-                                                border: "1px solid maroon",
+                                                border: "2px solid maroon",
+                                                borderLeft: "2px solid maroon",
+                                                py: 0.5,
                                                 fontSize: "12px",
-                                                 color: "blue"
                                             }}
+                                            onClick={() => handleRowClick(person.person_id)}
                                         >
-                                            {applicantId ?? "N/A"}
+                                            {person.applicant_number ?? "N/A"}
                                         </TableCell>
 
                                         {/* Applicant Name */}
                                         <TableCell
                                             sx={{
+                                                color: "blue",
                                                 textAlign: "left",
-                                                border: "1px solid maroon",
+                                                border: "2px solid maroon",
+                                                borderLeft: "2px solid maroon",
+                                                py: 0.5,
                                                 fontSize: "12px",
-                                                color: "blue"
                                             }}
+                                            onClick={() => handleRowClick(person.person_id)}
                                         >
                                             {`${person.last_name}, ${person.first_name} ${person.middle_name ?? ""} ${person.extension ?? ""}`}
                                         </TableCell>
+
 
                                         {/* Program */}
                                         <TableCell
                                             sx={{
                                                 textAlign: "center",
-                                                border: "1px solid maroon",
+                                                border: "2px solid maroon",
                                                 fontSize: "12px",
                                             }}
                                         >
@@ -1399,7 +1426,7 @@ Please bring the following requirements:`
                                         <TableCell
                                             sx={{
                                                 textAlign: "center",
-                                                border: "1px solid maroon",
+                                                border: "2px solid maroon",
                                                 fontSize: "12px",
                                             }}
                                         >
@@ -1410,7 +1437,7 @@ Please bring the following requirements:`
                                         <TableCell
                                             sx={{
                                                 textAlign: "center",
-                                                border: "1px solid maroon",
+                                                border: "2px solid maroon",
                                                 fontSize: "12px",
                                             }}
                                         >
@@ -1421,8 +1448,8 @@ Please bring the following requirements:`
                                         <TableCell
                                             sx={{
                                                 textAlign: "center",
-                                                border: "1px solid maroon",
-                                                borderRight: "2px solid maroon",
+                                                border: "2px solid maroon",
+
                                             }}
                                         >
                                             {!isAssigned ? (
