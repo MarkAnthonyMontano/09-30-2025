@@ -280,9 +280,6 @@ const StudentDashboard = () => {
     fetchAnnouncements();
   }, []);
 
-
-
-
   return (
     <Box sx={{ p: 4, marginLeft: "-2rem", paddingRight: 8, height: "calc(100vh - 150px)", overflowY: "auto" }}>
       {/* Header */}
@@ -585,11 +582,11 @@ const StudentDashboard = () => {
                   </Typography>
                 </Stack>
                 <Stack direction="row" spacing={3} justifyContent="center">
-                  <Typography sx={{ fontSize: "14px" }} color="success.main">
-                    Course Completed: 11
+                  <Typography sx={{ fontSize: "14px", width: "125px" }}>
+                    Completed: 0
                   </Typography>
-                  <Typography sx={{ fontSize: "14px" }} color="warning.main">
-                    Course Currently taken: 8
+                  <Typography sx={{ fontSize: "14px", width: "150px" }}>
+                    Ongoing: 11
                   </Typography>
                 </Stack>
               </CardContent>

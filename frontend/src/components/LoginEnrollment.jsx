@@ -129,7 +129,7 @@ const LoginEnrollment = ({ setIsAuthenticated }) => {
       setShowOtpModal(false);
 
       navigate(
-        tempLoginData.role === "registrar" ? "/dashboard"
+        tempLoginData.role === "registrar" ? "/registrar_dashboard"
           : tempLoginData.role === "faculty" ? "/faculty_dashboard"
             : "/student_dashboard"
       );

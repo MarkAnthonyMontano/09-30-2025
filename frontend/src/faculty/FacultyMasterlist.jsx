@@ -568,7 +568,7 @@ const FacultyMasterList = () => {
                   <TableCell sx={{ textAlign: "center", border: "1px solid maroon" }}>
                     {student.student_number}
                   </TableCell>
-                  <TableCell sx={{ textAlign: "center", border: "1px solid maroon" }}>
+                  <TableCell sx={{ border: "1px solid maroon" }}>
                     {student.last_name}, {student.first_name} {student.middle_name}
                   </TableCell>
                   <TableCell sx={{ textAlign: "center", border: "1px solid maroon" }}>

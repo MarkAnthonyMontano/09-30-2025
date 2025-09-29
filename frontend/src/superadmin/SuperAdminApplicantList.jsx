@@ -76,7 +76,6 @@ const ApplicantList = () => {
         { label: "Documents Submitted", to: "/student_requirements", icon: <DescriptionIcon /> },
         { label: "Entrance Examination Scores", to: "/applicant_scoring", icon: <SchoolIcon /> },
         { label: "Qualifying / Interview Examination Scores", to: "/qualifying_exam_scores", icon: <FactCheckIcon /> },
-        { label: "College Approval", to: "/college_approval", icon: <CheckCircleIcon /> },
         { label: "Medical Clearance", to: "/medical_clearance", icon: <LocalHospitalIcon /> },
         { label: "Student Numbering", to: "/student_numbering", icon: <HowToRegIcon /> },
     ];
@@ -218,25 +217,26 @@ const ApplicantList = () => {
         try {
             const res = await axios.put(
                 `http://localhost:5000/api/submitted-documents/${upload_id}`,
-                { submitted_documents: checked ? 1 : 0 }
+                {
+                    submitted_documents: checked ? 1 : 0,
+                    user_person_id: localStorage.getItem("person_id")
+                }
             );
 
-            // kung lahat complete -> update registrar_status = 1
             if (checked && res.data.allCompleted) {
                 await handleRegistrarStatusChange(person_id, 1);
                 setSnack({ open: true, message: "All documents completed ✅ Registrar status set to Submitted", severity: "success" });
-            }
-            // kung na-uncheck -> balik registrar_status = 0
-            else if (!checked) {
+            } else if (!checked) {
                 await handleRegistrarStatusChange(person_id, 0);
                 setSnack({ open: true, message: "Marked as Unsubmitted ❌", severity: "warning" });
             }
 
-            fetchApplicants(); // refresh table data
+            fetchApplicants();
         } catch (err) {
             console.error("❌ Failed to update submitted documents:", err);
         }
     };
+
 
 
 
@@ -1364,9 +1364,11 @@ const ApplicantList = () => {
                             <TableCell sx={{ color: "white", textAlign: "center", width: "15%", py: 0.5, fontSize: "12px", border: "2px solid maroon" }}>
                                 Remarks
                             </TableCell>
+                            {/*
                             <TableCell sx={{ color: "white", textAlign: "center", width: "8%", py: 0.5, fontSize: "12px", border: "2px solid maroon" }}>
                                 Registrar Status
                             </TableCell>
+                            */}
                         </TableRow>
                     </TableHead>
                     {/* --- Confirmation Dialog --- */}
@@ -1568,7 +1570,7 @@ const ApplicantList = () => {
 
 
 
-                                {/* Registrar Status */}
+                                {/*
                                 <TableCell sx={{ textAlign: "center", border: "2px solid maroon" }}>
                                     {person.registrar_status === 1 ? (
                                         <Box
@@ -1629,6 +1631,7 @@ const ApplicantList = () => {
                                         </Box>
                                     )}
                                 </TableCell>
+                                */}
                             </TableRow>
                         ))}
                     </TableBody>

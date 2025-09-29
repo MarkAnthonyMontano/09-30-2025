@@ -78,7 +78,6 @@ const ApplicantList = () => {
         { label: "Documents Submitted", to: "/student_requirements", icon: <DescriptionIcon /> },
         { label: "Entrance Examination Scores", to: "/applicant_scoring", icon: <SchoolIcon /> },
         { label: "Qualifying / Interview Examination Scores", to: "/qualifying_exam_scores", icon: <FactCheckIcon /> },
-        { label: "College Approval", to: "/college_approval", icon: <CheckCircleIcon /> },
         { label: "Medical Clearance", to: "/medical_clearance", icon: <LocalHospitalIcon /> },
         { label: "Student Numbering", to: "/student_numbering", icon: <HowToRegIcon /> },
     ];
@@ -1385,9 +1384,11 @@ const ApplicantList = () => {
                             <TableCell sx={{ color: "white", textAlign: "center", width: "15%", py: 0.5, fontSize: "12px", border: "2px solid maroon" }}>
                                 Remarks
                             </TableCell>
+                            {/*
                             <TableCell sx={{ color: "white", textAlign: "center", width: "8%", py: 0.5, fontSize: "12px", border: "2px solid maroon" }}>
                                 Registrar Status
                             </TableCell>
+                            */}
                         </TableRow>
                     </TableHead>
                     {/* --- Confirmation Dialog --- */}
@@ -1590,71 +1591,68 @@ const ApplicantList = () => {
 
 
 
-                                {/* Registrar Status */}
-                                <TableCell sx={{ textAlign: "center", border: "2px solid maroon" }}>
-                                    {person.registrar_status === 1 ? (
-                                        <Box
-                                            disabled
-                                            sx={{
-                                                background: "#4CAF50",
-                                                color: "white",
-                                                borderRadius: 1,
-                                                p: 0.5,
-                                            }}
-                                        >
-                                            <Typography sx={{ fontWeight: "bold" }}>Submitted</Typography>
-                                        </Box>
-                                    ) : person.registrar_status === 0 ? (
-                                        <Box
-                                            disabled
-                                            sx={{
-                                                background: "#F44336",
-                                                color: "white",
-                                                borderRadius: 1,
-                                                p: 0.5,
-                                            }}
-                                        >
-                                            <Typography sx={{ fontWeight: "bold" }}>
-                                                Unsubmitted / Incomplete
-                                            </Typography>
-                                        </Box>
-                                    ) : (
-                                        <Box display="flex" justifyContent="center" gap={1}>
-                                            <Button
-                                                disabled
-                                                variant="contained"
-                                                onClick={() => {
-                                                    setConfirmMessage(
-                                                        "Are you sure you want to set Registrar Status to Submitted?"
-                                                    );
-                                                    setConfirmAction(() => async () => {
-                                                        await handleRegistrarStatusChange(person.person_id, 1);
-                                                    });
-                                                    setConfirmOpen(true);
-                                                }}
-                                                sx={{ backgroundColor: "green", color: "white" }}
-                                            >
-                                                Submitted
-                                            </Button>
-                                            <Button
-                                                disabled
-                                                variant="contained"
-                                                onClick={() => {
-                                                    setConfirmMessage(
-                                                        "Are you sure you want to set Registrar Status to Unsubmitted?"
-                                                    );
-                                                    setConfirmAction(() => async () => {
-                                                        await handleRegistrarStatusChange(person.person_id, 0);
-                                                    });
-                                                    setConfirmOpen(true);
-                                                }}
-                                                sx={{ backgroundColor: "red", color: "white" }}
-                                            >
-                                                Unsubmitted
-                                            </Button>
-                                        </Box>
-                                    )}
-                                </TableCell>
+                                {/*
+                                                               <TableCell sx={{ textAlign: "center", border: "2px solid maroon" }}>
+                                                                   {person.registrar_status === 1 ? (
+                                                                       <Box
+                                                                           sx={{
+                                                                               background: "#4CAF50",
+                                                                               color: "white",
+                                                                               borderRadius: 1,
+                                                                               p: 0.5,
+                                                                           }}
+                                                                       >
+                                                                           <Typography sx={{ fontWeight: "bold" }}>Submitted</Typography>
+                                                                       </Box>
+                                                                   ) : person.registrar_status === 0 ? (
+                                                                       <Box
+                                                                           sx={{
+                                                                               background: "#F44336",
+                                                                               color: "white",
+                                                                               borderRadius: 1,
+                                                                               p: 0.5,
+                                                                           }}
+                                                                       >
+                                                                           <Typography sx={{ fontWeight: "bold" }}>
+                                                                               Unsubmitted / Incomplete
+                                                                           </Typography>
+                                                                       </Box>
+                                                                   ) : (
+                                                                       <Box display="flex" justifyContent="center" gap={1}>
+                                                                           <Button
+                                                                               variant="contained"
+                                                                               onClick={() => {
+                                                                                   setConfirmMessage(
+                                                                                       "Are you sure you want to set Registrar Status to Submitted?"
+                                                                                   );
+                                                                                   setConfirmAction(() => async () => {
+                                                                                       await handleRegistrarStatusChange(person.person_id, 1);
+                                                                                   });
+                                                                                   setConfirmOpen(true);
+                                                                               }}
+                                                                               sx={{ backgroundColor: "green", color: "white" }}
+                                                                           >
+                                                                               Submitted
+                                                                           </Button>
+                                                                           <Button
+                                                                               variant="contained"
+                                                                               onClick={() => {
+                                                                                   setConfirmMessage(
+                                                                                       "Are you sure you want to set Registrar Status to Unsubmitted?"
+                                                                                   );
+                                                                                   setConfirmAction(() => async () => {
+                                                                                       await handleRegistrarStatusChange(person.person_id, 0);
+                                                                                   });
+                                                                                   setConfirmOpen(true);
+                                                                               }}
+                                                                               sx={{ backgroundColor: "red", color: "white" }}
+                                                                           >
+                                                                               Unsubmitted
+                                                                           </Button>
+                                                                       </Box>
+                                                                   )}
+                                                               </TableCell>
+                                                               */}
                             </TableRow>
                         ))}
                     </TableBody>

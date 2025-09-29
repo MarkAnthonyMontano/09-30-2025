@@ -290,313 +290,314 @@ const StudentSchedule = () => {
 
       <Box sx={{ display: "flex", gap: 3,}}>
         {/* Event */}
-        <table style={{ border: "2px solid maroon" }}className='mt-[0.7rem]'>
-          <thead className="">
-            <tr className='flex align-center'>
-              <td className='min-w-[6.5rem] min-h-[2.2rem] flex items-center justify-center border border-black text-[14px] '>TIME</td>
-              <td className='p-0 m-0'>
-                <div className='min-w-[6.6rem] text-center border border-black border-l-0 border-b-0 text-[14px]'>DAY</div>
-                <p className='min-w-[6.6rem] text-center border border-black border-l-0 text-[11.5px] font-bold mt-[-3px]'>Official Time</p>
-              </td>
-              <td className='p-0 m-0'>
-                <div className='min-w-[6.8rem] text-center border border-black border-l-0 border-b-0 text-[14px]'>MONDAY</div>
-                <p className='min-w-[6.8rem] text-center border border-black border-l-0 text-[11.5px] mt-[-3px]'>7:00AM - 9:00PM</p>
-              </td>
-              <td className='p-0 m-0'>
-                <div className='min-w-[6.8rem] text-center border border-black border-l-0 border-b-0 text-[14px]'>TUESDAY</div>
-                <p className='min-w-[6.8rem] text-center border border-black border-l-0 text-[11.5px] mt-[-3px]'>7:00AM - 9:00PM</p>
-              </td>
-              <td className='p-0 m-0'>
-                <div className='min-w-[7rem] text-center border border-black border-l-0 border-b-0 text-[14px]'>WEDNESDAY</div>
-                <p className='min-w-[7rem] text-center border border-black border-l-0 text-[11.5px] mt-[-3px]'>7:00AM - 9:00PM</p>
-              </td>
-              <td className='p-0 m-0'>
-                <div className='min-w-[6.9rem] text-center border border-black border-l-0 border-b-0 text-[14px]'>THURSDAY</div>
-                <p className='min-w-[6.9rem] text-center border border-black border-l-0 text-[11.5px] mt-[-3px]'>7:00AM - 9:00PM</p>
-              </td>
-              <td className='p-0 m-0'>
-                <div className='min-w-[6.8rem] text-center border border-black border-l-0 border-b-0 text-[14px]'>FRIDAY</div>
-                <p className='min-w-[6.8rem] text-center border border-black border-l-0 text-[11.5px] mt-[-3px]'>7:00AM - 9:00PM</p>
-              </td>
-              <td className='p-0 m-0'>
-                <div className='min-w-[6.8rem] text-center border border-black border-l-0 border-b-0 text-[14px]'>SATUDAY</div>
-                <p className='min-w-[6.8rem] text-center border border-black border-l-0 text-[11.5px] mt-[-3px]'>7:00AM - 9:00PM</p>
-              </td>
-              <td className='p-0 m-0'>
-                <div className='min-w-[6.8rem] text-center border border-black border-l-0 border-b-0 text-[14px]'>SUNDAY</div>
-                <p className='min-w-[6.8rem] text-center border border-black border-l-0 text-[11.5px] mt-[-3px]'>7:00AM - 9:00PM</p>
-              </td>
-            </tr>
-          </thead>
-          <tbody className='flex flex-col mt-[-0.1px]'>
-            <tr className='flex w-full'>
-              <td className='m-0 p-0 min-w-[13.1rem]'>
-                <div className='h-[2.5rem] border border-black border-t-0 text-[14px] flex items-center justify-center'>
-                  07:00 AM - 08:00 AM
-                </div>
-              </td>
-
-              {["MON","TUE","WED","THU","FRI","SAT","SUN"].map((day, i) => (
-                <td key={day} className={`m-0 p-0 ${day==="WED" ? "min-w-[7rem]" : day==="THU" ? "min-w-[6.9rem]" : "min-w-[6.8rem]"}`}>
-                  <div className={`h-[2.5rem] border border-black border-t-0 border-l-0 text-[14px] flex items-center justify-center  
-                    ${isTimeInSchedule("7:00 AM", "8:00 AM", day) ? 'bg-yellow-300' : ''} 
-                    ${isTimeInSchedule("7:00 AM", "8:00 AM", day) && hasAdjacentSchedule("7:00 AM", "8:00 AM", day, "top") === "same" ? "border-t-0" : ''} 
-                    ${isTimeInSchedule("7:00 AM", "8:00 AM", day) && hasAdjacentSchedule("7:00 AM", "8:00 AM", day, "bottom") === "same" ? "border-b-0" : ''}`}
-                  >
-                     {getCenterText("7:00 AM", day)}
+        <Box style={{ border: "2px solid maroon",  padding: "1rem 1rem"}}>
+          <table>
+            <thead className="">
+              <tr className='flex align-center'>
+                <td className='min-w-[6.5rem] min-h-[2.2rem] flex items-center justify-center border border-black text-[14px] '>TIME</td>
+                <td className='p-0 m-0'>
+                  <div className='min-w-[6.6rem] text-center border border-black border-l-0 border-b-0 text-[14px]'>DAY</div>
+                  <p className='min-w-[6.6rem] text-center border border-black border-l-0 text-[11.5px] font-bold mt-[-3px]'>Official Time</p>
+                </td>
+                <td className='p-0 m-0'>
+                  <div className='min-w-[6.8rem] text-center border border-black border-l-0 border-b-0 text-[14px]'>MONDAY</div>
+                  <p className='min-w-[6.8rem] text-center border border-black border-l-0 text-[11.5px] mt-[-3px]'>7:00AM - 9:00PM</p>
+                </td>
+                <td className='p-0 m-0'>
+                  <div className='min-w-[6.8rem] text-center border border-black border-l-0 border-b-0 text-[14px]'>TUESDAY</div>
+                  <p className='min-w-[6.8rem] text-center border border-black border-l-0 text-[11.5px] mt-[-3px]'>7:00AM - 9:00PM</p>
+                </td>
+                <td className='p-0 m-0'>
+                  <div className='min-w-[7rem] text-center border border-black border-l-0 border-b-0 text-[14px]'>WEDNESDAY</div>
+                  <p className='min-w-[7rem] text-center border border-black border-l-0 text-[11.5px] mt-[-3px]'>7:00AM - 9:00PM</p>
+                </td>
+                <td className='p-0 m-0'>
+                  <div className='min-w-[6.9rem] text-center border border-black border-l-0 border-b-0 text-[14px]'>THURSDAY</div>
+                  <p className='min-w-[6.9rem] text-center border border-black border-l-0 text-[11.5px] mt-[-3px]'>7:00AM - 9:00PM</p>
+                </td>
+                <td className='p-0 m-0'>
+                  <div className='min-w-[6.8rem] text-center border border-black border-l-0 border-b-0 text-[14px]'>FRIDAY</div>
+                  <p className='min-w-[6.8rem] text-center border border-black border-l-0 text-[11.5px] mt-[-3px]'>7:00AM - 9:00PM</p>
+                </td>
+                <td className='p-0 m-0'>
+                  <div className='min-w-[6.8rem] text-center border border-black border-l-0 border-b-0 text-[14px]'>SATUDAY</div>
+                  <p className='min-w-[6.8rem] text-center border border-black border-l-0 text-[11.5px] mt-[-3px]'>7:00AM - 9:00PM</p>
+                </td>
+                <td className='p-0 m-0'>
+                  <div className='min-w-[6.8rem] text-center border border-black border-l-0 border-b-0 text-[14px]'>SUNDAY</div>
+                  <p className='min-w-[6.8rem] text-center border border-black border-l-0 text-[11.5px] mt-[-3px]'>7:00AM - 9:00PM</p>
+                </td>
+              </tr>
+            </thead>
+            <tbody className='flex flex-col mt-[-0.1px]'>
+              <tr className='flex w-full'>
+                <td className='m-0 p-0 min-w-[13.1rem]'>
+                  <div className='h-[2.5rem] border border-black border-t-0 text-[14px] flex items-center justify-center'>
+                    07:00 AM - 08:00 AM
                   </div>
                 </td>
-              ))}
-            </tr>
 
-            <tr className='flex w-full'>
-              <td className='m-0 p-0 min-w-[13.1rem]'>
-                <div className='h-[2.5rem] border border-black border-t-0 text-[14px] flex items-center justify-center'>
-                  08:00 AM - 09:00 AM
-                </div>
-              </td>
+                {["MON","TUE","WED","THU","FRI","SAT","SUN"].map((day, i) => (
+                  <td key={day} className={`m-0 p-0 ${day==="WED" ? "min-w-[7rem]" : day==="THU" ? "min-w-[6.9rem]" : "min-w-[6.8rem]"}`}>
+                    <div className={`h-[2.5rem] border border-black border-t-0 border-l-0 text-[14px] flex items-center justify-center  
+                      ${isTimeInSchedule("7:00 AM", "8:00 AM", day) ? 'bg-yellow-300' : ''} 
+                      ${isTimeInSchedule("7:00 AM", "8:00 AM", day) && hasAdjacentSchedule("7:00 AM", "8:00 AM", day, "top") === "same" ? "border-t-0" : ''} 
+                      ${isTimeInSchedule("7:00 AM", "8:00 AM", day) && hasAdjacentSchedule("7:00 AM", "8:00 AM", day, "bottom") === "same" ? "border-b-0" : ''}`}
+                    >
+                      {getCenterText("7:00 AM", day)}
+                    </div>
+                  </td>
+                ))}
+              </tr>
 
-              {["MON","TUE","WED","THU","FRI","SAT","SUN"].map((day, i) => (
-                <td key={day} className={`m-0 p-0 ${day==="WED" ? "min-w-[7rem]" : day==="THU" ? "min-w-[6.9rem]" : "min-w-[6.8rem]"}`}>
-                  <div className={`h-[2.5rem] border border-black border-t-0 border-l-0 text-[14px] flex items-center justify-center  
-                    ${isTimeInSchedule("8:00 AM", "9:00 AM", day) ? 'bg-yellow-300' : ''} 
-                    ${isTimeInSchedule("8:00 AM", "9:00 AM", day) && hasAdjacentSchedule("8:00 AM", "9:00 AM", day, "top") === "same" ? "border-t-0" : ''} 
-                    ${isTimeInSchedule("8:00 AM", "9:00 AM", day) && hasAdjacentSchedule("8:00 AM", "9:00 AM", day, "bottom") === "same" ? "border-b-0" : ''}`}
-                  >
-                     {getCenterText("8:00 AM", day)}
+              <tr className='flex w-full'>
+                <td className='m-0 p-0 min-w-[13.1rem]'>
+                  <div className='h-[2.5rem] border border-black border-t-0 text-[14px] flex items-center justify-center'>
+                    08:00 AM - 09:00 AM
                   </div>
                 </td>
-              ))}
-            </tr>
 
-            <tr className='flex w-full'>
-              <td className='m-0 p-0 min-w-[13.1rem]'>
-                <div className='h-[2.5rem] border border-black border-t-0 text-[14px] flex items-center justify-center'>
-                  09:00 AM - 10:00 AM
-                </div>
-              </td>
+                {["MON","TUE","WED","THU","FRI","SAT","SUN"].map((day, i) => (
+                  <td key={day} className={`m-0 p-0 ${day==="WED" ? "min-w-[7rem]" : day==="THU" ? "min-w-[6.9rem]" : "min-w-[6.8rem]"}`}>
+                    <div className={`h-[2.5rem] border border-black border-t-0 border-l-0 text-[14px] flex items-center justify-center  
+                      ${isTimeInSchedule("8:00 AM", "9:00 AM", day) ? 'bg-yellow-300' : ''} 
+                      ${isTimeInSchedule("8:00 AM", "9:00 AM", day) && hasAdjacentSchedule("8:00 AM", "9:00 AM", day, "top") === "same" ? "border-t-0" : ''} 
+                      ${isTimeInSchedule("8:00 AM", "9:00 AM", day) && hasAdjacentSchedule("8:00 AM", "9:00 AM", day, "bottom") === "same" ? "border-b-0" : ''}`}
+                    >
+                      {getCenterText("8:00 AM", day)}
+                    </div>
+                  </td>
+                ))}
+              </tr>
 
-              {["MON","TUE","WED","THU","FRI","SAT","SUN"].map((day, i) => (
-                <td key={day} className={`m-0 p-0 ${day==="WED" ? "min-w-[7rem]" : day==="THU" ? "min-w-[6.9rem]" : "min-w-[6.8rem]"}`}>
-                  <div className={`h-[2.5rem] border border-black border-t-0 border-l-0 text-[14px] flex items-center justify-center  
-                    ${isTimeInSchedule("9:00 AM", "10:00 AM", day) ? 'bg-yellow-300' : ''} 
-                    ${isTimeInSchedule("9:00 AM", "10:00 AM", day) && hasAdjacentSchedule("9:00 AM", "10:00 AM", day, "top") === "same" ? "border-t-0" : ''} 
-                    ${isTimeInSchedule("9:00 AM", "10:00 AM", day) && hasAdjacentSchedule("9:00 AM", "10:00 AM", day, "bottom") === "same" ? "border-b-0" : ''}`}
-                  >
-                     {getCenterText("9:00 AM", day)}
+              <tr className='flex w-full'>
+                <td className='m-0 p-0 min-w-[13.1rem]'>
+                  <div className='h-[2.5rem] border border-black border-t-0 text-[14px] flex items-center justify-center'>
+                    09:00 AM - 10:00 AM
                   </div>
                 </td>
-              ))}
-            </tr>
 
-            <tr className='flex w-full'>
-              <td className='m-0 p-0 min-w-[13.1rem]'>
-                <div className='h-[2.5rem] border border-black border-t-0 text-[14px] flex items-center justify-center'>
-                  10:00 AM - 11:00 AM
-                </div>
-              </td>
+                {["MON","TUE","WED","THU","FRI","SAT","SUN"].map((day, i) => (
+                  <td key={day} className={`m-0 p-0 ${day==="WED" ? "min-w-[7rem]" : day==="THU" ? "min-w-[6.9rem]" : "min-w-[6.8rem]"}`}>
+                    <div className={`h-[2.5rem] border border-black border-t-0 border-l-0 text-[14px] flex items-center justify-center  
+                      ${isTimeInSchedule("9:00 AM", "10:00 AM", day) ? 'bg-yellow-300' : ''} 
+                      ${isTimeInSchedule("9:00 AM", "10:00 AM", day) && hasAdjacentSchedule("9:00 AM", "10:00 AM", day, "top") === "same" ? "border-t-0" : ''} 
+                      ${isTimeInSchedule("9:00 AM", "10:00 AM", day) && hasAdjacentSchedule("9:00 AM", "10:00 AM", day, "bottom") === "same" ? "border-b-0" : ''}`}
+                    >
+                      {getCenterText("9:00 AM", day)}
+                    </div>
+                  </td>
+                ))}
+              </tr>
 
-              {["MON","TUE","WED","THU","FRI","SAT","SUN"].map((day, i) => (
-                <td key={day} className={`m-0 p-0 ${day==="WED" ? "min-w-[7rem]" : day==="THU" ? "min-w-[6.9rem]" : "min-w-[6.8rem]"}`}>
-                  <div className={`h-[2.5rem] border border-black border-t-0 border-l-0 text-[14px] flex items-center justify-center  
-                    ${isTimeInSchedule("10:00 AM", "11:00 AM", day) ? 'bg-yellow-300' : ''} 
-                    ${isTimeInSchedule("10:00 AM", "11:00 AM", day) && hasAdjacentSchedule("10:00 AM", "11:00 AM", day, "top") === "same" ? "border-t-0" : ''} 
-                    ${isTimeInSchedule("10:00 AM", "11:00 AM", day) && hasAdjacentSchedule("10:00 AM", "11:00 AM", day, "bottom") === "same" ? "border-b-0" : ''}`}
-                  >
-                    {getCenterText("10:00 AM", day)}
+              <tr className='flex w-full'>
+                <td className='m-0 p-0 min-w-[13.1rem]'>
+                  <div className='h-[2.5rem] border border-black border-t-0 text-[14px] flex items-center justify-center'>
+                    10:00 AM - 11:00 AM
                   </div>
                 </td>
-              ))}
-            </tr>
 
-            <tr className='flex w-full'>
-              <td className='m-0 p-0 min-w-[13.1rem]'>
-                <div className='h-[2.5rem] border border-black border-t-0 text-[14px] flex items-center justify-center'>
-                  11:00 AM - 12:00 PM
-                </div>
-              </td>
+                {["MON","TUE","WED","THU","FRI","SAT","SUN"].map((day, i) => (
+                  <td key={day} className={`m-0 p-0 ${day==="WED" ? "min-w-[7rem]" : day==="THU" ? "min-w-[6.9rem]" : "min-w-[6.8rem]"}`}>
+                    <div className={`h-[2.5rem] border border-black border-t-0 border-l-0 text-[14px] flex items-center justify-center  
+                      ${isTimeInSchedule("10:00 AM", "11:00 AM", day) ? 'bg-yellow-300' : ''} 
+                      ${isTimeInSchedule("10:00 AM", "11:00 AM", day) && hasAdjacentSchedule("10:00 AM", "11:00 AM", day, "top") === "same" ? "border-t-0" : ''} 
+                      ${isTimeInSchedule("10:00 AM", "11:00 AM", day) && hasAdjacentSchedule("10:00 AM", "11:00 AM", day, "bottom") === "same" ? "border-b-0" : ''}`}
+                    >
+                      {getCenterText("10:00 AM", day)}
+                    </div>
+                  </td>
+                ))}
+              </tr>
 
-              {["MON","TUE","WED","THU","FRI","SAT","SUN"].map((day, i) => (
-                <td key={day} className={`m-0 p-0 ${day==="WED" ? "min-w-[7rem]" : day==="THU" ? "min-w-[6.9rem]" : "min-w-[6.8rem]"}`}>
-                  <div className={`h-[2.5rem] border border-black border-t-0 border-l-0 text-[14px] flex items-center justify-center  
-                    ${isTimeInSchedule("11:00 AM", "12:00 PM", day) ? 'bg-yellow-300' : ''} 
-                    ${isTimeInSchedule("11:00 AM", "12:00 PM", day) && hasAdjacentSchedule("11:00 AM", "12:00 PM", day, "top") === "same" ? "border-t-0" : ''} 
-                    ${isTimeInSchedule("11:00 AM", "12:00 PM", day) && hasAdjacentSchedule("11:00 AM", "12:00 PM", day, "bottom") === "same" ? "border-b-0" : ''}`}
-                  >
-                    {getCenterText("11:00 AM", day)}
+              <tr className='flex w-full'>
+                <td className='m-0 p-0 min-w-[13.1rem]'>
+                  <div className='h-[2.5rem] border border-black border-t-0 text-[14px] flex items-center justify-center'>
+                    11:00 AM - 12:00 PM
                   </div>
                 </td>
-              ))}
-            </tr>
-            
-            <tr className='flex w-full'>
-              <td className='m-0 p-0 min-w-[13.1rem]'>
-                <div className='h-[2.5rem] border border-black border-t-0 text-[14px] flex items-center justify-center'>
-                  12:00 PM - 01:00 PM
-                </div>
-              </td>
 
-              {["MON","TUE","WED","THU","FRI","SAT","SUN"].map((day, i) => (
-                <td key={day} className={`m-0 p-0 ${day==="WED" ? "min-w-[7rem]" : day==="THU" ? "min-w-[6.9rem]" : "min-w-[6.8rem]"}`}>
-                  <div className={`h-[2.5rem] border border-black border-t-0 border-l-0 text-[14px] flex items-center justify-center  
-                    ${isTimeInSchedule("12:00 PM", "1:00 PM", day) ? 'bg-yellow-300' : ''} 
-                    ${isTimeInSchedule("12:00 PM", "1:00 PM", day) && hasAdjacentSchedule("12:00 PM", "1:00 PM", day, "top") === "same" ? "border-t-0" : ''} 
-                    ${isTimeInSchedule("12:00 PM", "1:00 PM", day) && hasAdjacentSchedule("12:00 PM", "1:00 PM", day, "bottom") === "same" ? "border-b-0" : ''}`}
-                  >
-                    {getCenterText("12:00 PM", day)}
+                {["MON","TUE","WED","THU","FRI","SAT","SUN"].map((day, i) => (
+                  <td key={day} className={`m-0 p-0 ${day==="WED" ? "min-w-[7rem]" : day==="THU" ? "min-w-[6.9rem]" : "min-w-[6.8rem]"}`}>
+                    <div className={`h-[2.5rem] border border-black border-t-0 border-l-0 text-[14px] flex items-center justify-center  
+                      ${isTimeInSchedule("11:00 AM", "12:00 PM", day) ? 'bg-yellow-300' : ''} 
+                      ${isTimeInSchedule("11:00 AM", "12:00 PM", day) && hasAdjacentSchedule("11:00 AM", "12:00 PM", day, "top") === "same" ? "border-t-0" : ''} 
+                      ${isTimeInSchedule("11:00 AM", "12:00 PM", day) && hasAdjacentSchedule("11:00 AM", "12:00 PM", day, "bottom") === "same" ? "border-b-0" : ''}`}
+                    >
+                      {getCenterText("11:00 AM", day)}
+                    </div>
+                  </td>
+                ))}
+              </tr>
+              
+              <tr className='flex w-full'>
+                <td className='m-0 p-0 min-w-[13.1rem]'>
+                  <div className='h-[2.5rem] border border-black border-t-0 text-[14px] flex items-center justify-center'>
+                    12:00 PM - 01:00 PM
                   </div>
                 </td>
-              ))}
-            </tr>
 
-            <tr className='flex w-full'>
-              <td className='m-0 p-0 min-w-[13.1rem]'>
-                <div className='h-[2.5rem] border border-black border-t-0 text-[14px] flex items-center justify-center'>
-                  01:00 PM - 02:00 PM
-                </div>
-              </td>
+                {["MON","TUE","WED","THU","FRI","SAT","SUN"].map((day, i) => (
+                  <td key={day} className={`m-0 p-0 ${day==="WED" ? "min-w-[7rem]" : day==="THU" ? "min-w-[6.9rem]" : "min-w-[6.8rem]"}`}>
+                    <div className={`h-[2.5rem] border border-black border-t-0 border-l-0 text-[14px] flex items-center justify-center  
+                      ${isTimeInSchedule("12:00 PM", "1:00 PM", day) ? 'bg-yellow-300' : ''} 
+                      ${isTimeInSchedule("12:00 PM", "1:00 PM", day) && hasAdjacentSchedule("12:00 PM", "1:00 PM", day, "top") === "same" ? "border-t-0" : ''} 
+                      ${isTimeInSchedule("12:00 PM", "1:00 PM", day) && hasAdjacentSchedule("12:00 PM", "1:00 PM", day, "bottom") === "same" ? "border-b-0" : ''}`}
+                    >
+                      {getCenterText("12:00 PM", day)}
+                    </div>
+                  </td>
+                ))}
+              </tr>
 
-              {["MON","TUE","WED","THU","FRI","SAT","SUN"].map((day, i) => (
-                <td key={day} className={`m-0 p-0 ${day==="WED" ? "min-w-[7rem]" : day==="THU" ? "min-w-[6.9rem]" : "min-w-[6.8rem]"}`}>
-                  <div className={`h-[2.5rem] border border-black border-t-0 border-l-0 text-[14px] flex items-center justify-center  
-                    ${isTimeInSchedule("1:00 PM", "2:00 PM", day) ? 'bg-yellow-300' : ''} 
-                    ${isTimeInSchedule("1:00 PM", "2:00 PM", day) && hasAdjacentSchedule("1:00 PM", "2:00 PM", day, "top") === "same" ? "border-t-0" : ''} 
-                    ${isTimeInSchedule("1:00 PM", "2:00 PM", day) && hasAdjacentSchedule("1:00 PM", "2:00 PM", day, "bottom") === "same" ? "border-b-0" : ''}`}
-                  >
-                    {getCenterText("1:00 PM", day)}
+              <tr className='flex w-full'>
+                <td className='m-0 p-0 min-w-[13.1rem]'>
+                  <div className='h-[2.5rem] border border-black border-t-0 text-[14px] flex items-center justify-center'>
+                    01:00 PM - 02:00 PM
                   </div>
                 </td>
-              ))}
-            </tr>
 
-            <tr className='flex w-full'>
-              <td className='m-0 p-0 min-w-[13.1rem]'>
-                <div className='h-[2.5rem] border border-black border-t-0 text-[14px] flex items-center justify-center'>
-                  02:00 PM - 03:00 PM
-                </div>
-              </td>
+                {["MON","TUE","WED","THU","FRI","SAT","SUN"].map((day, i) => (
+                  <td key={day} className={`m-0 p-0 ${day==="WED" ? "min-w-[7rem]" : day==="THU" ? "min-w-[6.9rem]" : "min-w-[6.8rem]"}`}>
+                    <div className={`h-[2.5rem] border border-black border-t-0 border-l-0 text-[14px] flex items-center justify-center  
+                      ${isTimeInSchedule("1:00 PM", "2:00 PM", day) ? 'bg-yellow-300' : ''} 
+                      ${isTimeInSchedule("1:00 PM", "2:00 PM", day) && hasAdjacentSchedule("1:00 PM", "2:00 PM", day, "top") === "same" ? "border-t-0" : ''} 
+                      ${isTimeInSchedule("1:00 PM", "2:00 PM", day) && hasAdjacentSchedule("1:00 PM", "2:00 PM", day, "bottom") === "same" ? "border-b-0" : ''}`}
+                    >
+                      {getCenterText("1:00 PM", day)}
+                    </div>
+                  </td>
+                ))}
+              </tr>
 
-              {["MON","TUE","WED","THU","FRI","SAT","SUN"].map((day, i) => (
-                <td key={day} className={`m-0 p-0 ${day==="WED" ? "min-w-[7rem]" : day==="THU" ? "min-w-[6.9rem]" : "min-w-[6.8rem]"}`}>
-                  <div className={`h-[2.5rem] border border-black border-t-0 border-l-0 text-[14px] flex items-center justify-center  
-                    ${isTimeInSchedule("2:00 PM", "3:00 PM", day) ? 'bg-yellow-300' : ''} 
-                    ${isTimeInSchedule("2:00 PM", "3:00 PM", day) && hasAdjacentSchedule("2:00 PM", "3:00 PM", day, "top") === "same" ? "border-t-0" : ''} 
-                    ${isTimeInSchedule("2:00 PM", "3:00 PM", day) && hasAdjacentSchedule("2:00 PM", "3:00 PM", day, "bottom") === "same" ? "border-b-0" : ''}`}
-                  >{getCenterText("2:00 PM", day)}</div>
+              <tr className='flex w-full'>
+                <td className='m-0 p-0 min-w-[13.1rem]'>
+                  <div className='h-[2.5rem] border border-black border-t-0 text-[14px] flex items-center justify-center'>
+                    02:00 PM - 03:00 PM
+                  </div>
                 </td>
-              ))}
-            </tr>
 
-            <tr className='flex w-full'>
-              <td className='m-0 p-0 min-w-[13.1rem]'>
-                <div className='h-[2.5rem] border border-black border-t-0 text-[14px] flex items-center justify-center'>
-                  03:00 PM - 04:00 PM
-                </div>
-              </td>
+                {["MON","TUE","WED","THU","FRI","SAT","SUN"].map((day, i) => (
+                  <td key={day} className={`m-0 p-0 ${day==="WED" ? "min-w-[7rem]" : day==="THU" ? "min-w-[6.9rem]" : "min-w-[6.8rem]"}`}>
+                    <div className={`h-[2.5rem] border border-black border-t-0 border-l-0 text-[14px] flex items-center justify-center  
+                      ${isTimeInSchedule("2:00 PM", "3:00 PM", day) ? 'bg-yellow-300' : ''} 
+                      ${isTimeInSchedule("2:00 PM", "3:00 PM", day) && hasAdjacentSchedule("2:00 PM", "3:00 PM", day, "top") === "same" ? "border-t-0" : ''} 
+                      ${isTimeInSchedule("2:00 PM", "3:00 PM", day) && hasAdjacentSchedule("2:00 PM", "3:00 PM", day, "bottom") === "same" ? "border-b-0" : ''}`}
+                    >{getCenterText("2:00 PM", day)}</div>
+                  </td>
+                ))}
+              </tr>
 
-              {["MON","TUE","WED","THU","FRI","SAT","SUN"].map((day, i) => (
-                <td key={day} className={`m-0 p-0 ${day==="WED" ? "min-w-[7rem]" : day==="THU" ? "min-w-[6.9rem]" : "min-w-[6.8rem]"}`}>
-                  <div className={`h-[2.5rem] border border-black border-t-0 border-l-0 text-[14px] flex items-center justify-center  
-                    ${isTimeInSchedule("3:00 PM", "4:00 PM", day) ? 'bg-yellow-300' : ''} 
-                    ${isTimeInSchedule("3:00 PM", "4:00 PM", day) && hasAdjacentSchedule("3:00 PM", "4:00 PM", day, "top") === "same" ? "border-t-0" : ''} 
-                    ${isTimeInSchedule("3:00 PM", "4:00 PM", day) && hasAdjacentSchedule("3:00 PM", "4:00 PM", day, "bottom") === "same" ? "border-b-0" : ''}`}
-                  >{getCenterText("3:00 PM", day)}</div>
+              <tr className='flex w-full'>
+                <td className='m-0 p-0 min-w-[13.1rem]'>
+                  <div className='h-[2.5rem] border border-black border-t-0 text-[14px] flex items-center justify-center'>
+                    03:00 PM - 04:00 PM
+                  </div>
                 </td>
-              ))}
-            </tr>
 
-            <tr className='flex w-full'>
-              <td className='m-0 p-0 min-w-[13.1rem]'>
-                <div className='h-[2.5rem] border border-black border-t-0 text-[14px] flex items-center justify-center'>
-                  04:00 PM - 05:00 PM
-                </div>
-              </td>
+                {["MON","TUE","WED","THU","FRI","SAT","SUN"].map((day, i) => (
+                  <td key={day} className={`m-0 p-0 ${day==="WED" ? "min-w-[7rem]" : day==="THU" ? "min-w-[6.9rem]" : "min-w-[6.8rem]"}`}>
+                    <div className={`h-[2.5rem] border border-black border-t-0 border-l-0 text-[14px] flex items-center justify-center  
+                      ${isTimeInSchedule("3:00 PM", "4:00 PM", day) ? 'bg-yellow-300' : ''} 
+                      ${isTimeInSchedule("3:00 PM", "4:00 PM", day) && hasAdjacentSchedule("3:00 PM", "4:00 PM", day, "top") === "same" ? "border-t-0" : ''} 
+                      ${isTimeInSchedule("3:00 PM", "4:00 PM", day) && hasAdjacentSchedule("3:00 PM", "4:00 PM", day, "bottom") === "same" ? "border-b-0" : ''}`}
+                    >{getCenterText("3:00 PM", day)}</div>
+                  </td>
+                ))}
+              </tr>
 
-              {["MON","TUE","WED","THU","FRI","SAT","SUN"].map((day, i) => (
-                <td key={day} className={`m-0 p-0 ${day==="WED" ? "min-w-[7rem]" : day==="THU" ? "min-w-[6.9rem]" : "min-w-[6.8rem]"}`}>
-                  <div className={`h-[2.5rem] border border-black border-t-0 border-l-0 text-[14px] flex items-center justify-center  
-                    ${isTimeInSchedule("4:00 PM", "5:00 PM", day) ? 'bg-yellow-300' : ''} 
-                    ${isTimeInSchedule("4:00 PM", "5:00 PM", day) && hasAdjacentSchedule("4:00 PM", "5:00 PM", day, "top") === "same" ? "border-t-0" : ''} 
-                    ${isTimeInSchedule("4:00 PM", "5:00 PM", day) && hasAdjacentSchedule("4:00 PM", "5:00 PM", day, "bottom") === "same" ? "border-b-0" : ''}`}
-                  >{getCenterText("4:00 PM", day)}</div>
+              <tr className='flex w-full'>
+                <td className='m-0 p-0 min-w-[13.1rem]'>
+                  <div className='h-[2.5rem] border border-black border-t-0 text-[14px] flex items-center justify-center'>
+                    04:00 PM - 05:00 PM
+                  </div>
                 </td>
-              ))}
-            </tr>
 
-            <tr className='flex w-full'>
-              <td className='m-0 p-0 min-w-[13.1rem]'>
-                <div className='h-[2.5rem] border border-black border-t-0 text-[14px] flex items-center justify-center'>
-                  05:00 PM - 06:00 PM
-                </div>
-              </td>
+                {["MON","TUE","WED","THU","FRI","SAT","SUN"].map((day, i) => (
+                  <td key={day} className={`m-0 p-0 ${day==="WED" ? "min-w-[7rem]" : day==="THU" ? "min-w-[6.9rem]" : "min-w-[6.8rem]"}`}>
+                    <div className={`h-[2.5rem] border border-black border-t-0 border-l-0 text-[14px] flex items-center justify-center  
+                      ${isTimeInSchedule("4:00 PM", "5:00 PM", day) ? 'bg-yellow-300' : ''} 
+                      ${isTimeInSchedule("4:00 PM", "5:00 PM", day) && hasAdjacentSchedule("4:00 PM", "5:00 PM", day, "top") === "same" ? "border-t-0" : ''} 
+                      ${isTimeInSchedule("4:00 PM", "5:00 PM", day) && hasAdjacentSchedule("4:00 PM", "5:00 PM", day, "bottom") === "same" ? "border-b-0" : ''}`}
+                    >{getCenterText("4:00 PM", day)}</div>
+                  </td>
+                ))}
+              </tr>
 
-              {["MON","TUE","WED","THU","FRI","SAT","SUN"].map((day, i) => (
-                <td key={day} className={`m-0 p-0 ${day==="WED" ? "min-w-[7rem]" : day==="THU" ? "min-w-[6.9rem]" : "min-w-[6.8rem]"}`}>
-                  <div className={`h-[2.5rem] border border-black border-t-0 border-l-0 text-[14px] flex items-center justify-center  
-                    ${isTimeInSchedule("5:00 PM", "6:00 PM", day) ? 'bg-yellow-300' : ''} 
-                    ${isTimeInSchedule("5:00 PM", "6:00 PM", day) && hasAdjacentSchedule("5:00 PM", "6:00 PM", day, "top") === "same" ? "border-t-0" : ''} 
-                    ${isTimeInSchedule("5:00 PM", "6:00 PM", day) && hasAdjacentSchedule("5:00 PM", "6:00 PM", day, "bottom") === "same" ? "border-b-0" : ''}`}
-                  >{getCenterText("5:00 PM", day)}</div>
+              <tr className='flex w-full'>
+                <td className='m-0 p-0 min-w-[13.1rem]'>
+                  <div className='h-[2.5rem] border border-black border-t-0 text-[14px] flex items-center justify-center'>
+                    05:00 PM - 06:00 PM
+                  </div>
                 </td>
-              ))}
-            </tr>
 
-            <tr className='flex w-full'>
-              <td className='m-0 p-0 min-w-[13.1rem]'>
-                <div className='h-[2.5rem] border border-black border-t-0 text-[14px] flex items-center justify-center'>
-                  06:00 PM - 07:00 PM
-                </div>
-              </td>
+                {["MON","TUE","WED","THU","FRI","SAT","SUN"].map((day, i) => (
+                  <td key={day} className={`m-0 p-0 ${day==="WED" ? "min-w-[7rem]" : day==="THU" ? "min-w-[6.9rem]" : "min-w-[6.8rem]"}`}>
+                    <div className={`h-[2.5rem] border border-black border-t-0 border-l-0 text-[14px] flex items-center justify-center  
+                      ${isTimeInSchedule("5:00 PM", "6:00 PM", day) ? 'bg-yellow-300' : ''} 
+                      ${isTimeInSchedule("5:00 PM", "6:00 PM", day) && hasAdjacentSchedule("5:00 PM", "6:00 PM", day, "top") === "same" ? "border-t-0" : ''} 
+                      ${isTimeInSchedule("5:00 PM", "6:00 PM", day) && hasAdjacentSchedule("5:00 PM", "6:00 PM", day, "bottom") === "same" ? "border-b-0" : ''}`}
+                    >{getCenterText("5:00 PM", day)}</div>
+                  </td>
+                ))}
+              </tr>
 
-              {["MON","TUE","WED","THU","FRI","SAT","SUN"].map((day, i) => (
-                <td key={day} className={`m-0 p-0 ${day==="WED" ? "min-w-[7rem]" : day==="THU" ? "min-w-[6.9rem]" : "min-w-[6.8rem]"}`}>
-                  <div className={`h-[2.5rem] border border-black border-t-0 border-l-0 text-[14px] flex items-center justify-center  
-                    ${isTimeInSchedule("6:00 PM", "7:00 PM", day) ? 'bg-yellow-300' : ''} 
-                    ${isTimeInSchedule("6:00 PM", "7:00 PM", day) && hasAdjacentSchedule("6:00 PM", "7:00 PM", day, "top") === "same" ? "border-t-0" : ''} 
-                    ${isTimeInSchedule("6:00 PM", "7:00 PM", day) && hasAdjacentSchedule("6:00 PM", "7:00 PM", day, "bottom") === "same" ? "border-b-0" : ''}`}
-                  >{getCenterText("6:00 PM", day)}</div>
+              <tr className='flex w-full'>
+                <td className='m-0 p-0 min-w-[13.1rem]'>
+                  <div className='h-[2.5rem] border border-black border-t-0 text-[14px] flex items-center justify-center'>
+                    06:00 PM - 07:00 PM
+                  </div>
                 </td>
-              ))}
-            </tr>
 
-            <tr className='flex w-full'>
-              <td className='m-0 p-0 min-w-[13.1rem]'>
-                <div className='h-[2.5rem] border border-black border-t-0 text-[14px] flex items-center justify-center'>
-                  07:00 PM - 08:00 PM
-                </div>
-              </td>
+                {["MON","TUE","WED","THU","FRI","SAT","SUN"].map((day, i) => (
+                  <td key={day} className={`m-0 p-0 ${day==="WED" ? "min-w-[7rem]" : day==="THU" ? "min-w-[6.9rem]" : "min-w-[6.8rem]"}`}>
+                    <div className={`h-[2.5rem] border border-black border-t-0 border-l-0 text-[14px] flex items-center justify-center  
+                      ${isTimeInSchedule("6:00 PM", "7:00 PM", day) ? 'bg-yellow-300' : ''} 
+                      ${isTimeInSchedule("6:00 PM", "7:00 PM", day) && hasAdjacentSchedule("6:00 PM", "7:00 PM", day, "top") === "same" ? "border-t-0" : ''} 
+                      ${isTimeInSchedule("6:00 PM", "7:00 PM", day) && hasAdjacentSchedule("6:00 PM", "7:00 PM", day, "bottom") === "same" ? "border-b-0" : ''}`}
+                    >{getCenterText("6:00 PM", day)}</div>
+                  </td>
+                ))}
+              </tr>
 
-              {["MON","TUE","WED","THU","FRI","SAT","SUN"].map((day, i) => (
-                <td key={day} className={`m-0 p-0 ${day==="WED" ? "min-w-[7rem]" : day==="THU" ? "min-w-[6.9rem]" : "min-w-[6.8rem]"}`}>
-                  <div className={`h-[2.5rem] border border-black border-t-0 border-l-0 text-[14px] flex items-center justify-center  
-                    ${isTimeInSchedule("7:00 PM", "8:00 PM", day) ? 'bg-yellow-300' : ''} 
-                    ${isTimeInSchedule("7:00 PM", "8:00 PM", day) && hasAdjacentSchedule("7:00 PM", "8:00 PM", day, "top") === "same" ? "border-t-0" : ''} 
-                    ${isTimeInSchedule("7:00 PM", "8:00 PM", day) && hasAdjacentSchedule("7:00 PM", "8:00 PM", day, "bottom") === "same" ? "border-b-0" : ''}`}
-                  >{getCenterText("7:00 PM", day)}</div>
+              <tr className='flex w-full'>
+                <td className='m-0 p-0 min-w-[13.1rem]'>
+                  <div className='h-[2.5rem] border border-black border-t-0 text-[14px] flex items-center justify-center'>
+                    07:00 PM - 08:00 PM
+                  </div>
                 </td>
-              ))}
-            </tr>
 
-            <tr className='flex w-full'>
-              <td className='m-0 p-0 min-w-[13.1rem]'>
-                <div className='h-[2.5rem] border border-black border-t-0 text-[14px] flex items-center justify-center'>
-                  08:00 PM - 09:00 PM
-                </div>
-              </td>
+                {["MON","TUE","WED","THU","FRI","SAT","SUN"].map((day, i) => (
+                  <td key={day} className={`m-0 p-0 ${day==="WED" ? "min-w-[7rem]" : day==="THU" ? "min-w-[6.9rem]" : "min-w-[6.8rem]"}`}>
+                    <div className={`h-[2.5rem] border border-black border-t-0 border-l-0 text-[14px] flex items-center justify-center  
+                      ${isTimeInSchedule("7:00 PM", "8:00 PM", day) ? 'bg-yellow-300' : ''} 
+                      ${isTimeInSchedule("7:00 PM", "8:00 PM", day) && hasAdjacentSchedule("7:00 PM", "8:00 PM", day, "top") === "same" ? "border-t-0" : ''} 
+                      ${isTimeInSchedule("7:00 PM", "8:00 PM", day) && hasAdjacentSchedule("7:00 PM", "8:00 PM", day, "bottom") === "same" ? "border-b-0" : ''}`}
+                    >{getCenterText("7:00 PM", day)}</div>
+                  </td>
+                ))}
+              </tr>
 
-              {["MON","TUE","WED","THU","FRI","SAT","SUN"].map((day, i) => (
-                <td key={day} className={`m-0 p-0 ${day==="WED" ? "min-w-[7rem]" : day==="THU" ? "min-w-[6.9rem]" : "min-w-[6.8rem]"}`}>
-                  <div className={`h-[2.5rem] border border-black border-t-0 border-l-0 text-[14px] flex items-center justify-center  
-                    ${isTimeInSchedule("8:00 PM", "9:00 PM", day) ? 'bg-yellow-300' : ''} 
-                    ${isTimeInSchedule("8:00 PM", "9:00 PM", day) && hasAdjacentSchedule("8:00 PM", "9:00 PM", day, "top") === "same" ? "border-t-0" : ''} 
-                    ${isTimeInSchedule("8:00 PM", "9:00 PM", day) && hasAdjacentSchedule("8:00 PM", "9:00 PM", day, "bottom") === "same" ? "border-b-0" : ''}`}
-                  >{getCenterText("8:00 PM", day)}</div>
+              <tr className='flex w-full'>
+                <td className='m-0 p-0 min-w-[13.1rem]'>
+                  <div className='h-[2.5rem] border border-black border-t-0 text-[14px] flex items-center justify-center'>
+                    08:00 PM - 09:00 PM
+                  </div>
                 </td>
-              ))}
-            </tr>
-          </tbody>
-        </table>
-        
+
+                {["MON","TUE","WED","THU","FRI","SAT","SUN"].map((day, i) => (
+                  <td key={day} className={`m-0 p-0 ${day==="WED" ? "min-w-[7rem]" : day==="THU" ? "min-w-[6.9rem]" : "min-w-[6.8rem]"}`}>
+                    <div className={`h-[2.5rem] border border-black border-t-0 border-l-0 text-[14px] flex items-center justify-center  
+                      ${isTimeInSchedule("8:00 PM", "9:00 PM", day) ? 'bg-yellow-300' : ''} 
+                      ${isTimeInSchedule("8:00 PM", "9:00 PM", day) && hasAdjacentSchedule("8:00 PM", "9:00 PM", day, "top") === "same" ? "border-t-0" : ''} 
+                      ${isTimeInSchedule("8:00 PM", "9:00 PM", day) && hasAdjacentSchedule("8:00 PM", "9:00 PM", day, "bottom") === "same" ? "border-b-0" : ''}`}
+                    >{getCenterText("8:00 PM", day)}</div>
+                  </td>
+                ))}
+              </tr>
+            </tbody>
+          </table>
+        </Box>
         <Card sx={{ flex: 1, border: "2px solid maroon" }}>
           <CardContent>
             <Typography

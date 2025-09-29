@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 29, 2025 at 02:58 AM
+-- Generation Time: Sep 29, 2025 at 12:22 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -49,10 +49,11 @@ INSERT INTO `active_school_year_table` (`id`, `year_id`, `semester_id`, `astatus
 (9, 3, 2, 0, 0),
 (10, 13, 2, 0, 0),
 (11, 13, 1, 0, 0),
-(12, 5, 1, 1, 0),
+(12, 5, 1, 0, 0),
 (13, 5, 2, 0, 0),
 (14, 5, 3, 0, 0),
-(15, 3, 1, 0, 0);
+(15, 3, 1, 0, 0),
+(16, 10, 1, 1, 0);
 
 -- --------------------------------------------------------
 
@@ -176,10 +177,9 @@ CREATE TABLE `curriculum_table` (
 --
 
 INSERT INTO `curriculum_table` (`curriculum_id`, `year_id`, `program_id`, `lock_status`) VALUES
-(0, 5, 58, 0),
 (1, 1, 1, 0),
 (2, 2, 2, 0),
-(3, 3, 3, 0),
+(3, 3, 15, 0),
 (4, 4, 4, 0),
 (5, 5, 5, 0),
 (6, 6, 6, 0),
@@ -231,7 +231,9 @@ INSERT INTO `curriculum_table` (`curriculum_id`, `year_id`, `program_id`, `lock_
 (52, 52, 52, 0),
 (53, 53, 53, 0),
 (54, 54, 54, 0),
-(55, 55, 55, 0);
+(55, 55, 55, 0),
+(56, 5, 58, 0),
+(57, 4, 15, 0);
 
 -- --------------------------------------------------------
 
@@ -1022,7 +1024,38 @@ INSERT INTO `enrolled_subject` (`id`, `student_number`, `curriculum_id`, `course
 (676, '202500001', 1, 6, 12, 0, 0, '0.00', 0, 1, 1, 0, '2025-09-17 08:51:48'),
 (677, '202500001', 1, 7, 12, 0, 0, '0.00', 0, 1, 1, 0, '2025-09-17 08:51:48'),
 (678, '202500001', 1, 8, 12, 0, 0, '0.00', 0, 1, 1, 0, '2025-09-17 08:51:48'),
-(679, '202500001', 1, 9, 12, 0, 0, '0.00', 0, 1, 1, 0, '2025-09-17 08:51:48');
+(679, '202500001', 1, 9, 12, 0, 0, '0.00', 0, 1, 1, 0, '2025-09-17 08:51:48'),
+(680, '224-06342M', 3, 54, 3, 0, 0, '1.25', 1, 0, 0, 0, '2025-09-29 07:32:40'),
+(681, '224-06342M', 3, 53, 3, 0, 0, '2', 1, 0, 0, 0, '2025-09-29 07:32:40'),
+(682, '224-06342M', 3, 46, 3, 0, 0, '1.5', 1, 0, 0, 0, '2025-09-29 07:32:40'),
+(683, '224-06342M', 3, 50, 3, 0, 0, '1', 1, 0, 0, 0, '2025-09-29 07:32:40'),
+(684, '224-06342M', 3, 49, 3, 0, 0, '1', 1, 0, 0, 0, '2025-09-29 07:32:40'),
+(685, '224-06342M', 3, 56, 3, 0, 0, '1.25', 1, 0, 0, 0, '2025-09-29 07:32:40'),
+(686, '224-06342M', 3, 55, 3, 0, 0, '1.25', 1, 0, 0, 0, '2025-09-29 07:32:40'),
+(687, '224-06342M', 3, 51, 3, 0, 0, '1', 1, 0, 0, 0, '2025-09-29 07:32:40'),
+(688, '224-06342M', 3, 52, 3, 0, 0, '1', 1, 0, 0, 0, '2025-09-29 07:32:40'),
+(689, '224-06342M', 3, 48, 3, 0, 0, '1', 1, 0, 0, 0, '2025-09-29 07:32:40'),
+(690, '224-06342M', 3, 47, 3, 0, 0, '1', 1, 0, 0, 0, '2025-09-29 07:32:40'),
+(691, '224-06342M', 3, 58, 2, 0, 0, '1.5', 1, 0, 0, 0, '2025-09-29 07:32:40'),
+(692, '224-06342M', 3, 57, 2, 0, 0, '1.75', 1, 0, 0, 0, '2025-09-29 07:32:40'),
+(693, '224-06342M', 3, 66, 2, 0, 0, '1', 1, 0, 0, 0, '2025-09-29 07:32:40'),
+(694, '224-06342M', 3, 65, 2, 0, 0, '1', 1, 0, 0, 0, '2025-09-29 07:32:40'),
+(695, '224-06342M', 3, 60, 2, 0, 0, '1.25', 1, 0, 0, 0, '2025-09-29 07:32:40'),
+(696, '224-06342M', 3, 62, 2, 0, 0, '1', 1, 0, 0, 0, '2025-09-29 07:32:40'),
+(697, '224-06342M', 3, 61, 2, 0, 0, '1', 1, 0, 0, 0, '2025-09-29 07:32:40'),
+(698, '224-06342M', 3, 64, 2, 0, 0, '1', 1, 0, 0, 0, '2025-09-29 07:32:40'),
+(699, '224-06342M', 3, 63, 2, 0, 0, '1', 1, 0, 0, 0, '2025-09-29 07:32:40'),
+(700, '224-06342M', 3, 59, 2, 0, 0, '1.75', 1, 0, 0, 0, '2025-09-29 07:32:40'),
+(701, '224-06342M', 3, 67, 16, 0, 0, '0', 0, 0, 0, 0, '2025-09-29 07:32:40'),
+(702, '224-06342M', 3, 73, 16, 0, 0, '0', 0, 0, 0, 0, '2025-09-29 07:32:40'),
+(703, '224-06342M', 3, 72, 16, 0, 0, '0', 0, 0, 0, 0, '2025-09-29 07:32:40'),
+(704, '224-06342M', 3, 70, 16, 0, 0, '0', 0, 0, 0, 0, '2025-09-29 07:32:40'),
+(705, '224-06342M', 3, 71, 16, 0, 0, '0', 0, 0, 0, 0, '2025-09-29 07:32:40'),
+(706, '224-06342M', 3, 76, 16, 0, 0, '0', 0, 0, 0, 0, '2025-09-29 07:32:40'),
+(707, '224-06342M', 3, 75, 16, 0, 0, '0', 0, 0, 0, 0, '2025-09-29 07:32:40'),
+(708, '224-06342M', 3, 74, 16, 0, 0, '0', 0, 0, 0, 0, '2025-09-29 07:32:40'),
+(709, '224-06342M', 3, 68, 16, 0, 0, '0', 0, 0, 0, 0, '2025-09-29 07:32:41'),
+(710, '224-06342M', 3, 69, 16, 0, 0, '0', 0, 0, 0, 0, '2025-09-29 07:32:41');
 
 -- --------------------------------------------------------
 
@@ -1358,16 +1391,11 @@ INSERT INTO `person_table` (`person_id`, `student_number`, `profile_img`, `campu
 (306, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'De La Cruz', 'Lloyd Cedrick', 'Pacheco', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'delacruz.lc.bsinfotech@gmail.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-08-09', 1),
 (307, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Montano', 'Mark Anthony', 'Placido', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'montano.ma.bsinfotech@gmail.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-09-16', 1),
 (308, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Ciruela', 'Genny', 'D.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'montano.ma.bsinfotech@gmail.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-09-16', 1),
-(1311, 'Eulogio \"Amang\" Rodriguez', '', 0, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 0, 0, 0, '', '', NULL, 0, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 0, '', '', '', '', '', '', '', 0, 0, '', '', '', '', '', 0, '', '', '', '', '', '', '', '', '', '', 0, '', '', '', '', '', 0, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 0.00, 0, '', '', '', '', '', 0.00, 0, '', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 0, '', '', '', '', '', '', '', '', '', '', '', '', '', 0, '', 0, '2025-09-28 20:47:22.032', 1),
-(1312, 'Institute of Science and Technology', '', 0, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 0, 0, 0, '', '', NULL, 0, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 0, '', '', '', '', '', '', '', 0, 0, '', '', '', '', '', 0, '', '', '', '', '', '', '', '', '', '', 0, '', '', '', '', '', 0, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 0.00, 0, '', '', '', '', '', 0.00, 0, '', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 0, '', '', '', '', '', '', '', '', '', '', '', '', '', 0, '', 0, '2025-09-28 20:47:22.044', 1),
-(1313, 'Nagtahan St. Sampaloc, Manila', '', 0, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 0, 0, 0, '', '', NULL, 0, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 0, '', '', '', '', '', '', '', 0, 0, '', '', '', '', '', 0, '', '', '', '', '', '', '', '', '', '', 0, '', '', '', '', '', 0, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 0.00, 0, '', '', '', '', '', 0.00, 0, '', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 0, '', '', '', '', '', '', '', '', '', '', '', '', '', 0, '', 0, '2025-09-28 20:47:22.047', 1),
-(1314, 'Student Data', '', 0, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 0, 0, 0, '', '', NULL, 0, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 0, '', '', '', '', '', '', '', 0, 0, '', '', '', '', '', 0, '', '', '', '', '', '', '', '', '', '', 0, '', '', '', '', '', 0, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 0.00, 0, '', '', '', '', '', 0.00, 0, '', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 0, '', '', '', '', '', '', '', '', '', '', '', '', '', 0, '', 0, '2025-09-28 20:47:22.049', 1),
-(1315, 'Student Number', 'Profile Image', 0, 'Academic Program', 'Classified As', 'Applying As', 'Program', 'Program2', 'Program3', 'Year Level', 'Last Name', 'First Name', 'Middle Name', 'Extension', 'Nickname', 'Height', 'Weight', 'LRN Number', 0, 0, 0, 'PWD Type', 'PWD ID', 'Birth Of Date', 0, 'Birthplace', 'Language Dialect Spoken', 'Citizenship', 'Religion', 'Civil Status', 'Tribe Ethnic Group', 'Cellphone Number', 'Email Address', 'Present Street', 'Present Barangay', 'Present Zi', 'Present Region', 'Present Province', 'Present Municipality', 'Present DSWD Household Number', 0, 'Permanent Street', 'Permanent Barangay', 'Permanent ', 'Permanent Region', 'Permanent Province', 'Permanent Municipality', 'Permanent DSWD Household Number', 0, 0, 'Father Family Name', 'Father Given Name', 'Father Middle Name', 'Father Ext', 'Father Nickname', 0, 'Father Education Level', 'Father Last School', 'Father Course', 'Father Yea', 'Father School Address', 'Father Contact', 'Father Occupation', 'Father Employer', 'Father Income', 'Father Email', 0, 'Mother Family Name', 'Mother Given Name', 'Mother Middle Name', 'Mother Ext', 'Mother Nickname', 0, 'Mother Education Level', 'Mother Last School', 'Mother Course', 'Mother Yea', 'Mother School Address', 'Mother Contact', 'Mother Occupation', 'Mother Employer', 'Mother Income', 'Mother Email', 'Guardian', 'Guardian Family Name', 'Guardian Given Name', 'Guardian Middle Name', 'Guardian Ext.', 'Guardian Nickname', 'Guardian Address', 'Guardian Contact', 'Guardian Email', 'Annual Income', 'School Level', 'School Last Attended', 'School Address', 'Course Program', 'Honor', 0.00, 0, 'School Level 1', 'School Last Attended 1', 'School Address 1', 'Course Program 1', 'Honor 1', 0.00, 0, 'Strand', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Medication Hospitalization Details', 'Had Covid', 0, 'Vaccine1 Brand', 'Vaccine1 Date', 'Vaccine2 Brand', 'Vaccine2 Date', 'Booster1 Brand', 'Booster1 Date', 'Booster2 Brand', 'Booster2 Date', 'Chest Xray', 'CBC', 'Urinalysis', 'Otherworkups', 'Symptoms Today', 0, 'Terms Of Agreement', 0, 'Current Step', 1),
-(1316, '224-09114M', '-', 0, 'Techvoc', 'Freshman (First Year)', 'Senior High School Graduate', 'Bachelor of Science in Computer Science', 'Bachelor of Science in Information Technology', 'Bachelor of Science in Mechanical Engineering', 'First Year', 'Santos', 'Christian Rainiel', 'Alarcon', 'Jr.', 'Rain', '5\'11', '60kg', '', 0, 0, 0, '', '', '38725', 19, 'Manila, Philippines', 'Tagalog, English, Cebuano', 'Filipino', 'Roman Catholic', 'Single', 'Cebuano', '9171234567', 'alarcon.cr@gmail.com', '63 Lt. J. Francisco Street', 'Barangay Krus Na Ligas', '1101', 'National Capital Region(NCR)', 'Metro Manila, Fourth District', 'Quezon City', 'DSWD123456', 0, '', '', '', '', '', '', '', 0, 0, 'Santos', 'Eduardo', 'Colorado', '', 'Eduardo', 0, '', '', '', '', '', '9581234567', 'Vendor', '', '5000', 'santoseduardo123@gmail.com', 0, 'Alarcon', 'Erlinda', 'Burgos', '', 'Linda', 0, 'College Undergraduate', 'Manuel L. Quezon University', 'Bachelor of Science in Business Management ', 'N/A', '916 Fr Hidalgo St, Quiapo, Manila, 1001 Metro Manila', '9178883228', 'Sales lady', '', '15000', 'erlindaburgos123@gmail.com', 'Mother ', 'Alarcon', 'Erlinda', 'Burgos', '', 'Linda', '63 Lt. J. Francisco Street', '9178883228', 'erlindaburgos123@gmail.com', '80,000 and below', 'Junior High School', 'Holy Family School of Quezon City Inc.', '66 Maginhawa, Diliman, Quezon City, 1101 Kalakhang Maynila', 'TVL-ICT', 'With Honors', 91.00, 2020, 'Senior High School', 'Holy Family School of Quezon City Inc.', '66 Maginhawa, Diliman, Quezon City, 1101 Kalakhang Maynila', 'TVL-ICT', 'With Honors', 94.00, 2022, 'Information and Communications Technology (ICT)', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', 'No', 0, 'Pfizer', '44634', 'Pfizer', '44695', 'Pfizer', '44756', 'Pfizer', '44818', 'Normal', 'Normal', 'Normal', 'Normal', 'For Compliance', 0, '/', 0, '2025-09-28 20:47:22.054', 1),
-(1317, '234-14491M', '-', 0, 'Techvoc', 'Freshman (First Year)', 'Senior High School Graduate', 'Bachelor of Science in Information Technology', 'Bachelor of Science in Architecture', 'Bachelor of Science in Hospitality Management', 'First Year', 'Perez', 'Eduard Daren', 'Tano', '', 'Dar', '5\'9', '65kg', '', 0, 0, 0, '', '', '38425', 20, 'Quezon City, Philippines', 'Tagalog, English, Ilonggo', 'Filipino', 'Roman Catholic', 'Single', 'Ilonggo', '9281234567', 'perezdar14@gmail.com', '12-D Manansala Street', 'Barangay U.P. Campus', '1101', 'National Capital Region(NCR)', 'Metro Manila, Fourth District', 'Quezon City', 'DSWD123457', 0, '', '', '', '', '', '', '', 0, 0, 'Perez', 'Rolando', 'Gala', '', 'Lando', 0, 'High School Graduate', 'Quirino High School', 'TVL', '1984', '128 Molave, Project 3, Quezon City, 1102 Kalakhang Maynila', '9491234567', 'Driver', '', '15000', 'rolando.p67@gmail.com', 0, 'Tano', 'Concepcion', 'Deuna', '', 'Connie', 0, '', '', '', '', '', '9178144282', 'Housewife', '', 'N/A', 'concepcion.deuna@gmail.com', 'Mother ', 'Tano', 'Concepcion', 'Deuna', '', 'Connie', '12-D Manansala Street', '9178144282', 'concepcion.deuna@gmail.com', '80,000 and below', 'Junior High School', 'Ramon Magsaysay Cubao High School', '731 Epifanio de los Santos Ave, Quezon City, 1112 Metro Manila', 'TVL-ICT', 'With Honors', 93.00, 2020, 'Senior High School', 'Ramon Magsaysay Cubao High School', '731 Epifanio de los Santos Ave, Quezon City, 1112 Metro Manila', 'TVL-ICT', 'With Honors', 92.00, 2022, 'Information and Communications Technology (ICT)', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', 'No', 0, 'Pfizer', '44663', 'Pfizer', '44724', 'Pfizer', '44785', 'Pfizer', '44846', 'Normal', 'Normal', 'Normal', 'Normal', 'For Compliance', 0, '/', 0, '2025-09-28 20:47:22.057', 1),
-(1318, '234-14491M', '-', 0, 'Techvoc', 'Freshman (First Year)', 'Senior High School Graduating Student', 'Bachelor of Science in Office Administration', 'Bachelor of Science in Psychology', 'Bachelor in Secondary Education Major in Math', 'First Year', 'Marcos', 'Andrey Kyle', 'Mascariola', '', 'Ky', '5\'1', '50kg', '', 0, 0, 0, '', '', '38027', 21, 'Quezon City, Philippines', 'Tagalog, English', 'Filipino', 'Roman Catholic', 'Single', 'English', '9391234567', 'andreykyle.mm@gmail.com', '18 B. Baluyot St.', 'Barangay San Vicente', '1101', 'National Capital Region(NCR)', 'Metro Manila, Fourth District', 'Quezon City', 'DSWD123458', 0, '', '', '', '', '', '', '', 0, 0, 'Marcos', 'Edwin', 'Tumaob', '', 'Ed', 0, 'High School Graduate', 'Ramon Magsaysay (Cubao) High School', 'TVL', '1980', '731 Epifanio de los Santos Ave, Quezon City, 1112 Metro Manila', '9391234567', 'Factory Worker', '', '12000', 'marcosedwin123@gmail', 0, 'Mascariola', 'Cynthia', 'Sioco', '', 'Cynth', 0, 'High School Graduate', 'Gregorio Perfecto High School', 'TVL', '1991', '775 Ricafort Tondo, Manila', '9303989756', 'Housewife', '', 'N/A', 'cynthiasioco123@gmail', 'Mother ', 'Mascariola', 'Cynthia', 'Sioco', '', 'Cynth', '18 B. Baluyot St.', '9303989756', 'cynthiasioco123@gmail', '80,000 and below', 'Junior High School', 'Ramon Magsaysay Cubao High School', '731 Epifanio de los Santos Ave, Quezon City, 1112 Metro Manila', 'HUMSS', 'With Honors', 94.00, 2020, 'Senior High School', 'Ramon Magsaysay Cubao High School', '731 Epifanio de los Santos Ave, Quezon City, 1112 Metro Manila', 'HUMSS', 'With Honors', 93.00, 2022, 'Humanities and Social Sciences (HUMSS)', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', 'No', 0, 'Pfizer', '44624', 'Pfizer', '44685', 'Pfizer', '44746', 'Pfizer', '44808', 'Normal', 'Normal', 'Normal', 'Normal', 'For Compliance', 0, '/', 0, '2025-09-28 20:47:22.063', 1),
-(1319, '234-14491M', '-', 0, 'Undergraduate', 'Transferee', 'Transferee from other University/College', 'Bachelor of Science in Civil Engineering', 'Bachelor of Science in Interior Design', 'Bachelor of Science in Industrial Technology Major in Food Technology', 'Second Year', 'Camba', 'Kate Nadine ', 'Dizon', '', 'Nadz', '5\'3', '71kg', '', 0, 0, 0, '', '', '37979', 21, 'Quezon City, Philippines', 'Tagalog, English', 'Filipino', 'Roman Catholic', 'Single', 'English', '9491234567', 'cambanadi.k8@gmail.com', '49 M. Dela Cruz Street', 'Barangay Pinyahan', '1100', 'National Capital Region(NCR)', 'Metro Manila, Fourth District', 'Quezon City', 'DSWD123459', 0, '', '', '', '', '', '', '', 0, 0, 'Camba', 'Norberto', 'Manansala', '', 'Balong', 0, 'College Graduate', 'AMA Computer College', 'Bachelor of Science in Computer Science', '1986', 'Villa Socorro Subdivision, Quezon City, Metro Manila', '9281234567', 'Electrician', '', '20000', 'cambanorberto1238@gmail', 0, 'Dizon', 'Cristina', 'Cruz', '', 'Tinay', 0, 'College Undergraduate', 'University of the East', 'BS Mass Communication', '1995', '2219 Recto Ave. Sampaloc, Manila', '9207869352', 'Call center agent', 'Accenture', '25000', 'cristinacruz1238@gmail', 'Mother ', 'Dizon', 'Cristina', 'Cruz', '', 'Tinay', '49 M. Dela Cruz Street', '9207869352', 'cristinacruz1238@gmail', '80,000 and below', 'Junior High School', 'Quirino High School', '128 Molave, Project 3, Quezon City, 1102 Kalakhang Maynila', 'STEM', 'With Honors', 92.00, 2018, 'Undergraduate', 'Polytechnic University of the Philippines', '1016 Anonas, Sta. Mesa, Manila, Kalakhang Maynila', 'STEM', 'With Honors', 91.00, 2020, 'Science, Technology, Engineering, and Mathematics (STEM)', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', 'No', 0, 'Pfizer', '44652', 'Pfizer', '44713', 'Pfizer', '44774', 'Pfizer', '44835', 'Normal', 'Normal', 'Normal', 'Normal', 'For Compliance', 0, '/', 0, '2025-09-28 20:47:22.065', 1),
-(1320, '234-14491M', '-', 0, 'Undergraduate', 'Transferee', 'Transferee from other University/College', 'Bachelor of Science in Tourism Management', 'Bachelor of Science in Public Administration', 'Bachelor of Science in Hospitality Management', 'Second Year', 'Balana', 'Edris Jazmine', 'Hernandez', '', 'Dris', '5\'3', '68kg', '', 0, 0, 0, '', '', '38111', 21, 'Manila, Philippines', 'Tagalog, English, Bicolano', 'Filipino', 'Roman Catholic', 'Single', 'Bicolano', '9581234567', 'edrisj.balana@gmail.com', '60 S. Salvador St.', 'Barangay Kamuning', '1103', 'National Capital Region(NCR)', 'Metro Manila, Fourth District', 'Quezon City', 'DSWD123460', 0, '', '', '', '', '', '', '', 0, 0, 'Balana', 'Randy', 'San Pascual', '', 'Rands', 0, 'College Graduate', 'Polytechnic University of the Philippines', 'Business Administration', '1990', '1016 Anonas, Sta. Mesa, Manila, Kalakhang Maynila', '9171234567', 'OFW', '', '40000', 'balanarandy123@gmail', 0, 'Hernandez', 'Nora', 'Catchero', '', 'Nors', 0, 'High School Graduate', 'San Jose National High School', 'TVL', '2011', 'Antipolo City', '9773731418', 'Online seller', '', '8000', 'nora.catchero@gmail.com', 'Mother ', 'Hernandez', 'Nora', 'Catchero', '', 'Nors', '60 S. Salvador St.', '9773731418', 'nora.catchero@gmail.com', '80,000 and below', 'Junior High School', 'San Jose National High School', 'Antipolo City', 'HUMSS', 'With Honors', 95.00, 2019, 'Undergraduate', 'ICCT Colleges', 'ICCT Bldg. V.V. Soliven Ave. II, Cainta, Rizal, Philippines 1900', 'HUMSS', 'With Honors', 94.00, 2021, 'Humanities and Social Sciences (HUMSS)', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', 'No', 0, 'Pfizer', '44648', 'Pfizer', '44709', 'Pfizer', '44770', 'Pfizer', '44832', 'Normal', 'Normal', 'Normal', 'Normal', 'For Compliance', 0, '/', 0, '2025-09-28 20:47:22.067', 1);
+(1342, NULL, '-', 0, 'Techvoc', 'Freshman (First Year)', 'Senior High School Graduate', '37', '18', '10', 'First Year', 'Santos', 'Christian Rainiel', 'Alarcon', 'Jr.', 'Rain', '5\'11', '60kg', 'No LRN Number', 0, 0, 0, '', '', '38725', 19, 'Manila, Philippines', 'Tagalog, English, Cebuano', 'Filipino', 'Roman Catholic', 'Single', 'Cebuano', '9171234567', 'alarcon.cr@gmail.com', '63 Lt. J. Francisco Street', 'Barangay Krus Na Ligas', '1101', 'National Capital Region(NCR)', 'Metro Manila, Fourth District', 'Quezon City', 'DSWD123456', 0, '', '', '', '', '', '', '', 0, 0, 'Santos', 'Eduardo', 'Colorado', '', 'Eduardo', 1, '', '', '', '', '', '9581234567', 'Vendor', '', '5000', 'santoseduardo123@gmail.com', 0, 'Alarcon', 'Erlinda', 'Burgos', '', 'Linda', 0, 'College Undergraduate', 'Manuel L. Quezon University', 'Bachelor of Science in Business Management ', 'N/A', '916 Fr Hidalgo St, Quiapo, Manila, 1001 Metro Manila', '9178883228', 'Sales lady', '', '15000', 'erlindaburgos123@gmail.com', 'Mother ', 'Alarcon', 'Erlinda', 'Burgos', '', 'Linda', '63 Lt. J. Francisco Street', '9178883228', 'erlindaburgos123@gmail.com', '80,000 and below', 'Junior High School', 'Holy Family School of Quezon City Inc.', '66 Maginhawa, Diliman, Quezon City, 1101 Kalakhang Maynila', 'TVL-ICT', 'With Honors', 91.00, 2020, 'Senior High School', 'Holy Family School of Quezon City Inc.', '66 Maginhawa, Diliman, Quezon City, 1101 Kalakhang Maynila', 'TVL-ICT', 'With Honors', 94.00, 2022, 'Information and Communications Technology (ICT)', 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 0, 'Pfizer', '44634', 'Pfizer', '44695', 'Pfizer', '44756', 'Pfizer', '44818', 'Normal', 'Normal', 'Normal', 'Normal', '1', 0, '1', 0, '2025-09-29 18:17:41.260', 1),
+(1343, NULL, '-', 0, 'Techvoc', 'Freshman (First Year)', 'Senior High School Graduate', '55', '20', '47', 'First Year', 'Perez', 'Eduard Daren', 'Tano', '', 'Dar', '5\'9', '65kg', '123456789012', 0, 0, 0, '', '', '38425', 20, 'Quezon City, Philippines', 'Tagalog, English, Ilonggo', 'Filipino', 'Roman Catholic', 'Single', 'Ilonggo', '9281234567', 'perezdar14@gmail.com', '12-D Manansala Street', 'Barangay U.P. Campus', '1101', 'National Capital Region(NCR)', 'Metro Manila, Fourth District', 'Quezon City', 'DSWD123457', 0, '', '', '', '', '', '', '', 0, 0, 'Perez', 'Rolando', 'Gala', '', 'Lando', 0, 'High School Graduate', 'Quirino High School', 'TVL', '1984', '128 Molave, Project 3, Quezon City, 1102 Kalakhang Maynila', '9491234567', 'Driver', '', '15000', 'rolando.p67@gmail.com', 0, 'Tano', 'Concepcion', 'Deuna', '', 'Connie', 1, '', '', '', '', '', '9178144282', 'Housewife', '', 'N/A', 'concepcion.deuna@gmail.com', 'Mother ', 'Tano', 'Concepcion', 'Deuna', '', 'Connie', '12-D Manansala Street', '9178144282', 'concepcion.deuna@gmail.com', '80,000 and below', 'Junior High School', 'Ramon Magsaysay Cubao High School', '731 Epifanio de los Santos Ave, Quezon City, 1112 Metro Manila', 'TVL-ICT', 'With Honors', 93.00, 2020, 'Senior High School', 'Ramon Magsaysay Cubao High School', '731 Epifanio de los Santos Ave, Quezon City, 1112 Metro Manila', 'TVL-ICT', 'With Honors', 92.00, 2022, 'Information and Communications Technology (ICT)', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 0, 'Pfizer', '44663', 'Pfizer', '44724', 'Pfizer', '44785', 'Pfizer', '44846', 'Normal', 'Normal', 'Normal', 'Normal', '1', 0, '1', 0, '2025-09-29 18:17:41.301', 1),
+(1344, NULL, '-', 0, 'Techvoc', 'Freshman (First Year)', 'Senior High School Graduating Student', '1', '17', '29', 'First Year', 'Marcos', 'Andrey Kyle', 'Mascariola', '', 'Ky', '5\'1', '50kg', 'No LRN Number', 0, 0, 0, '', '', '38027', 21, 'Quezon City, Philippines', 'Tagalog, English', 'Filipino', 'Roman Catholic', 'Single', 'English', '9391234567', 'andreykyle.mm@gmail.com', '18 B. Baluyot St.', 'Barangay San Vicente', '1101', 'National Capital Region(NCR)', 'Metro Manila, Fourth District', 'Quezon City', 'DSWD123458', 0, '', '', '', '', '', '', '', 0, 0, 'Marcos', 'Edwin', 'Tumaob', '', 'Ed', 0, 'High School Graduate', 'Ramon Magsaysay (Cubao) High School', 'TVL', '1980', '731 Epifanio de los Santos Ave, Quezon City, 1112 Metro Manila', '9391234567', 'Factory Worker', '', '12000', 'marcosedwin123@gmail', 0, 'Mascariola', 'Cynthia', 'Sioco', '', 'Cynth', 0, 'High School Graduate', 'Gregorio Perfecto High School', 'TVL', '1991', '775 Ricafort Tondo, Manila', '9303989756', 'Housewife', '', 'N/A', 'cynthiasioco123@gmail', 'Mother ', 'Mascariola', 'Cynthia', 'Sioco', '', 'Cynth', '18 B. Baluyot St.', '9303989756', 'cynthiasioco123@gmail', '80,000 and below', 'Junior High School', 'Ramon Magsaysay Cubao High School', '731 Epifanio de los Santos Ave, Quezon City, 1112 Metro Manila', 'HUMSS', 'With Honors', 94.00, 2020, 'Senior High School', 'Ramon Magsaysay Cubao High School', '731 Epifanio de los Santos Ave, Quezon City, 1112 Metro Manila', 'HUMSS', 'With Honors', 93.00, 2022, 'Humanities and Social Sciences (HUMSS)', 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 0, 'Pfizer', '44624', 'Pfizer', '44685', 'Pfizer', '44746', 'Pfizer', '44808', 'Normal', 'Normal', 'Normal', 'Normal', '1', 0, '1', 0, '2025-09-29 18:17:41.310', 1),
+(1345, NULL, '-', 0, 'Undergraduate', 'Transferee', 'Transferee from other University/College', '8', '31', '50', 'Second Year', 'Camba', 'Kate Nadine ', 'Dizon', '', 'Nadz', '5\'3', '71kg', 'No LRN Number', 0, 0, 0, '', '', '37979', 21, 'Quezon City, Philippines', 'Tagalog, English', 'Filipino', 'Roman Catholic', 'Single', 'English', '9491234567', 'cambanadi.k8@gmail.com', '49 M. Dela Cruz Street', 'Barangay Pinyahan', '1100', 'National Capital Region(NCR)', 'Metro Manila, Fourth District', 'Quezon City', 'DSWD123459', 0, '', '', '', '', '', '', '', 0, 0, 'Camba', 'Norberto', 'Manansala', '', 'Balong', 0, 'College Graduate', 'AMA Computer College', 'Bachelor of Science in Computer Science', '1986', 'Villa Socorro Subdivision, Quezon City, Metro Manila', '9281234567', 'Electrician', '', '20000', 'cambanorberto1238@gmail', 0, 'Dizon', 'Cristina', 'Cruz', '', 'Tinay', 0, 'College Undergraduate', 'University of the East', 'BS Mass Communication', '1995', '2219 Recto Ave. Sampaloc, Manila', '9207869352', 'Call center agent', 'Accenture', '25000', 'cristinacruz1238@gmail', 'Mother ', 'Dizon', 'Cristina', 'Cruz', '', 'Tinay', '49 M. Dela Cruz Street', '9207869352', 'cristinacruz1238@gmail', '80,000 and below', 'Junior High School', 'Quirino High School', '128 Molave, Project 3, Quezon City, 1102 Kalakhang Maynila', 'STEM', 'With Honors', 92.00, 2018, 'Undergraduate', 'Polytechnic University of the Philippines', '1016 Anonas, Sta. Mesa, Manila, Kalakhang Maynila', 'STEM', 'With Honors', 91.00, 2020, 'Science, Technology, Engineering, and Mathematics (STEM)', 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 0, 'Pfizer', '44652', 'Pfizer', '44713', 'Pfizer', '44774', 'Pfizer', '44835', 'Normal', 'Normal', 'Normal', 'Normal', '1', 0, '1', 0, '2025-09-29 18:17:41.319', 1),
+(1346, NULL, '-', 0, 'Undergraduate', 'Transferee', 'Transferee from other University/College', '12', '6', '4', 'Second Year', 'Balana', 'Edris Jazmine', 'Hernandez', '', 'Dris', '5\'3', '68kg', '123456789012', 0, 0, 0, '', '', '38111', 21, 'Manila, Philippines', 'Tagalog, English, Bicolano', 'Filipino', 'Roman Catholic', 'Single', 'Bicolano', '9581234567', 'edrisj.balana@gmail.com', '60 S. Salvador St.', 'Barangay Kamuning', '1103', 'National Capital Region(NCR)', 'Metro Manila, Fourth District', 'Quezon City', 'DSWD123460', 0, '', '', '', '', '', '', '', 0, 0, 'Balana', 'Randy', 'San Pascual', '', 'Rands', 0, 'College Graduate', 'Polytechnic University of the Philippines', 'Business Administration', '1990', '1016 Anonas, Sta. Mesa, Manila, Kalakhang Maynila', '9171234567', 'OFW', '', '40000', 'balanarandy123@gmail', 0, 'Hernandez', 'Nora', 'Catchero', '', 'Nors', 0, 'High School Graduate', 'San Jose National High School', 'TVL', '2011', 'Antipolo City', '9773731418', 'Online seller', '', '8000', 'nora.catchero@gmail.com', 'Mother ', 'Hernandez', 'Nora', 'Catchero', '', 'Nors', '60 S. Salvador St.', '9773731418', 'nora.catchero@gmail.com', '80,000 and below', 'Junior High School', 'San Jose National High School', 'Antipolo City', 'HUMSS', 'With Honors', 95.00, 2019, 'Undergraduate', 'ICCT Colleges', 'ICCT Bldg. V.V. Soliven Ave. II, Cainta, Rizal, Philippines 1900', 'HUMSS', 'With Honors', 94.00, 2021, 'Humanities and Social Sciences (HUMSS)', 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 0, 'Pfizer', '44648', 'Pfizer', '44709', 'Pfizer', '44770', 'Pfizer', '44832', 'Normal', 'Normal', 'Normal', 'Normal', '1', 0, '1', 0, '2025-09-29 18:17:41.325', 1);
 
 -- --------------------------------------------------------
 
@@ -1467,7 +1495,7 @@ INSERT INTO `program_table` (`program_id`, `program_description`, `program_code`
 (12, 'Bachelor of Science in Criminology', 'BSCRIM', NULL),
 (13, 'Bachelor in Public Administration', 'BPA', NULL),
 (14, 'Bachelor of Science in Computer Science', 'BSCS', NULL),
-(15, 'Bachelor of Science in Information Technology', 'BS INFOTECH', NULL),
+(15, 'Bachelor of Science in Information Technology', 'BSINFOTECH', NULL),
 (16, 'Bachelor in Secondary Education Major in Science', 'BSE-SCI', 'Science'),
 (17, 'Bachelor in Secondary Education Major in Mathematics', 'BSE-MATH', 'Mathematics'),
 (18, 'Bachelor in Secondary Education Major in Filipino', 'BSE-FIL', 'Filipino'),
@@ -1946,7 +1974,17 @@ INSERT INTO `student_numbering_table` (`id`, `student_number`, `person_id`) VALU
 (60, '202500060', 60),
 (61, '202500306', 306),
 (62, '202500307', 307),
-(63, '202500309', 309);
+(63, '202500309', 309),
+(80, '224-09114M', 1337),
+(81, '234-14491M', 1338),
+(82, '234-14491M', 1339),
+(83, '234-14491M', 1340),
+(84, '234-14491M', 1341),
+(85, '202500001', 1342),
+(86, '202500002', 1343),
+(87, '202500003', 1344),
+(88, '202500004', 1345),
+(89, '202500005', 1346);
 
 -- --------------------------------------------------------
 
@@ -2065,7 +2103,8 @@ INSERT INTO `time_table` (`id`, `room_day`, `school_time_start`, `school_time_en
 (30, 4, '7:00 AM', '10:00 AM', 7, 4, 38, 21, 12),
 (31, 4, '10:00 AM', '12:00 PM', 7, 2, 38, 21, 12),
 (32, 3, '12:00 PM', '3:00 PM', 2, 15, 63, 21, 12),
-(33, 6, '8:00 AM', '10:00 AM', 4, 11, 63, 21, 12);
+(33, 6, '8:00 AM', '10:00 AM', 4, 11, 63, 21, 12),
+(34, 1, '7:00 AM', '10:00 AM', 1, 1, 38, 21, 3);
 
 -- --------------------------------------------------------
 
@@ -2185,8 +2224,8 @@ INSERT INTO `year_level_table` (`year_level_id`, `year_level_description`) VALUE
 
 CREATE TABLE `year_table` (
   `year_id` int(11) NOT NULL,
-  `year_description` varchar(255) DEFAULT NULL,
-  `status` tinyint(1) DEFAULT 0
+  `year_description` int(11) NOT NULL,
+  `status` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -2194,14 +2233,22 @@ CREATE TABLE `year_table` (
 --
 
 INSERT INTO `year_table` (`year_id`, `year_description`, `status`) VALUES
-(1, '2021', 0),
-(2, '2022', 0),
-(3, '2023', 0),
-(4, '2024', 0),
-(5, '2025', 1),
-(6, '2026', 0),
-(7, '2027', 0),
-(8, '2028', 0);
+(1, 2016, 0),
+(2, 2017, 0),
+(3, 2018, 0),
+(4, 2019, 0),
+(5, 2020, 0),
+(6, 2021, 0),
+(7, 2022, 0),
+(8, 2023, 0),
+(9, 2024, 0),
+(10, 2025, 1),
+(11, 2026, 0),
+(12, 2027, 0),
+(13, 2028, 0),
+(14, 2029, 0),
+(15, 2030, 0),
+(16, 2031, 0);
 
 --
 -- Indexes for dumped tables
@@ -2424,13 +2471,19 @@ ALTER TABLE `year_table`
 -- AUTO_INCREMENT for table `active_school_year_table`
 --
 ALTER TABLE `active_school_year_table`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT for table `course_table`
 --
 ALTER TABLE `course_table`
   MODIFY `course_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=85;
+
+--
+-- AUTO_INCREMENT for table `curriculum_table`
+--
+ALTER TABLE `curriculum_table`
+  MODIFY `curriculum_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=58;
 
 --
 -- AUTO_INCREMENT for table `dprtmnt_curriculum_table`
@@ -2466,7 +2519,7 @@ ALTER TABLE `dprtmnt_table`
 -- AUTO_INCREMENT for table `enrolled_subject`
 --
 ALTER TABLE `enrolled_subject`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=680;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=711;
 
 --
 -- AUTO_INCREMENT for table `period_status`
@@ -2490,7 +2543,7 @@ ALTER TABLE `person_status_table`
 -- AUTO_INCREMENT for table `person_table`
 --
 ALTER TABLE `person_table`
-  MODIFY `person_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1321;
+  MODIFY `person_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1347;
 
 --
 -- AUTO_INCREMENT for table `prof_table`
@@ -2574,7 +2627,7 @@ ALTER TABLE `student_grade_overall_table`
 -- AUTO_INCREMENT for table `student_numbering_table`
 --
 ALTER TABLE `student_numbering_table`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=64;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=90;
 
 --
 -- AUTO_INCREMENT for table `student_status_table`
@@ -2586,7 +2639,7 @@ ALTER TABLE `student_status_table`
 -- AUTO_INCREMENT for table `time_table`
 --
 ALTER TABLE `time_table`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
 
 --
 -- AUTO_INCREMENT for table `user_accounts`
@@ -2599,6 +2652,12 @@ ALTER TABLE `user_accounts`
 --
 ALTER TABLE `year_level_table`
   MODIFY `year_level_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT for table `year_table`
+--
+ALTER TABLE `year_table`
+  MODIFY `year_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

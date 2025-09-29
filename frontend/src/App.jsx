@@ -24,7 +24,7 @@ import AdmissionDashboardPanel from './pages/AdmissionDashboard';
 import SystemDashboardPanel from './pages/SystemDashboard';
 import StudentDashboard from './pages/StudentDashboard';
 import FacultyDashboard from './pages/FacultyDashboard'; //For Professors & Faculty Members
-import Dashboard from './pages/Dashboard'; // For SuperAdmin & Admin
+import RegistrarDashboard from './pages/RegistrarDashboard'; // For SuperAdmin & Admin
 import ApplicantDashboard from './pages/ApplicantDashboard';
 import AccountDashboard from './pages/AccountDashboard';
 import ScheduleFilterer from './pages/SchedulePlottingFilter';
@@ -199,7 +199,7 @@ function App() {
               <Route path="/superadmin_registrar_reset_password" element={<ProtectedRoute><SuperAdminFacultyRegistrarPassword /></ProtectedRoute>} />
 
 
-              <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+              <Route path="/registrar_dashboard" element={<ProtectedRoute><RegistrarDashboard /></ProtectedRoute>} />
               <Route path="/faculty_dashboard" element={<ProtectedRoute allowedRoles={['faculty']}><FacultyDashboard /></ProtectedRoute>} />
               <Route path="/applicant_dashboard" element={<ProtectedRoute><ApplicantDashboard /></ProtectedRoute>} />
               <Route path="/register_prof" element={<ProtectedRoute><RegisterProf /></ProtectedRoute>} />

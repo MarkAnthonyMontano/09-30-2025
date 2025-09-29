@@ -894,74 +894,93 @@ app.put("/api/registrar-status/:person_id", async (req, res) => {
 // ✅ Update submitted_documents by upload_id (but apply to ALL docs of that applicant)
 app.put("/api/submitted-documents/:upload_id", async (req, res) => {
   const { upload_id } = req.params;
-  const { submitted_documents } = req.body;
+  const { submitted_documents, user_person_id } = req.body;
 
   try {
-    // Find person_id first
+    // 1️⃣ Find person_id
     const [[row]] = await db.query(
       "SELECT person_id FROM admission.requirement_uploads WHERE upload_id = ?",
       [upload_id]
     );
     if (!row) return res.status(404).json({ error: "Upload not found" });
-
     const person_id = row.person_id;
 
-    if (submitted_documents === 1) {
-      // ✅ Mark ALL docs as submitted
-      await db.query(
-        `UPDATE admission.requirement_uploads
-         SET submitted_documents = 1,
-             registrar_status = 1,
-             remarks = 1,
-             missing_documents = '[]'
-         WHERE person_id = ?`,
-        [person_id]
+    // 2️⃣ Applicant info
+    const [[appInfo]] = await db.query(`
+      SELECT ant.applicant_number, pt.last_name, pt.first_name, pt.middle_name
+      FROM applicant_numbering_table ant
+      JOIN person_table pt ON ant.person_id = pt.person_id
+      WHERE ant.person_id = ?
+    `, [person_id]);
+
+    const applicant_number = appInfo?.applicant_number || "Unknown";
+    const fullName = `${appInfo?.last_name || ""}, ${appInfo?.first_name || ""} ${appInfo?.middle_name?.charAt(0) || ""}.`;
+
+    // 3️⃣ Actor info
+    let actorEmail = "system@earist.edu.ph";
+    let actorFullName = "SYSTEM";
+    if (user_person_id) {
+      const [actorRows] = await db3.query(
+        "SELECT email, role FROM user_accounts WHERE person_id = ? LIMIT 1",
+        [user_person_id]
       );
-    } else {
-      // 🔄 If unchecked → reset ALL docs
-      await db.query(
-        `UPDATE admission.requirement_uploads
-         SET submitted_documents = 0,
-             registrar_status = 0,
-             remarks = 0,
-             missing_documents = NULL
-         WHERE person_id = ?`,
-        [person_id]
-      );
+      if (actorRows.length > 0) {
+        actorEmail = actorRows[0].email;
+        actorFullName = actorRows[0].role
+          ? actorRows[0].role.toUpperCase()
+          : actorEmail;
+      }
     }
 
-    // Recalculate completion state
-    const [[countRow]] = await db.query(
-      `SELECT COUNT(DISTINCT requirements_id) AS submitted_count
-       FROM admission.requirement_uploads
-       WHERE person_id = ? AND submitted_documents = 1`,
-      [person_id]
+    // 4️⃣ Toggle + Log
+    let type, message;
+    if (submitted_documents === 1) {
+      await db.query(`
+        UPDATE admission.requirement_uploads
+        SET submitted_documents = 1,
+            registrar_status = 1,
+            remarks = 1,
+            missing_documents = '[]'
+        WHERE person_id = ?`, [person_id]);
+
+      type = "submit";
+      message = `✅ Applicant #${applicant_number} - ${fullName} submitted all requirements.`;
+
+    } else {
+      await db.query(`
+        UPDATE admission.requirement_uploads
+        SET submitted_documents = 0,
+            registrar_status = 0,
+            remarks = 0,
+            missing_documents = NULL
+        WHERE person_id = ?`, [person_id]);
+
+      type = "unsubmit";
+      message = `↩️ Applicant #${applicant_number} - ${fullName} was unsubmitted.`;
+    }
+
+    // 5️⃣ Save log
+    await db.query(
+      `INSERT INTO notifications (type, message, applicant_number, actor_email, actor_name, timestamp)
+       VALUES (?, ?, ?, ?, ?, NOW())`,
+      [type, message, applicant_number, actorEmail, actorFullName]
     );
 
-    const [[totalRow]] = await db.query(
-      `SELECT COUNT(DISTINCT requirements_id) AS total_required
-       FROM admission.requirement_uploads
-       WHERE person_id = ?`,
-      [person_id]
-    );
-
-    res.json({
-      message: submitted_documents === 1
-        ? "✅ All documents marked as submitted (remarks = 1)"
-        : "↩️ All documents reverted to Missing Docs (remarks = 0)",
-      allCompleted: countRow.submitted_count === totalRow.total_required
+    io.emit("notification", {
+      type,
+      message,
+      applicant_number,
+      actor_email: actorEmail,
+      actor_name: actorFullName,
+      timestamp: new Date().toISOString(),
     });
 
+    res.json({ success: true, message });
   } catch (err) {
-    console.error("❌ Error updating submitted documents:", err);
-    res.status(500).json({ error: "Failed to update submitted documents" });
+    console.error("❌ Error toggling submitted documents:", err);
+    res.status(500).json({ error: "Failed to toggle submitted documents" });
   }
 });
-
-
-
-
-
 
 app.get("/api/verified-exam-applicants", async (req, res) => {
   try {
@@ -2094,7 +2113,6 @@ app.put("/api/person/:id", async (req, res) => {
 
 
 
-
 app.post("/api/person/import", upload.single("file"), async (req, res) => {
   try {
     if (!req.file) {
@@ -2105,20 +2123,28 @@ app.post("/api/person/import", upload.single("file"), async (req, res) => {
     const sheetName = workbook.SheetNames[0];
     const rawRows = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { header: 1 });
 
-    // Skip the first row (header row)
+    // Skip header row only
     const dataRows = rawRows.slice(1);
-
-    console.log("👉 First actual row:", dataRows[0]); // Debugging
 
     let insertedCount = 0;
 
     for (const row of dataRows) {
-      if (!row[0]) continue; // skip empty rows
+      if (!row[0]) continue; // Skip empty rows
 
+      const studentNumber = row[0].toString().trim();
+
+      // ✅ Only accept valid student numbers
+      const isValidStudentNumber =
+        /^\d{9,10}$/.test(studentNumber) ||   // pure digits (e.g., 202500001)
+        /^\d{3}-\d{5}[A-Z]$/.test(studentNumber); // format like 234-14491M
+
+      if (!isValidStudentNumber) {
+        console.log("⏩ Skipped invalid student number:", studentNumber);
+        continue;
+      }
+
+      // 1️⃣ Build person data
       const newPerson = {
-        student_number: row[0] || "", // ✅ keep this
-
-        // Follow the exact order you provided
         profile_img: row[1] || "",
         campus: row[2] || "",
         academicProgram: row[3] || "",
@@ -2267,13 +2293,22 @@ app.post("/api/person/import", upload.single("file"), async (req, res) => {
         created_at: row[146] || new Date(),
       };
 
-      await db3.query(`INSERT INTO person_table SET ?`, [newPerson]);
+      // 2️⃣ Insert into person_table
+      const [personResult] = await db3.query(`INSERT INTO person_table SET ?`, [newPerson]);
+      const personId = personResult.insertId;
+
+      // 3️⃣ Insert into student_numbering_table
+      await db3.query(
+        `INSERT INTO student_numbering_table (student_number, person_id) VALUES (?, ?)`,
+        [studentNumber, personId]
+      );
+
       insertedCount++;
     }
 
     res.json({
       success: true,
-      message: `Excel import done ✅ Inserted: ${insertedCount}`
+      message: `Excel import done ✅ Inserted: ${insertedCount}`,
     });
   } catch (err) {
     console.error("❌ Import error:", err);
@@ -5038,7 +5073,7 @@ app.put("/api/interview_applicants/assign", async (req, res) => {
 });
 
 app.put("/api/interview_applicants/assign/:applicant_number", async (req, res) => {
-  const { applicant_number } = req.params;  
+  const { applicant_number } = req.params;
 
   if (!applicant_number) {
     return res.status(400).json({ message: "Missing applicant_number" });
@@ -5064,7 +5099,7 @@ app.put("/api/interview_applicants/assign/:applicant_number", async (req, res) =
 
 
 app.put("/api/interview_applicants/unassign/:applicant_number", async (req, res) => {
-  const { applicant_number } = req.params;  
+  const { applicant_number } = req.params;
 
   if (!applicant_number) {
     return res.status(400).json({ message: "Missing applicant_number" });

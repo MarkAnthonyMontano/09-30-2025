@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 29, 2025 at 02:58 AM
+-- Generation Time: Sep 29, 2025 at 12:22 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -575,7 +575,7 @@ CREATE TABLE `exam_applicants` (
 --
 
 INSERT INTO `exam_applicants` (`id`, `schedule_id`, `applicant_id`, `email_sent`) VALUES
-(1, NULL, '2025100001', 0),
+(1, 22, '2025100001', 1),
 (2, NULL, '2025100002', 0),
 (3, NULL, '2025100003', 0),
 (4, NULL, '2025100004', 0),
@@ -822,7 +822,7 @@ CREATE TABLE `interview_applicants` (
 --
 
 INSERT INTO `interview_applicants` (`id`, `schedule_id`, `applicant_id`, `email_sent`, `status`, `action`, `created_at`) VALUES
-(1, NULL, '2025100001', 1, 'Waiting List', 0, '2025-09-17 05:47:54'),
+(1, 2, '2025100001', 1, 'Waiting List', 0, '2025-09-17 05:47:54'),
 (2, NULL, '2025100002', 0, 'Waiting List', 0, '2025-09-17 05:47:54'),
 (3, NULL, '2025100003', 0, 'Waiting List', 0, '2025-09-17 05:47:54'),
 (4, NULL, '2025100004', 0, 'Waiting List', 0, '2025-09-17 05:47:54'),
@@ -1463,7 +1463,23 @@ INSERT INTO `notifications` (`id`, `type`, `message`, `applicant_number`, `actor
 (413, 'email', '📧 Exam schedule email sent for Applicant #2025100206 (Schedule #22)', '2025100206', 'markmontano522@gmail.com', 'REGISTRAR', '2025-09-29 02:20:37'),
 (414, 'update', '📝 Qualifying Exam Result updated for Applicant #2025100113', '2025100113', 'system@earist.edu.ph', 'SYSTEM', '2025-09-29 02:21:17'),
 (415, 'update', '📝 Interview Result updated for Applicant #2025100113', '2025100113', 'system@earist.edu.ph', 'SYSTEM', '2025-09-29 02:21:18'),
-(416, 'email', '📧 Interview schedule email sent for Applicant #2025100198 (Schedule #3)', '2025100198', 'markmontano522@gmail.com', 'REGISTRAR', '2025-09-29 02:55:29');
+(416, 'email', '📧 Interview schedule email sent for Applicant #2025100198 (Schedule #3)', '2025100198', 'markmontano522@gmail.com', 'REGISTRAR', '2025-09-29 02:55:29'),
+(417, 'unsubmit', '↩️ Applicant #2025100206 - Mecasio, Arden M. was unsubmitted.', '2025100206', 'markmontano522@gmail.com', 'REGISTRAR', '2025-09-29 12:22:03'),
+(418, 'unsubmit', '↩️ Applicant #2025100206 - Mecasio, Arden M. was unsubmitted.', '2025100206', 'markmontano522@gmail.com', 'REGISTRAR', '2025-09-29 12:22:04'),
+(419, 'submit', '✅ Applicant #2025100206 - Mecasio, Arden M. submitted all requirements.', '2025100206', 'markmontano522@gmail.com', 'REGISTRAR', '2025-09-29 12:22:06'),
+(420, 'unsubmit', '↩️ Applicant #2025100206 - Mecasio, Arden M. was unsubmitted.', '2025100206', 'markmontano522@gmail.com', 'REGISTRAR', '2025-09-29 12:24:44'),
+(421, 'submit', '✅ Applicant #2025100206 - Mecasio, Arden M. submitted all requirements.', '2025100206', 'markmontano522@gmail.com', 'REGISTRAR', '2025-09-29 12:24:47'),
+(422, 'update', '✏️ Updated document status (Applicant #2025100001 - Montaño, Mark Anthony P.)', '2025100001', NULL, NULL, '2025-09-29 15:58:59'),
+(423, 'update', '✏️ Updated document status (Applicant #2025100001 - Montaño, Mark Anthony P.)', '2025100001', NULL, NULL, '2025-09-29 15:59:01'),
+(424, 'update', '✏️ Updated document status (Applicant #2025100001 - Montaño, Mark Anthony P.)', '2025100001', NULL, NULL, '2025-09-29 15:59:03'),
+(425, 'update', '✏️ Updated document status (Applicant #2025100001 - Montaño, Mark Anthony P.)', '2025100001', NULL, NULL, '2025-09-29 15:59:06'),
+(426, 'update', '✏️ Updated document status (Applicant #2025100001 - Montaño, Mark Anthony P.)', '2025100001', NULL, NULL, '2025-09-29 15:59:07'),
+(427, 'update', '📝 Interview Result updated for Applicant #2025100001', '2025100001', 'system@earist.edu.ph', 'SYSTEM', '2025-09-29 16:08:28'),
+(428, 'update', '📝 Qualifying Exam Result updated for Applicant #2025100001', '2025100001', 'system@earist.edu.ph', 'SYSTEM', '2025-09-29 16:08:30'),
+(429, 'email', '📧 Exam schedule email sent for Applicant #2025100001 (Schedule #22)', '2025100001', 'markmontano522@gmail.com', 'REGISTRAR', '2025-09-29 16:08:50'),
+(430, 'email', '📧 Interview schedule email sent for Applicant #2025100001 (Schedule #2)', '2025100001', 'markmontano522@gmail.com', 'REGISTRAR', '2025-09-29 16:10:13'),
+(431, 'email', '📧 Interview schedule email sent for Applicant #2025100001 (Schedule #2)', '2025100001', 'markmontano522@gmail.com', 'REGISTRAR', '2025-09-29 16:10:15'),
+(432, 'unsubmit', '↩️ Applicant #2025100206 - Mecasio, Arden M. was unsubmitted.', '2025100206', 'markmontano522@gmail.com', 'REGISTRAR', '2025-09-29 16:39:09');
 
 -- --------------------------------------------------------
 
@@ -1491,7 +1507,7 @@ CREATE TABLE `person_status_table` (
 --
 
 INSERT INTO `person_status_table` (`id`, `person_id`, `applicant_id`, `exam_status`, `interview_status`, `requirements`, `residency`, `student_registration_status`, `exam_result`, `hs_ave`, `qualifying_result`, `interview_result`) VALUES
-(1, 1, 2025100001, NULL, NULL, 0, NULL, NULL, 97, NULL, 96, 98),
+(1, 1, 2025100001, 1, NULL, 0, NULL, NULL, 99, NULL, 97, 100),
 (2, 2, 2025100002, NULL, NULL, NULL, NULL, NULL, 90, NULL, 91, 89),
 (3, 3, 2025100003, NULL, NULL, NULL, NULL, NULL, 87, NULL, 90, 83),
 (4, 4, 2025100004, NULL, NULL, NULL, NULL, NULL, 92, NULL, 94, 90),
@@ -2149,16 +2165,16 @@ INSERT INTO `requirement_uploads` (`upload_id`, `requirements_id`, `person_id`, 
 (119, 4, 3, 1, '2025100003_CertificateOfGraduatingClass_2025.pdf', 'MONTAÃ?O, MARK ANTHONY.pdf', NULL, NULL, 'Documents Verified & ECAT', NULL, 1, '2025-08-23 15:11:56', NULL),
 (120, 1, 2, NULL, '2025100002_BirthCertificate_2025.pdf', 'National_Skill_Registration_Program_Jobseeker_Registration_Form.pdf', NULL, NULL, NULL, NULL, NULL, '2025-09-12 01:25:08', 61),
 (121, 1, 2, 1, '2025100002_BirthCertificate_2025.pdf', 'National_Skill_Registration_Program_Jobseeker_Registration_Form.pdf', 'Good Moral is outdated must be 2022', 0, 'On process', NULL, 1, '2025-09-12 01:25:08', 61),
-(126, 1, 1, 1, '2025100001_BirthCertificate_2025.pdf', 'Certifate_of_registration (1).pdf', '1', 1, 'Disapproved', '[]', 1, '2025-09-06 13:35:27', 61),
-(128, 2, 1, 1, '2025100001_Form138_2025.pdf', 'Certifate_of_registration (1).pdf', '1', 1, 'Disapproved', '[]', 1, '2025-09-06 13:35:27', 61),
-(130, 4, 1, 1, '2025100001_CertificateOfGraduatingClass_2025.pdf', 'Recommendation-MIS-new-SA-7-2025.pdf', '1', 1, 'Disapproved', '[]', 1, '2025-09-06 13:35:27', 61),
-(133, 3, 1, 1, '2025100001_GoodMoralCharacter_2025.jpg', 'Purple and White Boxes Work Schedule Planner.jpg', '1', 1, 'Disapproved', '[]', 1, '2025-09-06 13:35:27', 61),
+(126, 1, 1, 1, '2025100001_BirthCertificate_2025.pdf', 'Certifate_of_registration (1).pdf', '75% OF ATTENDANCE IS NEEDED FOR TRANSFEREE', 1, 'Documents Verified & ECAT', '[]', 1, '2025-09-06 13:35:27', 61),
+(128, 2, 1, 1, '2025100001_Form138_2025.pdf', 'Certifate_of_registration (1).pdf', 'Attachments were blurry', 1, 'Documents Verified & ECAT', '[]', 1, '2025-09-06 13:35:27', 61),
+(130, 4, 1, 1, '2025100001_CertificateOfGraduatingClass_2025.pdf', 'Recommendation-MIS-new-SA-7-2025.pdf', 'Birth Certificate with Sarical Surname', 1, 'Documents Verified & ECAT', '[]', 1, '2025-09-06 13:35:27', 61),
+(133, 3, 1, 1, '2025100001_GoodMoralCharacter_2025.jpg', 'Purple and White Boxes Work Schedule Planner.jpg', 'GWA did not meet the Requirements', 1, 'Documents Verified & ECAT', '[]', 1, '2025-09-06 13:35:27', 61),
 (134, 1, 306, NULL, '2025100061_BirthCertificate_2025.png', '2.png', NULL, 1, NULL, NULL, NULL, '2025-09-06 19:29:09', 61),
 (135, 2, 306, NULL, '2025100061_Form138_2025.png', '3.png', NULL, 2, NULL, NULL, NULL, '2025-09-06 19:29:10', 61),
 (136, 3, 306, NULL, '2025100061_GoodMoralCharacter_2025.png', '4.png', NULL, 1, NULL, NULL, NULL, '2025-09-06 19:29:11', 61),
 (137, 4, 306, NULL, '2025100061_CertificateOfGraduatingClass_2025.png', '5.png', NULL, 2, NULL, NULL, NULL, '2025-09-06 19:29:12', 61),
 (138, 5, 306, 1, '2025100061_VaccineCard_2025.png', '4.png', NULL, NULL, 'Documents Verified & ECAT', NULL, 1, '2025-09-06 19:29:05', 61),
-(139, 5, 1, 1, '2025100001_VaccineCard_2025.pdf', 'Certifate_of_registration (2).pdf', '1', 1, NULL, '[]', 1, '2025-09-08 09:40:09', NULL),
+(139, 5, 1, 1, '2025100001_VaccineCard_2025.pdf', 'Certifate_of_registration (2).pdf', 'NO DOCUMENT UPLOADED', 1, 'Documents Verified & ECAT', '[]', 1, '2025-09-08 09:40:09', 61),
 (140, 1, 307, NULL, '2025100201_BirthCertificate_2025.pdf', 'Certifate_of_registration (2).pdf', NULL, 1, 'Documents Verified & ECAT', '[]', 1, '2025-09-12 14:39:46', NULL),
 (141, 2, 307, NULL, '2025100201_Form138_2025.jpg', 'Purple and White Boxes Work Schedule Planner.jpg', NULL, 1, 'Documents Verified & ECAT', '[]', 1, '2025-09-12 14:39:46', NULL),
 (142, 3, 307, NULL, '2025100201_GoodMoralCharacter_2025.jpg', 'Purple and White Boxes Work Schedule Planner (1).jpg', NULL, 1, 'Documents Verified & ECAT', '[]', 1, '2025-09-12 14:39:46', NULL),
@@ -2183,11 +2199,11 @@ INSERT INTO `requirement_uploads` (`upload_id`, `requirements_id`, `person_id`, 
 (170, 3, 312, NULL, '2025100205_GoodMoralCharacter_2025.pdf', 'Mark.pdf', 'Birth Certificate with Sarical Surname', 1, NULL, '[]', NULL, '2025-09-16 12:09:06', 1),
 (171, 4, 312, NULL, '2025100205_CertificateOfGraduatingClass_2025.jpg', 'Purple and White Boxes Work Schedule Planner (1).jpg', 'Documents did not match with the Requirement', 1, NULL, '[]', NULL, '2025-09-16 12:09:16', 1),
 (172, 5, 312, NULL, '2025100205_VaccineCard_2025.jpg', 'Purple and White Boxes Work Schedule Planner.jpg', '0', 1, NULL, '[]', NULL, '2025-09-16 12:09:20', 61),
-(173, 1, 313, 1, '2025100206_BirthCertificate_2025.png', 'dhani PDS ID.png', '1', 1, NULL, '[]', 1, '2025-09-16 15:20:25', 61),
-(174, 2, 313, 1, '2025100206_Form138_2025.jpg', 'DHANI I. SAN JOSE (1)_page-0001.jpg', '1', 1, NULL, '[]', 1, '2025-09-16 15:20:30', 61),
-(175, 3, 313, 1, '2025100206_GoodMoralCharacter_2025.png', '1752055171951_3dy7qp_b0ba1e6dfe7a4703a2d1401b97f1390a_1_1752055169_9995_watermarked.png', '1', 1, NULL, '[]', 1, '2025-09-16 15:20:33', 61),
-(176, 4, 313, 1, '2025100206_CertificateOfGraduatingClass_2025.jpg', 'maxresdefault.jpg', '1', 1, NULL, '[]', 1, '2025-09-16 15:20:38', 61),
-(177, 5, 313, 1, '2025100206_VaccineCard_2025.png', 'hero.png', '1', NULL, NULL, '[]', 1, '2025-09-16 15:20:42', NULL),
+(173, 1, 313, 0, '2025100206_BirthCertificate_2025.png', 'dhani PDS ID.png', '0', 1, NULL, NULL, 0, '2025-09-16 15:20:25', 61),
+(174, 2, 313, 0, '2025100206_Form138_2025.jpg', 'DHANI I. SAN JOSE (1)_page-0001.jpg', '0', 1, NULL, NULL, 0, '2025-09-16 15:20:30', 61),
+(175, 3, 313, 0, '2025100206_GoodMoralCharacter_2025.png', '1752055171951_3dy7qp_b0ba1e6dfe7a4703a2d1401b97f1390a_1_1752055169_9995_watermarked.png', '0', 1, NULL, NULL, 0, '2025-09-16 15:20:33', 61),
+(176, 4, 313, 0, '2025100206_CertificateOfGraduatingClass_2025.jpg', 'maxresdefault.jpg', '0', 1, NULL, NULL, 0, '2025-09-16 15:20:38', 61),
+(177, 5, 313, 0, '2025100206_VaccineCard_2025.png', 'hero.png', '0', NULL, NULL, NULL, 0, '2025-09-16 15:20:42', NULL),
 (178, 1, 319, NULL, '2025100212_BirthCertificate_2025.png', 'ProgramList.png', NULL, NULL, NULL, NULL, NULL, '2025-09-26 02:47:34', NULL),
 (179, 2, 319, NULL, '2025100212_Form138_2025.pdf', 'IAAS2_Midterm Activity No 2.pdf', NULL, NULL, NULL, NULL, NULL, '2025-09-26 02:47:37', NULL),
 (180, 3, 319, NULL, '2025100212_GoodMoralCharacter_2025.jpg', '1 (2).jpg', NULL, NULL, NULL, NULL, NULL, '2025-09-26 02:47:45', NULL),
@@ -2582,7 +2598,7 @@ ALTER TABLE `interview_exam_schedule`
 -- AUTO_INCREMENT for table `notifications`
 --
 ALTER TABLE `notifications`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=417;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=433;
 
 --
 -- AUTO_INCREMENT for table `person_status_table`

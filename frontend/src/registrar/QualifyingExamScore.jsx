@@ -532,7 +532,8 @@ const QualifyingExamScore = () => {
             }
           </style>
         </head>
-        <body onload="window.print(); setTimeout(() => window.close(), 100);">
+<body onload="setTimeout(() => { window.print(); window.close(); }, 500)">
+
           <div class="print-container">
   
             <!-- Header -->
@@ -550,7 +551,7 @@ const QualifyingExamScore = () => {
                 <div>${campusAddress}</div>
                 <div style="margin-top: 30px;">
                   <b style="font-size: 24px; letter-spacing: 1px;">
-                    Applicant List
+                    QUALIFYING EXAMINATION SCORE
                   </b>
                 </div>
               </div>
@@ -566,34 +567,32 @@ const QualifyingExamScore = () => {
                 <th style="width:7%">Qualifying Exam Score</th>
                 <th style="width:7%">Qualifying Interview Score</th>
                 <th style="width:7%">Total Ave</th>
+                <th style="width:7%">Status</th>
      
               </tr>
             </thead>
             <tbody>
-              ${filteredPersons.map(person => {
+            ${filteredPersons.map(person => {
             const qualifyingExam = editScores[person.person_id]?.qualifying_exam_score ?? person.qualifying_exam_score ?? 0;
             const qualifyingInterview = editScores[person.person_id]?.qualifying_interview_score ?? person.qualifying_interview_score ?? 0;
-
-
-            const computedTotalAve =
-                (Number(qualifyingExam) + Number(qualifyingInterview)) / 2;
-
+            const computedTotalAve = (Number(qualifyingExam) + Number(qualifyingInterview)) / 2;
 
             return `
-                  <tr>
-                    <td>${person.applicant_number ?? "N/A"}</td>
-                    <td class="name-col">${person.last_name}, ${person.first_name} ${person.middle_name ?? ""} ${person.extension ?? ""}</td>
-                    <td>${curriculumOptions.find(
+    <tr>
+      <td>${person.applicant_number ?? "N/A"}</td>
+      <td class="name-col">${person.last_name}, ${person.first_name} ${person.middle_name ?? ""} ${person.extension ?? ""}</td>
+      <td>${curriculumOptions.find(
                 item => item.curriculum_id?.toString() === person.program?.toString()
-            )?.program_code ?? "N/A"
-                }</td>
-              <td>${qualifyingExam}</td>
-              <td>${qualifyingInterview}</td>
-              <td>${computedTotalAve}</td>
-              <td>${college_approval_status}</td>
-                  </tr>
-                `;
+            )?.program_code ?? "N/A"}</td>
+      <td>${qualifyingExam}</td>
+      <td>${qualifyingInterview}</td>
+      <td>${computedTotalAve}</td>
+      <td>${person.college_approval_status ?? "N/A"}</td>
+
+    </tr>
+  `;
         }).join("")}
+
             </tbody>
           </table>
 
@@ -1031,14 +1030,20 @@ const QualifyingExamScore = () => {
             `Dear ${applicant?.first_name || "Applicant"} ${applicant?.last_name || ""},
 
 Congratulations on passing the Interview/Qualifying Exam!  
-Please submit your Original Documents at the Registrar's Office within 7 days.  
+
+You must first proceed to the Clinic for your Medical Examination.  
+Please bring and present your Medical Examination Permit so the Clinic can verify if you are fit to enroll.  
+
+After completing your Medical Examination, you may then proceed to the Registrar’s Office to submit your Original Documents within 7 days.  
 Submissions are accepted only during working hours, Monday to Friday, from 7:00 AM to 4:00 PM.  
 Failure to comply within 7 days may result in the slot being given to another applicant.  
+
 This email is valid until ${formattedValidUntil}.  
 
 Thank you,  
 EARIST Registrar's Office
 `;
+
 
         setSelectedApplicant(applicant?.applicant_number || null);
         setEmailMessage(defaultMessage);
