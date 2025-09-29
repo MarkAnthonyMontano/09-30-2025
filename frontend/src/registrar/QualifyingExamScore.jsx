@@ -1886,7 +1886,7 @@ EARIST Registrar's Office
                 <Table size="small">
                     <TableHead sx={{ backgroundColor: "#6D2323" }}>
                         <TableRow>
-                            <TableCell sx={{ color: "white", textAlign: "center", width: "2%", py: 0.5, fontSize: "12px", border: "2px solid maroon"}}>
+                            <TableCell sx={{ color: "white", textAlign: "center", width: "2%", py: 0.5, fontSize: "12px", border: "2px solid maroon" }}>
                                 #
                             </TableCell>
 
@@ -1956,6 +1956,7 @@ EARIST Registrar's Office
                                     <TableCell
                                         sx={{
                                             color: "blue",
+                                            cursor: "pointer",
                                             textAlign: "center",
                                             border: "2px solid maroon",
                                             borderLeft: "2px solid maroon",
@@ -1971,6 +1972,7 @@ EARIST Registrar's Office
                                     <TableCell
                                         sx={{
                                             color: "blue",
+                                            cursor: "pointer",
                                             textAlign: "left",
                                             border: "2px solid maroon",
                                             borderLeft: "2px solid maroon",
@@ -2068,7 +2070,7 @@ EARIST Registrar's Office
                                             color: "black",
                                             textAlign: "center",
                                             border: "2px solid maroon",
-    
+
                                             py: 0.5,
                                             fontSize: "12px",
                                         }}
@@ -2080,7 +2082,7 @@ EARIST Registrar's Office
                                         sx={{
                                             textAlign: "center",
                                             border: "2px solid maroon",
-                                      
+
                                             verticalAlign: "middle",
                                         }}
                                     >
@@ -2096,7 +2098,7 @@ EARIST Registrar's Office
                                                     variant="contained"
                                                     color="error"
                                                     size="small"
-                                                    sx={{ width: "110px", height: "40px" }}
+                                                    sx={{ width: "120px", height: "38px" }}
                                                     onClick={() => handleUnassignImmediate(person.applicant_number)}
                                                 >
                                                     Unassign
@@ -2106,7 +2108,7 @@ EARIST Registrar's Office
                                                     variant="contained"
                                                     color="success"
                                                     onClick={() => handleOpenDialog(null)} // for batch mode
-                                                    sx={{ width: "110px", height: "40px" }}
+                                                    sx={{ width: "120px", height: "38px" }}
                                                 >
                                                     Send Email
                                                 </Button>
@@ -2131,7 +2133,7 @@ EARIST Registrar's Office
                                             color: "black",
                                             textAlign: "center",
                                             border: "2px solid maroon",
-                                        
+
                                             py: 0.5,
                                             fontSize: "12px",
                                         }}

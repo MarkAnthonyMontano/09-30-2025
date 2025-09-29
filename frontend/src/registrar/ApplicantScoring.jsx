@@ -419,7 +419,7 @@ const ApplicantList = () => {
         newWin.document.write(`
       <html>
         <head>
-          <title>Applicant List</title>
+          <title></title>
           <style>
             @page {
               size: A4;
@@ -487,7 +487,7 @@ const ApplicantList = () => {
                 <div>${campusAddress}</div>
                 <div style="margin-top: 30px;">
                   <b style="font-size: 24px; letter-spacing: 1px;">
-                    Applicant List
+                    Entrance Examination Scores
                   </b>
                 </div>
               </div>

@@ -63,7 +63,7 @@ const StudentPersonalDataForm = () => {
     // ✅ Fetch person data from backend
     const fetchPersonData = async (id) => {
         try {
-            const res = await axios.get(`http://localhost:5000/api/person/${id}`);
+            const res = await axios.get(`http://localhost:5000/api/student-person-data/${id}`);
             setPerson(res.data); // make sure backend returns the correct format
         } catch (error) {
             console.error("Failed to fetch person:", error);

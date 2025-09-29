@@ -155,6 +155,33 @@ const ApplicantList = () => {
         }
     }, [user]);
 
+    // Helper to compute applicant status
+    const getApplicantStatus = (personData) => {
+        const status = (personData.document_status ?? "").trim().toLowerCase();
+
+        // If all 4 required docs are verified → ECAT ready
+        if (personData.required_docs_verified === 4) {
+            return "Documents Verified & ECAT";
+        }
+
+        // Match explicit statuses
+        if (status === "disapproved") {
+            return "Disapproved";
+        }
+
+        if (status === "program closed") {
+            return "Program Closed";
+        }
+
+        if (status === "on process") {
+            return "On Process";
+        }
+
+        // Default fallback
+        return "On Process";
+    };
+
+
     const [error, setError] = useState('');
     const [searchQuery, setSearchQuery] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
@@ -1490,8 +1517,9 @@ const ApplicantList = () => {
 
                                 {/* Status */}
                                 <TableCell sx={{ textAlign: "center", border: "2px solid maroon" }}>
-                                    {person.document_status || "On process"}
+                                    {getApplicantStatus(person)}
                                 </TableCell>
+
 
                                 <TableCell
                                     sx={{

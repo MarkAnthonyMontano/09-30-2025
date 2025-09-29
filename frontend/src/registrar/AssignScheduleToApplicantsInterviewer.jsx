@@ -503,32 +503,32 @@ Please bring the following requirements:`
     };
 
 
-  const confirmSendEmails = () => {
-  setConfirmOpen(false);
+    const confirmSendEmails = () => {
+        setConfirmOpen(false);
 
-  const assignedApplicants = Array.from(selectedApplicants);
+        const assignedApplicants = Array.from(selectedApplicants);
 
-  socket.emit("send_interview_emails", {
-    schedule_id: selectedSchedule,
-    applicant_numbers: assignedApplicants,
-    subject: emailSubject,
-    senderName: emailSender,
-    message: emailMessage,
-    user_person_id: loggedInPersonId, // ✅ now comes from state
-  });
+        socket.emit("send_interview_emails", {
+            schedule_id: selectedSchedule,
+            applicant_numbers: assignedApplicants,
+            subject: emailSubject,
+            senderName: emailSender,
+            message: emailMessage,
+            user_person_id: loggedInPersonId, // ✅ now comes from state
+        });
 
-  socket.once("send_schedule_emails_result", (emailRes) => {
-    setSnack({
-      open: true,
-      message: emailRes.success ? emailRes.message : emailRes.error,
-      severity: emailRes.success ? "success" : "error"
-    });
+        socket.once("send_schedule_emails_result", (emailRes) => {
+            setSnack({
+                open: true,
+                message: emailRes.success ? emailRes.message : emailRes.error,
+                severity: emailRes.success ? "success" : "error"
+            });
 
-    if (emailRes.success) {
-      fetchAllApplicants();
-    }
-  });
-};
+            if (emailRes.success) {
+                fetchAllApplicants();
+            }
+        });
+    };
 
 
 
@@ -1380,6 +1380,7 @@ Please bring the following requirements:`
                                         <TableCell
                                             sx={{
                                                 color: "blue",
+                                                cursor: "pointer",
                                                 textAlign: "center",
                                                 border: "2px solid maroon",
                                                 borderLeft: "2px solid maroon",
@@ -1395,6 +1396,7 @@ Please bring the following requirements:`
                                         <TableCell
                                             sx={{
                                                 color: "blue",
+                                                cursor: "pointer",
                                                 textAlign: "left",
                                                 border: "2px solid maroon",
                                                 borderLeft: "2px solid maroon",
@@ -1405,7 +1407,6 @@ Please bring the following requirements:`
                                         >
                                             {`${person.last_name}, ${person.first_name} ${person.middle_name ?? ""} ${person.extension ?? ""}`}
                                         </TableCell>
-
 
                                         {/* Program */}
                                         <TableCell

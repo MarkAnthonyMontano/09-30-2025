@@ -269,17 +269,17 @@ const StudentSchedule = () => {
                     <TableCell sx={{fontSize: "0.75rem", border: "2px solid maroon"}}>
                       {row.program_code} {row.section_description}
                     </TableCell>
-                    <TableCell sx={{fontSize: "0.75rem"}}>
+                    <TableCell sx={{fontSize: "0.75rem", border: "2px solid maroon"}}>
                       {row.day_description}, {row.school_time_start} - {row.school_time_end} {row.room_description}
                     </TableCell>
                   </TableRow>
                 ))}
                 <TableRow sx={{fontSize: "0.75rem", border: "2px solid maroon"}}>
-                  <TableCell colSpan={3} />
-                  <TableCell colSpan={2} style={{ fontWeight: '600'}}>
+                  <TableCell colSpan={3} style={{border: "2px solid maroon"}}/>
+                  <TableCell colSpan={2} style={{ fontWeight: '600', border: "2px solid maroon"}}>
                     Total Units
                   </TableCell>
-                  <TableCell>
+                  <TableCell style={{border: "2px solid maroon"}}>
                     {studentSchedule.reduce((total, row) => total + (Number(row.course_unit) || 0), 0)}
                   </TableCell>
                 </TableRow>

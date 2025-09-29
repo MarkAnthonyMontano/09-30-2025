@@ -227,15 +227,27 @@ const StudentGradingPage = () => {
                         <TableRow key={i} hover>
                           <TableCell style={{ border: "2px solid maroon" }}>{row.course_code}</TableCell>
                           <TableCell style={{ border: "2px solid maroon" }}>{row.course_description}</TableCell>
-                          <TableCell style={{ border: "2px solid maroon" }}></TableCell>
-                          <TableCell style={{ border: "2px solid maroon" }} align="center">{row.course_unit}</TableCell>
-                          <TableCell style={{ border: "2px solid maroon" }}></TableCell>
-
-                          <TableCell style={{ border: "2px solid maroon" }} align="center">{row.final_grade ?? ""}</TableCell>
-                          <TableCell style={{ border: "2px solid maroon" }} align="center">{row.en_remarks ? getRemarks(row.en_remarks) : ""}</TableCell>
+                          <TableCell sx={{ border: "2px solid maroon" }}>
+                            {row.fname === "TBA" && row.lname === "TBA"
+                              ? "TBA"
+                              : `Prof. ${row.fname} ${row.lname}`}
+                          </TableCell>
+                          <TableCell style={{ border: "2px solid maroon" }} align="center">
+                            {row.course_unit}
+                          </TableCell>
+                          <TableCell style={{ border: "2px solid maroon" }}>
+                            {row.program_code}-{row.section_description}
+                          </TableCell>
+                          <TableCell style={{ border: "2px solid maroon" }} align="center">
+                            {row.final_grade ?? ""}
+                          </TableCell>
+                          <TableCell style={{ border: "2px solid maroon" }} align="center">
+                            {row.en_remarks ? getRemarks(row.en_remarks) : ""}
+                          </TableCell>
                         </TableRow>
                       ))}
                   </TableBody>
+
                 </Table>
               </TableContainer>
             </Box>

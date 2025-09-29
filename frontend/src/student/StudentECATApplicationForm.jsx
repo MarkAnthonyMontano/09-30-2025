@@ -1,3 +1,4 @@
+
 import { useRef, useState, useEffect } from "react";
 import { Box, Container, } from "@mui/material";
 import EaristLogo from "../assets/EaristLogo.png";
@@ -111,6 +112,14 @@ const StudentECATApplicationForm = () => {
         window.location.href = "/login";
     }, [queryPersonId]);
 
+    const fetchPersonData = async (id) => {
+        try {
+            const response = await axios.get(`http://localhost:5000/api/student-person-data/${id}`);
+            setPerson(response.data);
+        } catch (err) {
+            console.error("Error fetching person data:", err);
+        }
+    }
 
 
     const [shortDate, setShortDate] = useState("");
@@ -1444,3 +1453,23 @@ const StudentECATApplicationForm = () => {
 };
 
 export default StudentECATApplicationForm;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1242,6 +1242,7 @@ const AssignScheduleToApplicants = () => {
                     <TableCell
                       sx={{
                         color: "blue",
+                        cursor: "pointer",
                         textAlign: "center",
                         border: "2px solid maroon",
                         borderLeft: "2px solid maroon",
@@ -1257,6 +1258,7 @@ const AssignScheduleToApplicants = () => {
                     <TableCell
                       sx={{
                         color: "blue",
+                        cursor: "pointer",
                         textAlign: "left",
                         border: "2px solid maroon",
                         borderLeft: "2px solid maroon",

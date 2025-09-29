@@ -1406,19 +1406,23 @@ app.get("/api/all-applicants", async (req, res) => {
         ees.start_time AS exam_start_time,
         ees.end_time AS exam_end_time,
 
-        /* latest upload id for this person */
-        ru.latest_upload_id AS upload_id,
+        /* latest prioritized upload id for this person */
+        ruprio.upload_id AS upload_id,
 
         /* ✅ allow NULL values to pass through */
-        rufull.submitted_documents,
-        rufull.registrar_status,
+        ruprio.submitted_documents,
+        ruprio.registrar_status,
 
         /* collect missing_documents across uploads if you still want to show aggregated missing docs */
-        ru.all_missing_docs,
+        ruagg.all_missing_docs,
 
-        rufull.document_status,
-        rufull.created_at AS last_updated,
-        ps.exam_status
+        ruprio.document_status,
+        ruprio.created_at AS last_updated,
+        ps.exam_status,
+
+        /* ✅ NEW: how many required docs are verified */
+        COALESCE(vdocs.verified_count, 0) AS required_docs_verified
+
       FROM admission.person_table AS p
       LEFT JOIN admission.applicant_numbering_table AS a
         ON p.person_id = a.person_id
@@ -1427,22 +1431,44 @@ app.get("/api/all-applicants", async (req, res) => {
       LEFT JOIN admission.entrance_exam_schedule AS ees
         ON ea.schedule_id = ees.schedule_id
 
-      /* get latest upload_id per person and aggregate missing_documents for display only */
+      /* get aggregated missing_documents for display only */
       LEFT JOIN (
         SELECT
           person_id,
-          MAX(upload_id) AS latest_upload_id,
           GROUP_CONCAT(missing_documents SEPARATOR '||') AS all_missing_docs
         FROM admission.requirement_uploads
         GROUP BY person_id
-      ) AS ru ON ru.person_id = p.person_id
+      ) AS ruagg ON ruagg.person_id = p.person_id
 
-      /* get the full row for the latest upload */
-      LEFT JOIN admission.requirement_uploads AS rufull
-        ON rufull.upload_id = ru.latest_upload_id
+      /* ✅ get the prioritized row per applicant */
+      LEFT JOIN admission.requirement_uploads AS ruprio
+        ON ruprio.upload_id = (
+          SELECT ru2.upload_id
+          FROM admission.requirement_uploads ru2
+          WHERE ru2.person_id = p.person_id
+          ORDER BY 
+            CASE 
+              WHEN ru2.document_status = 'Disapproved' THEN 1
+              WHEN ru2.document_status = 'Program Closed' THEN 2
+              WHEN ru2.document_status = 'Documents Verified & ECAT' THEN 3
+              WHEN ru2.document_status = 'On process' THEN 4
+              ELSE 5
+            END ASC,
+            ru2.upload_id DESC
+          LIMIT 1
+        )
 
       LEFT JOIN admission.person_status_table AS ps
         ON p.person_id = ps.person_id
+
+      /* ✅ subquery: count verified docs for this applicant */
+      LEFT JOIN (
+        SELECT person_id, COUNT(DISTINCT requirements_id) AS verified_count
+        FROM admission.requirement_uploads
+        WHERE document_status = 'Documents Verified & ECAT'
+          AND requirements_id IN (1,2,3,4)
+        GROUP BY person_id
+      ) AS vdocs ON vdocs.person_id = p.person_id
 
       ORDER BY p.last_name ASC, p.first_name ASC
     `);
@@ -1817,6 +1843,7 @@ app.get("/api/applicants-with-number", async (req, res) => {
         SUBSTRING(a.applicant_number, 5, 1) AS middle_code,
         p.program,
         p.created_at,
+        ia.status as interview_status,
 
         -- Exam scores
         e.English AS english,
@@ -9024,7 +9051,10 @@ app.get("/api/student_schedule/:id", async (req, res) => {
       IFNULL(rdt.description, 'TBA') AS day_description, 
       IFNULL(tt.school_time_start, 'TBA') AS school_time_start,
       IFNULL(tt.school_time_end, 'TBA') AS school_time_end,
-      IFNULL(rt.room_description, 'TBA') AS room_description FROM enrolled_subject AS es 
+      IFNULL(rt.room_description, 'TBA') AS room_description,
+      IFNULL(pft.fname, 'TBA') AS fname,
+      IFNULL(pft.lname, 'TBA') AS lname
+     FROM enrolled_subject AS es
     JOIN student_numbering_table AS snt ON es.student_number = snt.student_number 
     JOIN person_table AS pt ON snt.person_id = pt.person_id
     JOIN course_table AS ct ON es.course_id = ct.course_id
@@ -9039,7 +9069,7 @@ app.get("/api/student_schedule/:id", async (req, res) => {
     LEFT JOIN room_table AS rt ON tt.department_room_id = rt.room_id
     LEFT JOIN prof_table AS pft ON tt.professor_id = pft.prof_id
     JOIN active_school_year_table AS sy ON es.active_school_year_id = sy.id
-    WHERE pt.person_id = ? AND sy.astatus = 1;`, [id]);
+    WHERE pt.person_id = ? AND sy.astatus = 1;;`, [id]);
 
     if (rows.length === 0) {
       return res.status(404).json({ error: "Schedule not found" });
@@ -9085,6 +9115,8 @@ app.get("/api/student_grade/:id", async (req, res) => {
         yt.year_description AS first_year,
         yt.year_description + 1 AS last_year,
         smt.semester_description,
+        IFNULL(pft.fname, 'TBA') AS fname,
+        IFNULL(pft.lname, 'TBA') AS lname,
         es.final_grade,
         es.fe_status,
         es.en_remarks
@@ -9159,10 +9191,10 @@ app.get("/api/student/view_latest_grades/:id", async (req, res) => {
   try {
     // Count professors not yet evaluated
     const [pending] = await db3.execute(`
-      SELECT COUNT(DISTINCT tt.professor_id AND es.course_id) AS total_professors 
+      SELECT COUNT(DISTINCT es.course_id) AS total_professors 
       FROM enrolled_subject AS es
       JOIN student_numbering_table AS snt ON es.student_number = snt.student_number
-      JOIN time_table AS tt 
+      LEFT JOIN time_table AS tt 
         ON tt.course_id = es.course_id 
        AND tt.department_section_id = es.department_section_id
       WHERE es.fe_status = 0 AND snt.person_id = ?
@@ -9187,6 +9219,8 @@ app.get("/api/student/view_latest_grades/:id", async (req, res) => {
         pgt.program_description,
         st.description AS section_description, 
         pft.lname AS prof_lastname, 
+        IFNULL(pft.fname, 'TBA') AS fname,
+        IFNULL(pft.lname, 'TBA') AS lname,
         rdt.description AS day_description, 
         tt.school_time_start, 
         tt.school_time_end, 
@@ -9242,7 +9276,6 @@ app.get("/api/student/view_latest_grades/:id", async (req, res) => {
     res.status(500).json({ error: "Database error" });
   }
 });
-
 /* Faculty Evaluation (Student Side) */
 //GET Student Course
 app.get("/api/student_course/:id", async (req, res) => {
@@ -10822,6 +10855,29 @@ app.put("/api/enrollment_person/:id", async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
+
+app.get("/api/student-person-data/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const [rows] = await db3.query(
+      `SELECT * FROM person_table WHERE person_id = ?`,
+      [id]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ error: "Person not found" });
+    }
+
+    res.json(rows[0]);
+  } catch (err) {
+    console.error("Error fetching person data:", err);
+    res.status(500).json({ error: "Database error" });
+  }
+});
+
+
+
 
 http.listen(5000, () => {
   console.log("Server with Socket.IO running on port 5000");
