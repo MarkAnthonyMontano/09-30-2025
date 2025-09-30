@@ -75,12 +75,13 @@ const StudentOfficeOfTheRegistrar = () => {
     // ✅ Fetch person data from backend
     const fetchPersonData = async (id) => {
         try {
-            const res = await axios.get(`http://localhost:5000/api/student-person-data/${id}`);
-            setPerson(res.data); // make sure backend returns the correct format
-        } catch (error) {
-            console.error("Failed to fetch person:", error);
+            const response = await axios.get(`http://localhost:5000/api/student-person-data/${id}`);
+            setPerson(response.data);
+        } catch (err) {
+            console.error("Error fetching person data:", err);
         }
-    };
+    }
+
 
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
@@ -102,7 +103,7 @@ const StudentOfficeOfTheRegistrar = () => {
         setUserRole(storedRole);
 
         // Allow Applicant, Admin, SuperAdmin to view ECAT
-      const allowedRoles = ["registrar", "applicant", "student"];
+        const allowedRoles = ["registrar", "applicant", "student"];
         if (allowedRoles.includes(storedRole)) {
             const targetId = searchedPersonId || queryPersonId || loggedInPersonId;
             setUserID(targetId);
@@ -232,6 +233,7 @@ const StudentOfficeOfTheRegistrar = () => {
     });
 
 
+
     return (
         <Box sx={{ height: 'calc(95vh - 80px)', overflowY: 'auto', paddingRight: 1, backgroundColor: 'transparent' }}>
             <Container>
@@ -283,7 +285,7 @@ const StudentOfficeOfTheRegistrar = () => {
                                 padding: "10px 0", // reduced horizontal padding
                                 fontSize: "12px",
 
-                                marginBottom: "20px"
+
                             }}>
 
                             <div style={{
@@ -659,18 +661,20 @@ const StudentOfficeOfTheRegistrar = () => {
                                     style={{
                                         fontFamily: "Times New Roman",
                                         fontSize: "12px",
-                                        paddingTop: "5px",  // you can reduce this if needed
+                                        paddingTop: "5px",
                                         marginTop: 0,
-                                        fontWeight: "bold",
                                         textAlign: "center",
                                         border: "1px solid black",
+                                        height: "30px",
+                                        textTransform: "uppercase",
 
-
-                                        height: "30px"
 
                                     }}
                                 >
-
+                                    {curriculumOptions.find(
+                                        (c) =>
+                                            c.curriculum_id?.toString() === (person?.program ?? "").toString()
+                                    )?.major || ""}
                                 </td>
                                 <td
                                     colSpan={10}
@@ -685,6 +689,7 @@ const StudentOfficeOfTheRegistrar = () => {
 
                                     }}
                                 >
+
 
                                 </td>
 

@@ -79,13 +79,13 @@ const StudentECATApplicationForm = () => {
 
     const campusAddress = campusAddresses[person?.campus] || "";
 
-   
+
 
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
     const queryPersonId = queryParams.get("person_id");
 
-   // do not alter
+    // do not alter
     useEffect(() => {
         const storedUser = localStorage.getItem("email");
         const storedRole = localStorage.getItem("role");
@@ -239,23 +239,26 @@ const StudentECATApplicationForm = () => {
     }
 
 
- // 🔒 Disable right-click
-  document.addEventListener('contextmenu', (e) => e.preventDefault());
 
-  // 🔒 Block DevTools shortcuts + Ctrl+P silently
-  document.addEventListener('keydown', (e) => {
-    const isBlockedKey =
-      e.key === 'F12' || // DevTools
-      e.key === 'F11' || // Fullscreen
-      (e.ctrlKey && e.shiftKey && (e.key.toLowerCase() === 'i' || e.key.toLowerCase() === 'j')) || // Ctrl+Shift+I/J
-      (e.ctrlKey && e.key.toLowerCase() === 'u') || // Ctrl+U (View Source)
-      (e.ctrlKey && e.key.toLowerCase() === 'p');   // Ctrl+P (Print)
 
-    if (isBlockedKey) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
-  });
+
+    // 🔒 Disable right-click
+    document.addEventListener('contextmenu', (e) => e.preventDefault());
+
+    // 🔒 Block DevTools shortcuts + Ctrl+P silently
+    document.addEventListener('keydown', (e) => {
+        const isBlockedKey =
+            e.key === 'F12' || // DevTools
+            e.key === 'F11' || // Fullscreen
+            (e.ctrlKey && e.shiftKey && (e.key.toLowerCase() === 'i' || e.key.toLowerCase() === 'j')) || // Ctrl+Shift+I/J
+            (e.ctrlKey && e.key.toLowerCase() === 'u') || // Ctrl+U (View Source)
+            (e.ctrlKey && e.key.toLowerCase() === 'p');   // Ctrl+P (Print)
+
+        if (isBlockedKey) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+    });
 
 
 
@@ -498,7 +501,8 @@ const StudentECATApplicationForm = () => {
                                     {curriculumOptions.length > 0
                                         ? curriculumOptions.find(
                                             (item) =>
-                                                item?.curriculum_id?.toString() === (person?.program ?? "").toString()
+                                                item?.curriculum_id?.toString() ===
+                                                (person?.program ?? "").toString()
                                         )?.program_description || (person?.program ?? "")
                                         : "Loading..."}
                                 </div>
@@ -615,7 +619,7 @@ const StudentECATApplicationForm = () => {
                     </tbody>
                 </table>
 
-  <table
+                <table
 
                     style={{
 
@@ -650,7 +654,7 @@ const StudentECATApplicationForm = () => {
                                         fontStyle: 'italic',
                                         border: "2px solid black"
                                     }}>
-                                    PERSONAL INFORMATION (Please print your name as written in your NSO/PSA Birth Certificate)
+                                        PERSONAL INFORMATION (Please print your name as written in your NSO/PSA Birth Certificate)
                                     </b>
 
                                 </b>

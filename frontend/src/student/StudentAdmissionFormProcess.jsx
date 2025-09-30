@@ -1,35 +1,140 @@
 import { useRef, useState, useEffect } from "react";
+import axios from "axios";
 import { Box, Container, } from "@mui/material";
 import EaristLogo from "../assets/EaristLogo.png";
 import ForwardIcon from '@mui/icons-material/Forward';
 import { FcPrint } from "react-icons/fc";
+import { useLocation } from "react-router-dom";
+import { QRCodeSVG } from "qrcode.react";
 
 const StudentAdmissionFormProcess = () => {
-
 
   const [userID, setUserID] = useState("");
   const [user, setUser] = useState("");
   const [userRole, setUserRole] = useState("");
 
+  const [person, setPerson] = useState({
+    applicant_number: "",
+    profile_img: "",
+    campus: "",
+    academicProgram: "",
+    classifiedAs: "",
+    program: "",
+    program2: "",
+    program3: "",
+    yearLevel: "",
+    last_name: "",
+    first_name: "",
+    middle_name: "",
+    extension: "",
+    nickname: "",
+    height: "",
+    weight: "",
+    lrnNumber: "",
+    gender: "",
+    pwdType: "",
+    pwdId: "",
+    birthOfDate: "",
+    age: "",
+    birthPlace: "",
+    languageDialectSpoken: "",
+    citizenship: "",
+    religion: "",
+    civilStatus: "",
+    tribeEthnicGroup: "",
+    otherEthnicGroup: "",
+    cellphoneNumber: "",
+    emailAddress: "",
+    telephoneNumber: "",
+    facebookAccount: "",
+    presentStreet: "",
+    presentBarangay: "",
+    presentZipCode: "",
+    presentRegion: "",
+    presentProvince: "",
+    presentMunicipality: "",
+    presentDswdHouseholdNumber: "",
+    permanentStreet: "",
+    permanentBarangay: "",
+    permanentZipCode: "",
+    permanentRegion: "",
+    permanentProvince: "",
+    permanentMunicipality: "",
+    permanentDswdHouseholdNumber: "",
+    father_deceased: "",
+    father_family_name: "", father_given_name: "", father_middle_name: "", father_ext: "", father_contact: "", father_occupation: "",
+    father_income: "", father_email: "", mother_deceased: "", mother_family_name: "", mother_given_name: "", mother_middle_name: "",
+    mother_contact: "", mother_occupation: "", mother_income: "", guardian: "", guardian_family_name: "", guardian_given_name: "",
+    guardian_middle_name: "", guardian_ext: "", guardian_nickname: "", guardian_address: "", guardian_contact: "", guardian_email: "",
+    schoolLevel: "",
+    schoolLastAttended: "",
+    schoolAddress: "",
+    courseProgram: "",
+    honor: "",
+    generalAverage: "",
+    yearGraduated: "",
+    schoolLevel1: "",
+    schoolLastAttended1: "",
+    schoolAddress1: "",
+    courseProgram1: "",
+    honor1: "",
+    generalAverage1: "",
+    yearGraduated1: "",
+    strand: "",
+  });
+
   useEffect(() => {
-     const storedUser = localStorage.getItem("email");
-     const storedRole = localStorage.getItem("role");
-     const storedID = localStorage.getItem("person_id");
- 
-     if (storedUser && storedRole && storedID) {
-       setUser(storedUser);
-       setUserRole(storedRole);
-       setUserID(storedID);
- 
-       if (storedRole === "student") {
- 
-       } else {
-         window.location.href = "/login";
-       }
-     } else {
-       window.location.href = "/login";
-     }
-   }, []);
+    const pid = localStorage.getItem("person_id");
+    if (!pid) return;
+
+    const fetchData = async () => {
+      try {
+        // Fetch person
+        const res = await axios.get(`http://localhost:5000/api/person/${pid}`);
+        let personData = res.data;
+
+        // Fetch applicant number separately
+        const applicantRes = await axios.get(`http://localhost:5000/api/applicant_number/${pid}`);
+        if (applicantRes.data?.applicant_number) {
+          personData.applicant_number = applicantRes.data.applicant_number;
+        }
+
+        setPerson(personData);
+      } catch (err) {
+        console.error("Error fetching admission form data:", err);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const queryPersonId = queryParams.get("person_id");
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("email");
+    const storedRole = localStorage.getItem("role");
+    const storedID = localStorage.getItem("person_id");
+
+    if (storedUser && storedRole && storedID) {
+      setUser(storedUser);
+      setUserRole(storedRole);
+      setUserID(storedID);
+
+      if (storedRole === "applicant" || storedRole === "registrar" || storedRole === "student") {
+        fetchPersonData(storedID);
+      } else {
+        window.location.href = "/login";
+      }
+    } else {
+      window.location.href = "/login";
+    }
+  }, []);
+
+
+
 
 
 
@@ -103,24 +208,58 @@ const StudentAdmissionFormProcess = () => {
     }
   };
 
+  useEffect(() => {
+    console.log("Fetched campus:", person.campus);
+  }, [person]);
 
-  // 🔒 Disable right-click
-  document.addEventListener('contextmenu', (e) => e.preventDefault());
 
-  // 🔒 Block DevTools shortcuts + Ctrl+P silently
-  document.addEventListener('keydown', (e) => {
-    const isBlockedKey =
-      e.key === 'F12' || // DevTools
-      e.key === 'F11' || // Fullscreen
-      (e.ctrlKey && e.shiftKey && (e.key.toLowerCase() === 'i' || e.key.toLowerCase() === 'j')) || // Ctrl+Shift+I/J
-      (e.ctrlKey && e.key.toLowerCase() === 'u') || // Ctrl+U (View Source)
-      (e.ctrlKey && e.key.toLowerCase() === 'p');   // Ctrl+P (Print)
+  const campusAddresses = {
+    0: "Nagtahan St. Sampaloc, Manila",
+    1: "Blk. 3 Lot 2, 5 Congressional Rd, General Mariano Alvarez",
+  };
 
-    if (isBlockedKey) {
-      e.preventDefault();
-      e.stopPropagation();
+
+  const campusAddress = campusAddresses[person?.campus] || "";
+
+
+  const fetchPersonData = async (id) => {
+    try {
+      const response = await axios.get(`http://localhost:5000/api/student-person-data/${id}`);
+      setPerson(response.data);
+    } catch (err) {
+      console.error("Error fetching person data:", err);
     }
-  });
+  }
+
+
+  const [curriculumOptions, setCurriculumOptions] = useState([]);
+
+  useEffect(() => {
+    const fetchCurriculums = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/api/applied_program");
+        setCurriculumOptions(response.data);
+      } catch (error) {
+        console.error("Error fetching curriculum options:", error);
+      }
+    };
+
+    fetchCurriculums();
+  }, []);
+
+  console.log("person.program:", person.program);
+  console.log("curriculumOptions:", curriculumOptions);
+
+  {
+    curriculumOptions.find(
+      (item) =>
+        item?.curriculum_id?.toString() === (person?.program ?? "").toString()
+    )?.program_description || (person?.program ?? "")
+
+  }
+
+
+
 
 
 
@@ -168,66 +307,154 @@ const StudentAdmissionFormProcess = () => {
 
           <Container>
 
-            <div style={{
-              width: "8in", // matches table width assuming 8in for 40 columns
-              maxWidth: "100%",
-              margin: "0 auto", // center the content
-              fontFamily: "Times New Roman",
-              boxSizing: "border-box",
-              padding: "10px 0", // reduced horizontal padding
-
-            }}>
-              <div style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                flexWrap: "wrap"
-              }}>
-                {/* Logo */}
-                <div style={{ flexShrink: 0, marginRight: "20px" }}>
+            <div
+              style={{
+                width: "8in", // matches table width assuming 8in for 40 columns
+                maxWidth: "100%",
+                margin: "0 auto",
+                fontFamily: "Times New Roman",
+                boxSizing: "border-box",
+                padding: "10px 0",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between", // spread logo, text, profile+QR
+                  flexWrap: "nowrap",
+                }}
+              >
+                {/* Logo (Left Side) */}
+                <div style={{ flexShrink: 0 }}>
                   <img
                     src={EaristLogo}
                     alt="Earist Logo"
-                    style={{ width: "120px", height: "120px", objectFit: "contain", marginLeft: "10px", marginTop: "-25px" }}
+                    style={{
+                      width: "120px",
+                      height: "120px",
+                      objectFit: "contain",
+                      marginLeft: "10px",
+                      marginTop: "-25px",
+                    }}
                   />
                 </div>
 
+                {/* Text Block (Center) */}
+                <div
+                  style={{
+                    flexGrow: 1,
+                    textAlign: "center",
+                    fontSize: "12px",
+                    fontFamily: "Arial",
+                    letterSpacing: "5",
+                    lineHeight: 1.4,
+                    paddingTop: 0,
+                    paddingBottom: 0,
+                  }}
+                >
+                  <div
+                    style={{ fontFamily: "Arial", fontSize: "12px" }}
+                  >
+                    Republic of the Philippines
+                  </div>
+                  <div style={{ fontFamily: "Arial", letterSpacing: "2px" }}>
+                    <b>EULOGIO "AMANG" RODRIGUEZ </b>
+                  </div>
+                  <div style={{ fontFamily: "Arial", letterSpacing: "2px" }}>
+                    <b>INSTITUTE OF SCIENCE AND TECHNOLOGY</b>
+                  </div>
+                  {campusAddress && (
+                    <div style={{ fontSize: "12px", letterSpacing: "1px", fontFamily: "Arial" }}>
+                      {campusAddress}
+                    </div>
+                  )}
 
-
-                <div style={{
-                  flexGrow: 1,
-                  textAlign: "center",
-                  fontSize: "12px",
-                  fontFamily: "Arial",
-                  letterSpacing: "5",
-                  lineHeight: 1.4,
-                  paddingTop: 0,
-
-                  paddingBottom: 0
-                }}>
-                  <div style={{ marginLeft: "-155px", fontFamily: "Arial", fontSize: "12px", }}>Republic of the Philippines</div>
-                  <div style={{ marginLeft: "-155px", fontFamily: "Arial", letterSpacing: '2px' }}><b>EULOGIO "AMANG" RODRIGUEZ </b></div>
-                  <div style={{ marginLeft: "-155px", fontFamily: "Arial", letterSpacing: '2px' }}><b>INSTITUTE OF SCIENCE AND TECHNOLOGY</b></div>
-                  <div style={{ marginLeft: "-155px", fontFamily: "Arial", fontSize: "12px" }}>Nagtahan, Sampaloc, Manila 1008</div>
-                  <div style={{ marginLeft: "-155px", fontFamily: "Arial", fontSize: "12px" }}>Blk. 3 Lot 2, 5 Congressional Rd, General Mariano Alvarez</div>
-                  <div style={{ marginLeft: "-155px", fontFamily: "Arial", letterSpacing: '1px', }}><b>OFFICE OF THE ADMISSION SERVICES</b></div>
+                  <div
+                    style={{ fontFamily: "Arial", letterSpacing: "1px" }}
+                  >
+                    <b>OFFICE OF THE ADMISSION SERVICES</b>
+                  </div>
 
                   <br />
 
-                  <div style={{
-                    fontSize: "21px",
-                    fontFamily: "Arial",
-                    fontWeight: "bold",
-                    marginBottom: "5px",
-                    marginTop: "0",
-                    marginLeft: "-145px",
-                    textAlign: "center",
-                  }}>
+                  <div
+                    style={{
+                      fontSize: "21px",
+                      fontFamily: "Arial",
+                      fontWeight: "bold",
+                      marginBottom: "5px",
+                      marginTop: "0",
+                      textAlign: "center",
+                    }}
+                  >
                     Admission Form (Process)
                   </div>
                 </div>
+
+                {/* Profile + QR Code (Right Side) */}
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "row",   // ✅ side by side
+                    alignItems: "center",
+                    marginRight: "10px",
+                    gap: "10px",            // ✅ 10px space between them
+                  }}
+                >
+                  {/* Profile Image (2x2) */}
+                  <div
+                    style={{
+                      width: "1.3in",
+                      height: "1.3in",
+                      border: "1px solid black",
+                      overflow: "hidden",
+                      flexShrink: 0,
+                    }}
+                  >
+                    {person?.profile_img ? (
+                      <img
+                        src={`http://localhost:5000/uploads/${person.profile_img}`}
+                        alt="Profile"
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                        }}
+                      />
+                    ) : (
+                      <span style={{ fontSize: "12px", color: "#888" }}>No Image</span>
+                    )}
+                  </div>
+
+                  {/* QR Code (same size as profile) */}
+                  <div
+                    style={{
+                      width: "1.3in",
+                      height: "1.3in",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      border: "1px solid black",
+                      background: "#fff",
+                      flexShrink: 0,
+                    }}
+                  >
+                    {person?.applicant_number && (
+                      <QRCodeSVG
+                        value={`http://localhost:5173/examination_profile/${person.applicant_number}`}
+                        size={110}   // fits well inside 1.5in box
+                        level="H"
+                        includeMargin={false}
+                      />
+                    )}
+                  </div>
+                </div>
+
               </div>
             </div>
+
+
           </Container>
           <br />
           <br />
@@ -246,8 +473,9 @@ const StudentAdmissionFormProcess = () => {
           >
 
             <tbody>
+              {/* Name of Student Row */}
+              {/* Name of Student Row */}
               <tr>
-
                 <td
                   colSpan={40}
                   style={{
@@ -258,50 +486,71 @@ const StudentAdmissionFormProcess = () => {
                   }}
                 >
                   <div style={{ display: "flex", alignItems: "center", width: "100%" }}>
-                    <span style={{ fontWeight: "bold", whiteSpace: "nowrap", marginRight: "10px" }}>
-                      Name of Student:
-                    </span>
                     <span
                       style={{
-                        flexGrow: 1,
-                        borderBottom: "1px solid black",
-                        display: "inline-block",
-                        height: "1.2em", // gives visible height to the line
+                        fontWeight: "bold",
+                        whiteSpace: "nowrap",
+                        marginRight: "10px",
                       }}
                     >
-                      {/* Full name goes here */}
+                      Name of Student:
                     </span>
+                    <div style={{ flexGrow: 1, display: "flex", justifyContent: "space-between" }}>
+                      <span style={{ width: "25%", textAlign: "center", borderBottom: "1px solid black" }}>
+                        {person.last_name}
+                      </span>
+                      <span style={{ width: "25%", textAlign: "center", borderBottom: "1px solid black" }}>
+                        {person.first_name}
+                      </span>
+                      <span style={{ width: "25%", textAlign: "center", borderBottom: "1px solid black" }}>
+                        {person.middle_name}
+                      </span>
+                      <span style={{ width: "25%", textAlign: "center", borderBottom: "1px solid black" }}>
+                        {person.extension}
+                      </span>
+                    </div>
                   </div>
                 </td>
-
               </tr>
 
-
+              {/* Labels Row */}
               <tr>
-                <td colSpan={40} style={{ fontFamily: "Times New Roman", fontSize: "14px", paddingTop: "2px" }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", width: "80%", marginLeft: "140px" }}>
-
-                    <span>Last Name</span>
-                    <span>Given Name</span>
-                    <span>Middle Name</span>
-                    <span>Middle Initial</span>
-
+                <td
+                  colSpan={40}
+                  style={{
+                    fontFamily: "Times New Roman",
+                    fontSize: "14px",
+                    paddingTop: "2px",
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      marginLeft: "140px",
+                    }}
+                  >
+                    <span style={{ width: "15%", textAlign: "center" }}>Last Name</span>
+                    <span style={{ width: "20%", textAlign: "center" }}>Given Name</span>
+                    <span style={{ width: "20%", textAlign: "center" }}>Middle Name</span>
+                    <span style={{ width: "10%", textAlign: "center" }}>Ext. Name</span>
                   </div>
                 </td>
               </tr>
+
 
               {/* Email & Applicant ID */}
               <tr style={{ fontFamily: "Times New Roman", fontSize: "15px" }}>
                 <td colSpan={20}>
                   <div style={{ display: "flex", alignItems: "center", width: "100%" }}>
                     <label style={{ fontWeight: "bold", whiteSpace: "nowrap", marginRight: "10px" }}>Email:</label>
-                    <span style={{ flexGrow: 1, borderBottom: "1px solid black", height: "1.2em" }}></span>
+                    <span style={{ flexGrow: 1, borderBottom: "1px solid black", height: "1.2em" }}>{person.emailAddress}</span>
                   </div>
                 </td>
                 <td colSpan={20}>
                   <div style={{ display: "flex", alignItems: "center", width: "100%" }}>
                     <label style={{ fontWeight: "bold", whiteSpace: "nowrap", marginRight: "10px" }}>Applicant Id No.:</label>
-                    <span style={{ flexGrow: 1, borderBottom: "1px solid black", height: "1.2em" }}></span>
+                    <span style={{ flexGrow: 1, borderBottom: "1px solid black", height: "1.2em" }}>{person.emailAddress}</span>
                   </div>
                 </td>
               </tr>
@@ -311,7 +560,15 @@ const StudentAdmissionFormProcess = () => {
                 <td colSpan={40}>
                   <div style={{ display: "flex", alignItems: "center", width: "100%" }}>
                     <label style={{ fontWeight: "bold", whiteSpace: "nowrap", marginRight: "10px" }}>Permanent Address:</label>
-                    <span style={{ flexGrow: 1, borderBottom: "1px solid black", height: "1.2em" }}></span>
+                    <span style={{ flexGrow: 1, borderBottom: "1px solid black", height: "1.2em" }}>
+                      {person.permanentStreet}{" "}
+                      {person.permanentBarangay}{" "}
+                      {person.permanentMunicipality}{" "}
+                      {person.permanentRegion}{" "}
+                      {person.permanentZipCode}
+                    </span>
+
+
                   </div>
                 </td>
               </tr>
@@ -321,19 +578,19 @@ const StudentAdmissionFormProcess = () => {
                 <td colSpan={13}>
                   <div style={{ display: "flex", alignItems: "center", width: "100%" }}>
                     <label style={{ fontWeight: "bold", whiteSpace: "nowrap", marginRight: "10px" }}>Cellphone No:</label>
-                    <span style={{ flexGrow: 1, borderBottom: "1px solid black", height: "1.2em" }}></span>
+                    <span style={{ flexGrow: 1, borderBottom: "1px solid black", height: "1.2em" }}>{person.cellphoneNumber}</span>
                   </div>
                 </td>
                 <td colSpan={13}>
                   <div style={{ display: "flex", alignItems: "center", width: "100%" }}>
                     <label style={{ fontWeight: "bold", whiteSpace: "nowrap", marginRight: "10px" }}>Civil Status:</label>
-                    <span style={{ flexGrow: 1, borderBottom: "1px solid black", height: "1.2em" }}></span>
+                    <span style={{ flexGrow: 1, borderBottom: "1px solid black", height: "1.2em" }}>{person.civilStatus}</span>
                   </div>
                 </td>
                 <td colSpan={14}>
                   <div style={{ display: "flex", alignItems: "center", width: "100%" }}>
                     <label style={{ fontWeight: "bold", whiteSpace: "nowrap", marginRight: "10px" }}>Gender:</label>
-                    <span style={{ flexGrow: 1, borderBottom: "1px solid black", height: "1.2em" }}></span>
+                    <span style={{ flexGrow: 1, borderBottom: "1px solid black", height: "1.2em" }}>  {person.gender === 0 ? "Male" : person.gender === 1 ? "Female" : ""}</span>
                   </div>
                 </td>
               </tr>
@@ -343,76 +600,190 @@ const StudentAdmissionFormProcess = () => {
                 <td colSpan={13}>
                   <div style={{ display: "flex", alignItems: "center", width: "100%" }}>
                     <label style={{ fontWeight: "bold", whiteSpace: "nowrap", marginRight: "10px" }}>Date of Birth:</label>
-                    <span style={{ flexGrow: 1, borderBottom: "1px solid black", height: "1.2em" }}></span>
+                    <span style={{ flexGrow: 1, borderBottom: "1px solid black", height: "1.2em" }}>{person.birthOfDate}</span>
                   </div>
                 </td>
                 <td colSpan={14}>
                   <div style={{ display: "flex", alignItems: "center", width: "100%" }}>
                     <label style={{ fontWeight: "bold", whiteSpace: "nowrap", marginRight: "10px" }}>Place of Birth:</label>
-                    <span style={{ flexGrow: 1, borderBottom: "1px solid black", height: "1.2em" }}></span>
+                    <span style={{ flexGrow: 1, borderBottom: "1px solid black", height: "1.2em" }}>{person.birthPlace}</span>
                   </div>
                 </td>
                 <td colSpan={13}>
                   <div style={{ display: "flex", alignItems: "center", width: "100%" }}>
                     <label style={{ fontWeight: "bold", whiteSpace: "nowrap", marginRight: "10px" }}>Age:</label>
-                    <span style={{ flexGrow: 1, borderBottom: "1px solid black", height: "1.2em" }}></span>
+                    <span style={{ flexGrow: 1, borderBottom: "1px solid black", height: "1.2em" }}>{person.age}</span>
                   </div>
                 </td>
               </tr>
 
-              {/* Please Check, Freshman, Transferee, Others */}
               <tr style={{ fontFamily: "Times New Roman", fontSize: "15px" }}>
+                {/* Please Check */}
                 <td colSpan={10}>
                   <div style={{ display: "flex", alignItems: "center", width: "100%" }}>
-                    <label style={{ fontWeight: "bold", whiteSpace: "nowrap", marginRight: "10px" }}>Please Check (✓):</label>
-                    <span style={{ flexGrow: 1, borderBottom: "1px solid black", height: "1.2em" }}></span>
+                    <label style={{ fontWeight: "bold", whiteSpace: "nowrap", marginRight: "10px" }}>
+                      Please Check (✓):
+                    </label>
+                    <span
+                      style={{
+                        flexGrow: 1,
+                        borderBottom: "1px solid black",
+                        height: "1.2em",
+                        display: "inline-block",
+                      }}
+                    >
+                      {/* left blank intentionally */}
+                    </span>
                   </div>
                 </td>
+
+                {/* Freshman */}
                 <td colSpan={10}>
                   <div style={{ display: "flex", alignItems: "center", width: "100%" }}>
-                    <label style={{ fontWeight: "bold", whiteSpace: "nowrap", marginRight: "10px" }}>Freshman:</label>
-                    <span style={{ flexGrow: 1, borderBottom: "1px solid black", height: "1.2em" }}></span>
+                    <label style={{ fontWeight: "bold", whiteSpace: "nowrap", marginRight: "10px" }}>
+                      Freshman:
+                    </label>
+                    <span
+                      style={{
+                        flexGrow: 1,
+                        borderBottom: "1px solid black",
+                        height: "1.2em",
+                        textAlign: "center",
+                        display: "inline-block",
+                        fontSize: "15px",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      {person.classifiedAs === "Freshman (First Year)" ? "✓" : ""}
+                    </span>
                   </div>
                 </td>
+
+                {/* Transferee */}
                 <td colSpan={10}>
                   <div style={{ display: "flex", alignItems: "center", width: "100%" }}>
-                    <label style={{ fontWeight: "bold", whiteSpace: "nowrap", marginRight: "10px" }}>Transferee:</label>
-                    <span style={{ flexGrow: 1, borderBottom: "1px solid black", height: "1.2em" }}></span>
+                    <label style={{ fontWeight: "bold", whiteSpace: "nowrap", marginRight: "10px" }}>
+                      Transferee:
+                    </label>
+                    <span
+                      style={{
+                        flexGrow: 1,
+                        borderBottom: "1px solid black",
+                        height: "1.2em",
+                        textAlign: "center",
+                        display: "inline-block",
+                        fontSize: "15px",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      {["Transferee", "Returnee", "Shiftee"].includes(person.classifiedAs) ? "✓" : ""}
+                    </span>
                   </div>
                 </td>
+
+                {/* Others */}
                 <td colSpan={10}>
                   <div style={{ display: "flex", alignItems: "center", width: "100%" }}>
-                    <label style={{ fontWeight: "bold", whiteSpace: "nowrap", marginRight: "10px" }}>Others:</label>
-                    <span style={{ flexGrow: 1, borderBottom: "1px solid black", height: "1.2em" }}></span>
+                    <label style={{ fontWeight: "bold", whiteSpace: "nowrap", marginRight: "10px" }}>
+                      Others:
+                    </label>
+                    <span
+                      style={{
+                        flexGrow: 1,
+                        borderBottom: "1px solid black",
+                        height: "1.2em",
+                        textAlign: "center",
+                        display: "inline-block",
+                        fontSize: "15px",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      {person.classifiedAs === "Foreign Student" ? "✓" : ""}
+                    </span>
                   </div>
                 </td>
               </tr>
+
 
               {/* Last School Attended */}
               <tr style={{ fontFamily: "Times New Roman", fontSize: "15px" }}>
                 <td colSpan={40}>
                   <div style={{ display: "flex", alignItems: "center", width: "100%" }}>
                     <label style={{ fontWeight: "bold", whiteSpace: "nowrap", marginRight: "10px" }}>Last School Attended:</label>
-                    <span style={{ flexGrow: 1, borderBottom: "1px solid black", height: "1.2em" }}></span>
+                    <span style={{ flexGrow: 1, borderBottom: "1px solid black", height: "1.2em" }}>{person.schoolLastAttended1}</span>
                   </div>
                 </td>
               </tr>
 
               {/* Degree/Program & Major */}
               <tr style={{ fontFamily: "Times New Roman", fontSize: "15px" }}>
-                <td colSpan={20}>
-                  <div style={{ display: "flex", alignItems: "center", width: "100%" }}>
-                    <label style={{ fontWeight: "bold", whiteSpace: "nowrap", marginRight: "10px" }}>DEGREE/PROGRAM APPLIED:</label>
-                    <span style={{ flexGrow: 1, borderBottom: "1px solid black", height: "1.2em" }}></span>
+                <td colSpan={30} style={{ verticalAlign: "top" }}>
+                  <div style={{ display: "flex", alignItems: "flex-start", width: "100%" }}>
+                    <label
+                      style={{
+                        fontWeight: "bold",
+                        whiteSpace: "nowrap",
+                        marginRight: "10px",
+                      }}
+                    >
+                      DEGREE/PROGRAM APPLIED:
+                    </label>
+                    <div
+                      style={{
+                        flexGrow: 1,
+                        borderBottom: "1px solid black",
+                        minHeight: "1.2em",
+                        whiteSpace: "normal",   // allow text wrapping
+                        wordWrap: "break-word", // break long words
+                        lineHeight: "1.4em",
+                        paddingBottom: "2px",
+                      }}
+                    >
+                      {curriculumOptions.length > 0
+                        ? curriculumOptions.find(
+                          (item) =>
+                            item?.curriculum_id?.toString() ===
+                            (person?.program ?? "").toString()
+                        )?.program_description || (person?.program ?? "")
+                        : "Loading..."}
+                    </div>
                   </div>
                 </td>
-                <td colSpan={20}>
-                  <div style={{ display: "flex", alignItems: "center", width: "100%" }}>
-                    <label style={{ fontWeight: "bold", whiteSpace: "nowrap", marginRight: "10px" }}>MAJOR:</label>
-                    <span style={{ flexGrow: 1, borderBottom: "1px solid black", height: "1.2em" }}></span>
+
+                <td colSpan={10} style={{ verticalAlign: "top" }}>
+                  <div style={{ display: "flex", alignItems: "flex-start", width: "100%" }}>
+                    <label
+                      style={{
+                        fontWeight: "bold",
+                        whiteSpace: "nowrap",
+                        marginRight: "10px",
+                      }}
+                    >
+                      MAJOR:
+                    </label>
+                    <div
+                      style={{
+                        flexGrow: 1,
+                        borderBottom: "1px solid black",
+                        minHeight: "1.2em",
+                        whiteSpace: "normal",
+                        wordWrap: "break-word",
+                        lineHeight: "1.4em",
+                        paddingBottom: "2px",
+                      }}
+                    >
+                      {curriculumOptions.length > 0
+                        ? curriculumOptions.find(
+                          (item) =>
+                            item?.curriculum_id?.toString() ===
+                            (person?.program ?? "").toString()
+                        )?.major || ""
+                        : "Loading..."}
+                    </div>
                   </div>
                 </td>
               </tr>
+
 
 
 
@@ -661,66 +1032,158 @@ const StudentAdmissionFormProcess = () => {
           />
 
 
-          <Container>
-            <div style={{
-              width: "8in", // matches table width assuming 8in for 40 columns
-              maxWidth: "100%",
-              margin: "0 auto", // center the content
-              fontFamily: "Times New Roman",
-              boxSizing: "border-box",
-              padding: "10px 0", // reduced horizontal padding
 
-            }}>
-              <div style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                flexWrap: "wrap"
-              }}>
-                {/* Logo */}
-                <div style={{ flexShrink: 0, marginRight: "20px" }}>
+          <Container>
+
+
+            <div
+              style={{
+                width: "8in", // matches table width assuming 8in for 40 columns
+                maxWidth: "100%",
+                margin: "0 auto",
+                fontFamily: "Times New Roman",
+                boxSizing: "border-box",
+                padding: "10px 0",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between", // spread logo, text, profile+QR
+                  flexWrap: "nowrap",
+                }}
+              >
+                {/* Logo (Left Side) */}
+                <div style={{ flexShrink: 0 }}>
                   <img
                     src={EaristLogo}
                     alt="Earist Logo"
-                    style={{ width: "120px", height: "120px", objectFit: "contain", marginLeft: "10px", marginTop: "-25px" }}
+                    style={{
+                      width: "120px",
+                      height: "120px",
+                      objectFit: "contain",
+                      marginLeft: "10px",
+                      marginTop: "-25px",
+                    }}
                   />
                 </div>
 
+                {/* Text Block (Center) */}
+                <div
+                  style={{
+                    flexGrow: 1,
+                    textAlign: "center",
+                    fontSize: "12px",
+                    fontFamily: "Arial",
+                    letterSpacing: "5",
+                    lineHeight: 1.4,
+                    paddingTop: 0,
+                    paddingBottom: 0,
+                  }}
+                >
+                  <div
+                    style={{ fontFamily: "Arial", fontSize: "12px" }}
+                  >
+                    Republic of the Philippines
+                  </div>
+                  <div style={{ fontFamily: "Arial", letterSpacing: "2px" }}>
+                    <b>EULOGIO "AMANG" RODRIGUEZ </b>
+                  </div>
+                  <div style={{ fontFamily: "Arial", letterSpacing: "2px" }}>
+                    <b>INSTITUTE OF SCIENCE AND TECHNOLOGY</b>
+                  </div>
+                  {campusAddress && (
+                    <div style={{ fontSize: "12px", letterSpacing: "1px", fontFamily: "Arial" }}>
+                      {campusAddress}
+                    </div>
+                  )}
 
+                  <div
+                    style={{ fontFamily: "Arial", letterSpacing: "1px" }}
+                  >
+                    <b>OFFICE OF THE ADMISSION SERVICES</b>
+                  </div>
 
-                <div style={{
-                  flexGrow: 1,
-                  textAlign: "center",
-                  fontSize: "12px",
-                  fontFamily: "Arial",
-                  letterSpacing: "5",
-                  lineHeight: 1.4,
-                  paddingTop: 0,
-
-                  paddingBottom: 0
-                }}>
-                  <div style={{ marginLeft: "-155px", fontFamily: "Arial", fontSize: "12px", }}>Republic of the Philippines</div>
-                  <div style={{ marginLeft: "-155px", fontFamily: "Arial", letterSpacing: '2px' }}><b>EULOGIO "AMANG" RODRIGUEZ </b></div>
-                  <div style={{ marginLeft: "-155px", fontFamily: "Arial", letterSpacing: '2px' }}><b>INSTITUTE OF SCIENCE AND TECHNOLOGY</b></div>
-                  <div style={{ marginLeft: "-155px", fontFamily: "Arial", fontSize: "12px" }}>Nagtahan, Sampaloc, Manila 1008</div>
-                  <div style={{ marginLeft: "-155px", fontFamily: "Arial", fontSize: "12px" }}>Blk. 3 Lot 2, 5 Congressional Rd, General Mariano Alvarez</div>
-                  <div style={{ marginLeft: "-155px", fontFamily: "Arial", letterSpacing: '1px', }}><b>OFFICE OF THE ADMISSION SERVICES</b></div>
                   <br />
 
-                  <div style={{
-                    fontSize: "21px",
-                    fontFamily: "Arial",
-                    fontWeight: "bold",
-                    marginBottom: "5px",
-                    marginTop: "0",
-                    marginLeft: "-145px",
-                    textAlign: "center",
-                  }}>
+                  <div
+                    style={{
+                      fontSize: "21px",
+                      fontFamily: "Arial",
+                      fontWeight: "bold",
+                      marginBottom: "5px",
+                      marginTop: "0",
+                      textAlign: "center",
+                    }}
+                  >
                     Admission Form (Process)
                   </div>
                 </div>
+
+                {/* Profile + QR Code (Right Side) */}
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "row",   // ✅ side by side
+                    alignItems: "center",
+                    marginRight: "10px",
+                    gap: "10px",            // ✅ 10px space between them
+                  }}
+                >
+                  {/* Profile Image (2x2) */}
+                  <div
+                    style={{
+                      width: "1.3in",
+                      height: "1.3in",
+                      border: "1px solid black",
+                      overflow: "hidden",
+                      flexShrink: 0,
+                    }}
+                  >
+                    {person?.profile_img ? (
+                      <img
+                        src={`http://localhost:5000/uploads/${person.profile_img}`}
+                        alt="Profile"
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                        }}
+                      />
+                    ) : (
+                      <span style={{ fontSize: "12px", color: "#888" }}>No Image</span>
+                    )}
+                  </div>
+
+                  {/* QR Code (same size as profile) */}
+                  <div
+                    style={{
+                      width: "1.3in",
+                      height: "1.3in",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      border: "1px solid black",
+                      background: "#fff",
+                      flexShrink: 0,
+                    }}
+                  >
+                    {person?.applicant_number && (
+                      <QRCodeSVG
+                        value={`http://localhost:5173/examination_profile/${person.applicant_number}`}
+                        size={110}   // fits well inside 1.5in box
+                        level="H"
+                        includeMargin={false}
+                      />
+                    )}
+                  </div>
+                </div>
+
               </div>
             </div>
+
+
           </Container>
           <br />
           <br />
@@ -739,8 +1202,9 @@ const StudentAdmissionFormProcess = () => {
           >
 
             <tbody>
+              {/* Name of Student Row */}
+              {/* Name of Student Row */}
               <tr>
-
                 <td
                   colSpan={40}
                   style={{
@@ -751,50 +1215,71 @@ const StudentAdmissionFormProcess = () => {
                   }}
                 >
                   <div style={{ display: "flex", alignItems: "center", width: "100%" }}>
-                    <span style={{ fontWeight: "bold", whiteSpace: "nowrap", marginRight: "10px" }}>
-                      Name of Student:
-                    </span>
                     <span
                       style={{
-                        flexGrow: 1,
-                        borderBottom: "1px solid black",
-                        display: "inline-block",
-                        height: "1.2em", // gives visible height to the line
+                        fontWeight: "bold",
+                        whiteSpace: "nowrap",
+                        marginRight: "10px",
                       }}
                     >
-                      {/* Full name goes here */}
+                      Name of Student:
                     </span>
+                    <div style={{ flexGrow: 1, display: "flex", justifyContent: "space-between" }}>
+                      <span style={{ width: "25%", textAlign: "center", borderBottom: "1px solid black" }}>
+                        {person.last_name}
+                      </span>
+                      <span style={{ width: "25%", textAlign: "center", borderBottom: "1px solid black" }}>
+                        {person.first_name}
+                      </span>
+                      <span style={{ width: "25%", textAlign: "center", borderBottom: "1px solid black" }}>
+                        {person.middle_name}
+                      </span>
+                      <span style={{ width: "25%", textAlign: "center", borderBottom: "1px solid black" }}>
+                        {person.extension}
+                      </span>
+                    </div>
                   </div>
                 </td>
-
               </tr>
 
-
+              {/* Labels Row */}
               <tr>
-                <td colSpan={40} style={{ fontFamily: "Times New Roman", fontSize: "14px", paddingTop: "2px" }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", width: "80%", marginLeft: "140px" }}>
-
-                    <span>Last Name</span>
-                    <span>Given Name</span>
-                    <span>Middle Name</span>
-                    <span>Middle Initial</span>
-
+                <td
+                  colSpan={40}
+                  style={{
+                    fontFamily: "Times New Roman",
+                    fontSize: "14px",
+                    paddingTop: "2px",
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      marginLeft: "140px",
+                    }}
+                  >
+                    <span style={{ width: "15%", textAlign: "center" }}>Last Name</span>
+                    <span style={{ width: "20%", textAlign: "center" }}>Given Name</span>
+                    <span style={{ width: "20%", textAlign: "center" }}>Middle Name</span>
+                    <span style={{ width: "10%", textAlign: "center" }}>Ext. Name</span>
                   </div>
                 </td>
               </tr>
+
 
               {/* Email & Applicant ID */}
               <tr style={{ fontFamily: "Times New Roman", fontSize: "15px" }}>
                 <td colSpan={20}>
                   <div style={{ display: "flex", alignItems: "center", width: "100%" }}>
                     <label style={{ fontWeight: "bold", whiteSpace: "nowrap", marginRight: "10px" }}>Email:</label>
-                    <span style={{ flexGrow: 1, borderBottom: "1px solid black", height: "1.2em" }}></span>
+                    <span style={{ flexGrow: 1, borderBottom: "1px solid black", height: "1.2em" }}>{person.emailAddress}</span>
                   </div>
                 </td>
                 <td colSpan={20}>
                   <div style={{ display: "flex", alignItems: "center", width: "100%" }}>
                     <label style={{ fontWeight: "bold", whiteSpace: "nowrap", marginRight: "10px" }}>Applicant Id No.:</label>
-                    <span style={{ flexGrow: 1, borderBottom: "1px solid black", height: "1.2em" }}></span>
+                    <span style={{ flexGrow: 1, borderBottom: "1px solid black", height: "1.2em" }}>{person.emailAddress}</span>
                   </div>
                 </td>
               </tr>
@@ -804,7 +1289,15 @@ const StudentAdmissionFormProcess = () => {
                 <td colSpan={40}>
                   <div style={{ display: "flex", alignItems: "center", width: "100%" }}>
                     <label style={{ fontWeight: "bold", whiteSpace: "nowrap", marginRight: "10px" }}>Permanent Address:</label>
-                    <span style={{ flexGrow: 1, borderBottom: "1px solid black", height: "1.2em" }}></span>
+                    <span style={{ flexGrow: 1, borderBottom: "1px solid black", height: "1.2em" }}>
+                      {person.permanentStreet}{" "}
+                      {person.permanentBarangay}{" "}
+                      {person.permanentMunicipality}{" "}
+                      {person.permanentRegion}{" "}
+                      {person.permanentZipCode}
+                    </span>
+
+
                   </div>
                 </td>
               </tr>
@@ -814,19 +1307,19 @@ const StudentAdmissionFormProcess = () => {
                 <td colSpan={13}>
                   <div style={{ display: "flex", alignItems: "center", width: "100%" }}>
                     <label style={{ fontWeight: "bold", whiteSpace: "nowrap", marginRight: "10px" }}>Cellphone No:</label>
-                    <span style={{ flexGrow: 1, borderBottom: "1px solid black", height: "1.2em" }}></span>
+                    <span style={{ flexGrow: 1, borderBottom: "1px solid black", height: "1.2em" }}>{person.cellphoneNumber}</span>
                   </div>
                 </td>
                 <td colSpan={13}>
                   <div style={{ display: "flex", alignItems: "center", width: "100%" }}>
                     <label style={{ fontWeight: "bold", whiteSpace: "nowrap", marginRight: "10px" }}>Civil Status:</label>
-                    <span style={{ flexGrow: 1, borderBottom: "1px solid black", height: "1.2em" }}></span>
+                    <span style={{ flexGrow: 1, borderBottom: "1px solid black", height: "1.2em" }}>{person.civilStatus}</span>
                   </div>
                 </td>
                 <td colSpan={14}>
                   <div style={{ display: "flex", alignItems: "center", width: "100%" }}>
                     <label style={{ fontWeight: "bold", whiteSpace: "nowrap", marginRight: "10px" }}>Gender:</label>
-                    <span style={{ flexGrow: 1, borderBottom: "1px solid black", height: "1.2em" }}></span>
+                    <span style={{ flexGrow: 1, borderBottom: "1px solid black", height: "1.2em" }}>  {person.gender === 0 ? "Male" : person.gender === 1 ? "Female" : ""}</span>
                   </div>
                 </td>
               </tr>
@@ -836,76 +1329,190 @@ const StudentAdmissionFormProcess = () => {
                 <td colSpan={13}>
                   <div style={{ display: "flex", alignItems: "center", width: "100%" }}>
                     <label style={{ fontWeight: "bold", whiteSpace: "nowrap", marginRight: "10px" }}>Date of Birth:</label>
-                    <span style={{ flexGrow: 1, borderBottom: "1px solid black", height: "1.2em" }}></span>
+                    <span style={{ flexGrow: 1, borderBottom: "1px solid black", height: "1.2em" }}>{person.birthOfDate}</span>
                   </div>
                 </td>
                 <td colSpan={14}>
                   <div style={{ display: "flex", alignItems: "center", width: "100%" }}>
                     <label style={{ fontWeight: "bold", whiteSpace: "nowrap", marginRight: "10px" }}>Place of Birth:</label>
-                    <span style={{ flexGrow: 1, borderBottom: "1px solid black", height: "1.2em" }}></span>
+                    <span style={{ flexGrow: 1, borderBottom: "1px solid black", height: "1.2em" }}>{person.birthPlace}</span>
                   </div>
                 </td>
                 <td colSpan={13}>
                   <div style={{ display: "flex", alignItems: "center", width: "100%" }}>
                     <label style={{ fontWeight: "bold", whiteSpace: "nowrap", marginRight: "10px" }}>Age:</label>
-                    <span style={{ flexGrow: 1, borderBottom: "1px solid black", height: "1.2em" }}></span>
+                    <span style={{ flexGrow: 1, borderBottom: "1px solid black", height: "1.2em" }}>{person.age}</span>
                   </div>
                 </td>
               </tr>
 
-              {/* Please Check, Freshman, Transferee, Others */}
               <tr style={{ fontFamily: "Times New Roman", fontSize: "15px" }}>
+                {/* Please Check */}
                 <td colSpan={10}>
                   <div style={{ display: "flex", alignItems: "center", width: "100%" }}>
-                    <label style={{ fontWeight: "bold", whiteSpace: "nowrap", marginRight: "10px" }}>Please Check (✓):</label>
-                    <span style={{ flexGrow: 1, borderBottom: "1px solid black", height: "1.2em" }}></span>
+                    <label style={{ fontWeight: "bold", whiteSpace: "nowrap", marginRight: "10px" }}>
+                      Please Check (✓):
+                    </label>
+                    <span
+                      style={{
+                        flexGrow: 1,
+                        borderBottom: "1px solid black",
+                        height: "1.2em",
+                        display: "inline-block",
+                      }}
+                    >
+                      {/* left blank intentionally */}
+                    </span>
                   </div>
                 </td>
+
+                {/* Freshman */}
                 <td colSpan={10}>
                   <div style={{ display: "flex", alignItems: "center", width: "100%" }}>
-                    <label style={{ fontWeight: "bold", whiteSpace: "nowrap", marginRight: "10px" }}>Freshman:</label>
-                    <span style={{ flexGrow: 1, borderBottom: "1px solid black", height: "1.2em" }}></span>
+                    <label style={{ fontWeight: "bold", whiteSpace: "nowrap", marginRight: "10px" }}>
+                      Freshman:
+                    </label>
+                    <span
+                      style={{
+                        flexGrow: 1,
+                        borderBottom: "1px solid black",
+                        height: "1.2em",
+                        textAlign: "center",
+                        display: "inline-block",
+                        fontSize: "15px",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      {person.classifiedAs === "Freshman (First Year)" ? "✓" : ""}
+                    </span>
                   </div>
                 </td>
+
+                {/* Transferee */}
                 <td colSpan={10}>
                   <div style={{ display: "flex", alignItems: "center", width: "100%" }}>
-                    <label style={{ fontWeight: "bold", whiteSpace: "nowrap", marginRight: "10px" }}>Transferee:</label>
-                    <span style={{ flexGrow: 1, borderBottom: "1px solid black", height: "1.2em" }}></span>
+                    <label style={{ fontWeight: "bold", whiteSpace: "nowrap", marginRight: "10px" }}>
+                      Transferee:
+                    </label>
+                    <span
+                      style={{
+                        flexGrow: 1,
+                        borderBottom: "1px solid black",
+                        height: "1.2em",
+                        textAlign: "center",
+                        display: "inline-block",
+                        fontSize: "15px",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      {["Transferee", "Returnee", "Shiftee"].includes(person.classifiedAs) ? "✓" : ""}
+                    </span>
                   </div>
                 </td>
+
+                {/* Others */}
                 <td colSpan={10}>
                   <div style={{ display: "flex", alignItems: "center", width: "100%" }}>
-                    <label style={{ fontWeight: "bold", whiteSpace: "nowrap", marginRight: "10px" }}>Others:</label>
-                    <span style={{ flexGrow: 1, borderBottom: "1px solid black", height: "1.2em" }}></span>
+                    <label style={{ fontWeight: "bold", whiteSpace: "nowrap", marginRight: "10px" }}>
+                      Others:
+                    </label>
+                    <span
+                      style={{
+                        flexGrow: 1,
+                        borderBottom: "1px solid black",
+                        height: "1.2em",
+                        textAlign: "center",
+                        display: "inline-block",
+                        fontSize: "15px",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      {person.classifiedAs === "Foreign Student" ? "✓" : ""}
+                    </span>
                   </div>
                 </td>
               </tr>
+
 
               {/* Last School Attended */}
               <tr style={{ fontFamily: "Times New Roman", fontSize: "15px" }}>
                 <td colSpan={40}>
                   <div style={{ display: "flex", alignItems: "center", width: "100%" }}>
                     <label style={{ fontWeight: "bold", whiteSpace: "nowrap", marginRight: "10px" }}>Last School Attended:</label>
-                    <span style={{ flexGrow: 1, borderBottom: "1px solid black", height: "1.2em" }}></span>
+                    <span style={{ flexGrow: 1, borderBottom: "1px solid black", height: "1.2em" }}>{person.schoolLastAttended1}</span>
                   </div>
                 </td>
               </tr>
 
               {/* Degree/Program & Major */}
               <tr style={{ fontFamily: "Times New Roman", fontSize: "15px" }}>
-                <td colSpan={20}>
-                  <div style={{ display: "flex", alignItems: "center", width: "100%" }}>
-                    <label style={{ fontWeight: "bold", whiteSpace: "nowrap", marginRight: "10px" }}>DEGREE/PROGRAM APPLIED:</label>
-                    <span style={{ flexGrow: 1, borderBottom: "1px solid black", height: "1.2em" }}></span>
+                <td colSpan={30} style={{ verticalAlign: "top" }}>
+                  <div style={{ display: "flex", alignItems: "flex-start", width: "100%" }}>
+                    <label
+                      style={{
+                        fontWeight: "bold",
+                        whiteSpace: "nowrap",
+                        marginRight: "10px",
+                      }}
+                    >
+                      DEGREE/PROGRAM APPLIED:
+                    </label>
+                    <div
+                      style={{
+                        flexGrow: 1,
+                        borderBottom: "1px solid black",
+                        minHeight: "1.2em",
+                        whiteSpace: "normal",   // allow text wrapping
+                        wordWrap: "break-word", // break long words
+                        lineHeight: "1.4em",
+                        paddingBottom: "2px",
+                      }}
+                    >
+                      {curriculumOptions.length > 0
+                        ? curriculumOptions.find(
+                          (item) =>
+                            item?.curriculum_id?.toString() ===
+                            (person?.program ?? "").toString()
+                        )?.program_description || (person?.program ?? "")
+                        : "Loading..."}
+                    </div>
                   </div>
                 </td>
-                <td colSpan={20}>
-                  <div style={{ display: "flex", alignItems: "center", width: "100%" }}>
-                    <label style={{ fontWeight: "bold", whiteSpace: "nowrap", marginRight: "10px" }}>MAJOR:</label>
-                    <span style={{ flexGrow: 1, borderBottom: "1px solid black", height: "1.2em" }}></span>
+
+                <td colSpan={10} style={{ verticalAlign: "top" }}>
+                  <div style={{ display: "flex", alignItems: "flex-start", width: "100%" }}>
+                    <label
+                      style={{
+                        fontWeight: "bold",
+                        whiteSpace: "nowrap",
+                        marginRight: "10px",
+                      }}
+                    >
+                      MAJOR:
+                    </label>
+                    <div
+                      style={{
+                        flexGrow: 1,
+                        borderBottom: "1px solid black",
+                        minHeight: "1.2em",
+                        whiteSpace: "normal",
+                        wordWrap: "break-word",
+                        lineHeight: "1.4em",
+                        paddingBottom: "2px",
+                      }}
+                    >
+                      {curriculumOptions.length > 0
+                        ? curriculumOptions.find(
+                          (item) =>
+                            item?.curriculum_id?.toString() ===
+                            (person?.program ?? "").toString()
+                        )?.major || ""
+                        : "Loading..."}
+                    </div>
                   </div>
                 </td>
               </tr>
+
 
 
 
@@ -938,7 +1545,6 @@ const StudentAdmissionFormProcess = () => {
                 </td>
 
               </tr>
-
 
               <tr>
                 <td colSpan={15} style={{ border: "1px solid black", textAlign: "left", padding: "8px", fontSize: "12px" }}>

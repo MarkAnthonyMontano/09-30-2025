@@ -269,6 +269,7 @@ const ApplicantList = () => {
 
 
 
+
     useEffect(() => {
         // Replace this with your actual API endpoint
         fetch("http://localhost:5000/api/all-applicants")
@@ -321,7 +322,6 @@ const ApplicantList = () => {
     const [selectedSchoolYear, setSelectedSchoolYear] = useState("");
     const [selectedSchoolSemester, setSelectedSchoolSemester] = useState('');
 
-
     useEffect(() => {
         axios
             .get(`http://localhost:5000/get_school_year/`)
@@ -348,8 +348,6 @@ const ApplicantList = () => {
             .catch((err) => console.error(err));
 
     }, []);
-
-
 
     const handleSchoolYearChange = (event) => {
         setSelectedSchoolYear(event.target.value);
@@ -1386,9 +1384,11 @@ const ApplicantList = () => {
                             <TableCell sx={{ color: "white", textAlign: "center", width: "15%", py: 0.5, fontSize: "12px", border: "2px solid maroon" }}>
                                 Remarks
                             </TableCell>
-                            <TableCell sx={{ color: "white", textAlign: "center", width: "8%", py: 0.5, fontSize: "12px", border: "2px solid maroon", }}>
+                            {/*
+                            <TableCell sx={{ color: "white", textAlign: "center", width: "8%", py: 0.5, fontSize: "12px", border: "2px solid maroon" }}>
                                 Registrar Status
                             </TableCell>
+                            */}
                         </TableRow>
                     </TableHead>
                     {/* --- Confirmation Dialog --- */}
@@ -1417,7 +1417,7 @@ const ApplicantList = () => {
 
                     <TableBody>
                         {currentPersons.map((person, index) => (
-                            <TableRow key={person.person_id}>
+                            <TableRow key={person.person_id} sx={{ height: "48px" }}>
                                 {/* # */}
                                 <TableCell sx={{ textAlign: "center", border: "2px solid maroon" }}>
                                     {index + 1}
@@ -1426,6 +1426,7 @@ const ApplicantList = () => {
                                 {/* ✅ Submitted Checkbox */}
                                 <TableCell sx={{ textAlign: "center", border: "2px solid maroon" }}>
                                     <Checkbox
+                                        disabled
                                         checked={Number(person.submitted_documents) === 1}
                                         onChange={(e) => {
                                             const checked = e.target.checked;
@@ -1588,69 +1589,70 @@ const ApplicantList = () => {
                                     </Box>
                                 </TableCell>
 
+ 
 
-
-                                {/* Registrar Status */}
-                                <TableCell sx={{ textAlign: "center", border: "2px solid maroon" }}>
-                                    {person.registrar_status === 1 ? (
-                                        <Box
-                                            sx={{
-                                                background: "#4CAF50",
-                                                color: "white",
-                                                borderRadius: 1,
-                                                p: 0.5,
-                                            }}
-                                        >
-                                            <Typography sx={{ fontWeight: "bold" }}>Submitted</Typography>
-                                        </Box>
-                                    ) : person.registrar_status === 0 ? (
-                                        <Box
-                                            sx={{
-                                                background: "#F44336",
-                                                color: "white",
-                                                borderRadius: 1,
-                                                p: 0.5,
-                                            }}
-                                        >
-                                            <Typography sx={{ fontWeight: "bold" }}>
-                                                Unsubmitted / Incomplete
-                                            </Typography>
-                                        </Box>
-                                    ) : (
-                                        <Box display="flex" justifyContent="center" gap={1}>
-                                            <Button
-                                                variant="contained"
-                                                onClick={() => {
-                                                    setConfirmMessage(
-                                                        "Are you sure you want to set Registrar Status to Submitted?"
-                                                    );
-                                                    setConfirmAction(() => async () => {
-                                                        await handleRegistrarStatusChange(person.person_id, 1);
-                                                    });
-                                                    setConfirmOpen(true);
-                                                }}
-                                                sx={{ backgroundColor: "green", color: "white" }}
-                                            >
-                                                Submitted
-                                            </Button>
-                                            <Button
-                                                variant="contained"
-                                                onClick={() => {
-                                                    setConfirmMessage(
-                                                        "Are you sure you want to set Registrar Status to Unsubmitted?"
-                                                    );
-                                                    setConfirmAction(() => async () => {
-                                                        await handleRegistrarStatusChange(person.person_id, 0);
-                                                    });
-                                                    setConfirmOpen(true);
-                                                }}
-                                                sx={{ backgroundColor: "red", color: "white" }}
-                                            >
-                                                Unsubmitted
-                                            </Button>
-                                        </Box>
-                                    )}
-                                </TableCell>
+                                {/*
+                                                               <TableCell sx={{ textAlign: "center", border: "2px solid maroon" }}>
+                                                                   {person.registrar_status === 1 ? (
+                                                                       <Box
+                                                                           sx={{
+                                                                               background: "#4CAF50",
+                                                                               color: "white",
+                                                                               borderRadius: 1,
+                                                                               p: 0.5,
+                                                                           }}
+                                                                       >
+                                                                           <Typography sx={{ fontWeight: "bold" }}>Submitted</Typography>
+                                                                       </Box>
+                                                                   ) : person.registrar_status === 0 ? (
+                                                                       <Box
+                                                                           sx={{
+                                                                               background: "#F44336",
+                                                                               color: "white",
+                                                                               borderRadius: 1,
+                                                                               p: 0.5,
+                                                                           }}
+                                                                       >
+                                                                           <Typography sx={{ fontWeight: "bold" }}>
+                                                                               Unsubmitted / Incomplete
+                                                                           </Typography>
+                                                                       </Box>
+                                                                   ) : (
+                                                                       <Box display="flex" justifyContent="center" gap={1}>
+                                                                           <Button
+                                                                               variant="contained"
+                                                                               onClick={() => {
+                                                                                   setConfirmMessage(
+                                                                                       "Are you sure you want to set Registrar Status to Submitted?"
+                                                                                   );
+                                                                                   setConfirmAction(() => async () => {
+                                                                                       await handleRegistrarStatusChange(person.person_id, 1);
+                                                                                   });
+                                                                                   setConfirmOpen(true);
+                                                                               }}
+                                                                               sx={{ backgroundColor: "green", color: "white" }}
+                                                                           >
+                                                                               Submitted
+                                                                           </Button>
+                                                                           <Button
+                                                                               variant="contained"
+                                                                               onClick={() => {
+                                                                                   setConfirmMessage(
+                                                                                       "Are you sure you want to set Registrar Status to Unsubmitted?"
+                                                                                   );
+                                                                                   setConfirmAction(() => async () => {
+                                                                                       await handleRegistrarStatusChange(person.person_id, 0);
+                                                                                   });
+                                                                                   setConfirmOpen(true);
+                                                                               }}
+                                                                               sx={{ backgroundColor: "red", color: "white" }}
+                                                                           >
+                                                                               Unsubmitted
+                                                                           </Button>
+                                                                       </Box>
+                                                                   )}
+                                                               </TableCell>
+                                                               */}
                             </TableRow>
                         ))}
                     </TableBody>
@@ -1685,11 +1687,15 @@ const ApplicantList = () => {
                                     ? activePerson.missing_documents
                                     : [];
 
-                                // 👉 Completed lang kung walang missing docs + naka-submit
                                 const isCompleted =
                                     selectedArray.length === 0 &&
                                     activePerson?.submitted_documents === 1 &&
                                     activePerson?.registrar_status === 1;
+
+                                const isMarking =
+                                    !isCompleted &&
+                                    Array.isArray(activePerson?.missing_documents) &&
+                                    activePerson.missing_documents.length >= 0;
 
                                 return (
                                     <FormControlLabel
@@ -1697,9 +1703,9 @@ const ApplicantList = () => {
                                         control={
                                             <Checkbox
                                                 checked={isCompleted ? true : selectedArray.includes(doc.key)}
-                                                disabled={isCompleted} // disable only kapag completed talaga
+                                                disabled={isCompleted || isMarking} // 🔒 disable both modes
                                                 onChange={(e) => {
-                                                    if (isCompleted) return; // block changes if completed
+                                                    if (isCompleted || isMarking) return;
                                                     const updated = e.target.checked
                                                         ? [...selectedArray, doc.key]
                                                         : selectedArray.filter((x) => x !== doc.key);
@@ -1734,6 +1740,7 @@ const ApplicantList = () => {
                                 )}
                         </DialogActions>
                     </Dialog>
+
 
 
                 </Table>

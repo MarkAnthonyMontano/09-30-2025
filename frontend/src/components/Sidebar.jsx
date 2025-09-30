@@ -90,6 +90,24 @@ const SideBar = ({ setIsAuthenticated }) => {
     }
   };
 
+  // Before rendering links
+  let dashboardKeys = JSON.parse(localStorage.getItem("dashboardKeys"));
+
+  if (!dashboardKeys) {
+    const generateKey = () => Math.random().toString(36).substring(2, 10);
+
+    dashboardKeys = {
+      step1: generateKey(),
+      step2: generateKey(),
+      step3: generateKey(),
+      step4: generateKey(),
+      step5: generateKey(),
+    };
+
+    localStorage.setItem("dashboardKeys", JSON.stringify(dashboardKeys));
+  }
+
+
   return (
     <div className="h-full w-enough hidden-print">
       <ul className="bg-white h-full border-r-[3px] border-maroon-500 p-3 px-5 text-maroon-500 w-full gap-2 ">
@@ -189,7 +207,7 @@ const SideBar = ({ setIsAuthenticated }) => {
         <br />
         {role === "registrar" && (
           <>
-            <Link to="/dashboard">
+            <Link to="/registrar_dashboard">
               <li
                 className={`w-full flex items-center border border-maroon-500 px-2 rounded button-hover ${location.pathname === "/dashboard"
                   ? "bg-maroon-500 text-white"
@@ -300,14 +318,12 @@ const SideBar = ({ setIsAuthenticated }) => {
               </li>
             </Link>
 
+        
             {/* Applicant Form */}
-            <Link
-              to={`/dashboard/${JSON.parse(localStorage.getItem("dashboardKeys"))?.step1 || ""
-                }`}
-            >
+            <Link to={`/dashboard/${dashboardKeys.step1}`}>
               <li
                 className={`w-full flex items-center border border-maroon-500 px-2 rounded m-2 mx-0 button-hover 
-          ${location.pathname.startsWith("/dashboard/")
+      ${location.pathname.startsWith("/dashboard/")
                     ? "bg-maroon-500 text-white"
                     : ""
                   }`}
@@ -318,6 +334,7 @@ const SideBar = ({ setIsAuthenticated }) => {
                 </span>
               </li>
             </Link>
+
 
             {/* Upload Requirements */}
             <Link to="/requirements_uploader">
@@ -423,7 +440,7 @@ const SideBar = ({ setIsAuthenticated }) => {
                 </span>
               </li>
             </Link>
-            
+
             <Link to="/faculty_reset_password">
               <li
                 className={`w-full flex items-center border border-maroon-500 px-2 rounded m-2 mx-0 button-hover ${location.pathname === "/faculty_reset_password"
@@ -500,8 +517,8 @@ const SideBar = ({ setIsAuthenticated }) => {
             <Link to="/student_dashboard1">
               <li
                 className={`w-full flex items-center border border-maroon-500 px-2 rounded m-2 mx-0 button-hover ${/^\/student_dashboard[1-5]$/.test(location.pathname)
-                    ? "bg-maroon-500 text-white"
-                    : ""
+                  ? "bg-maroon-500 text-white"
+                  : ""
                   }`}
               >
                 <PersonIcon />

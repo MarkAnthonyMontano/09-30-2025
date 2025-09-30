@@ -60,6 +60,7 @@ import ProctorApplicantList from './registrar/ProctorApplicantList';
 import ApplicantScoring from './registrar/ApplicantScoring';
 import QualifyingExamScore from './registrar/QualifyingExamScore';
 import MedicalClearance from './registrar/MedicalClearance';
+import MedicalProfile from './registrar/MedicalProfile';
 import InterviewerApplicantList from './registrar/InterviewerApplicantList';
 import AssignInterviewExam from './registrar/AssignInterviewExam';
 import AssignScheduleToApplicantsInterviewer from './registrar/AssignScheduleToApplicantsInterviewer';
@@ -265,6 +266,7 @@ function App() {
               <Route path="/super_admin_applicant_list" element={<ProtectedRoute><SuperAdminApplicantList /></ProtectedRoute>} />
               <Route path="/proctor_applicant_list" element={<ProtectedRoute><ProctorApplicantList /></ProtectedRoute>} />
               <Route path="/medical_clearance" element={<ProtectedRoute><MedicalClearance /></ProtectedRoute>} />
+              <Route path="/medical_profile" element={<ProtectedRoute><MedicalProfile /></ProtectedRoute>} />
 
               <Route path="/qualifying_exam_scores" element={<ProtectedRoute><QualifyingExamScore /></ProtectedRoute>} />
 
@@ -387,7 +389,7 @@ function App() {
               <Route
                 path="/admission_form_process"
                 element={
-                  <ProtectedRoute allowedRoles={['applicant', 'registrar']}>
+                  <ProtectedRoute allowedRoles={['applicant', 'registrar', 'student']}>
                     <AdmissionFormProcess />
                   </ProtectedRoute>
                 }
@@ -417,12 +419,12 @@ function App() {
               <Route path="/email_template_manager" element={<ProtectedRoute><EmailTemplateManager /></ProtectedRoute>} />
               <Route path="/announcement" element={<ProtectedRoute><Announcement /></ProtectedRoute>} />
               <Route path="/exam_permit" element={<ExamPermit />} />
-
+    
               <Route path="/student_ecat_application_form" element={<ProtectedRoute allowedRoles={['student',]}><StudentECATApplicationForm /></ProtectedRoute>} />
               <Route path="/student_personal_data_form" element={<ProtectedRoute allowedRoles={['student']} ><StudentPersonalDataForm /></ProtectedRoute>} />
               <Route path="/student_office_of_the_registrar" element={<ProtectedRoute allowedRoles={['student']}><StudentOfficeOfTheRegistrar /></ProtectedRoute>} />
-              <Route path="/student_admission_services" element={<ProtectedRoute allowedRoles={['student']} ><StudentAdmissionFormProcess /></ProtectedRoute>} />
-              <Route path="/student_form_process" element={<ProtectedRoute allowedRoles={['student']}><StudentAdmissionServices /></ProtectedRoute>} />
+              <Route path="/student_admission_services" element={<ProtectedRoute allowedRoles={['student']} ><StudentAdmissionServices /></ProtectedRoute>} />
+              <Route path="/student_form_process" element={<ProtectedRoute allowedRoles={['student', 'registrar', 'applicant']}><StudentAdmissionFormProcess /></ProtectedRoute>} />
 
 
 

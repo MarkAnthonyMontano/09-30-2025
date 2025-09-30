@@ -86,25 +86,25 @@ const OfficeOfTheRegistrar = () => {
     const queryParams = new URLSearchParams(location.search);
     const queryPersonId = queryParams.get("person_id");
 
-   useEffect(() => {
-    const storedUser = localStorage.getItem("email");
-    const storedRole = localStorage.getItem("role");
-    const storedID = localStorage.getItem("person_id");
+    useEffect(() => {
+        const storedUser = localStorage.getItem("email");
+        const storedRole = localStorage.getItem("role");
+        const storedID = localStorage.getItem("person_id");
 
-    if (storedUser && storedRole && storedID) {
-      setUser(storedUser);
-      setUserRole(storedRole);
-      setUserID(storedID);
+        if (storedUser && storedRole && storedID) {
+            setUser(storedUser);
+            setUserRole(storedRole);
+            setUserID(storedID);
 
-      if (storedRole === "applicant" || storedRole === "registrar") {
-        fetchPersonData(storedID);
-      } else {
-        window.location.href = "/login";
-      }
-    } else {
-      window.location.href = "/login";
-    }
-  }, []);
+            if (storedRole === "applicant" || storedRole === "registrar") {
+                fetchPersonData(storedID);
+            } else {
+                window.location.href = "/login";
+            }
+        } else {
+            window.location.href = "/login";
+        }
+    }, []);
 
 
 
@@ -276,7 +276,7 @@ const OfficeOfTheRegistrar = () => {
                                 padding: "10px 0", // reduced horizontal padding
                                 fontSize: "12px",
 
-                               
+
                             }}>
 
                             <div style={{
@@ -652,18 +652,20 @@ const OfficeOfTheRegistrar = () => {
                                     style={{
                                         fontFamily: "Times New Roman",
                                         fontSize: "12px",
-                                        paddingTop: "5px",  // you can reduce this if needed
+                                        paddingTop: "5px",
                                         marginTop: 0,
-                                        fontWeight: "bold",
                                         textAlign: "center",
                                         border: "1px solid black",
+                                        height: "30px",
+                                        textTransform: "uppercase",
 
-
-                                        height: "30px"
 
                                     }}
                                 >
-
+                                    {curriculumOptions.find(
+                                        (c) =>
+                                            c.curriculum_id?.toString() === (person?.program ?? "").toString()
+                                    )?.major || ""}
                                 </td>
                                 <td
                                     colSpan={10}
@@ -678,6 +680,7 @@ const OfficeOfTheRegistrar = () => {
 
                                     }}
                                 >
+
 
                                 </td>
 

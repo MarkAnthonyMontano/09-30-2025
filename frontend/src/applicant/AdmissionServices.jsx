@@ -476,7 +476,7 @@ const AdmissionServices = () => {
                                     margin: "0 auto",
                                     textAlign: "left",
                                     tableLayout: "fixed",
-                                    marginTop: "-25px"
+                                    marginTop: "-30px"
                                 }}
                             >
                                 <tbody>
@@ -582,6 +582,7 @@ const AdmissionServices = () => {
                                     margin: "0 auto",
                                     textAlign: "center",
                                     tableLayout: "fixed",
+                                    marginTop: "-15px"
                                 }}
                             >
                                 <tbody>
@@ -1481,7 +1482,7 @@ const AdmissionServices = () => {
                                         <td colSpan={40} style={{ textAlign: "left", fontFamily: "Times New Roman", fontSize: "12px", paddingTop: "15px" }}>
                                             <span style={{ fontWeight: "bold", marginRight: "10px" }}>Email Address: (optional)</span>{" "}
 
-                                            <span style={{ marginTop: "15px", display: "inline-block", borderBottom: "1px solid black", width: "50%", paddingLeft: "10px" }}>
+                                            <span style={{ marginTop: "10px", display: "inline-block", borderBottom: "1px solid black", width: "50%", paddingLeft: "10px" }}>
                                                 {/* Full name goes here */}
                                             </span>
                                         </td>

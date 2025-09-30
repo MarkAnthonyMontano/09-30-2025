@@ -370,11 +370,11 @@ const divToPrintRef = useRef();
 
 
   const links = [
-    { to: `/admin_ecat_application_form?person_id=${userID}`, label: "ECAT Application Form" },
-    { to: `/admission_form_process?person_id=${userID}`, label: "Admission Form Process" },
-    { to: `/admin_personal_data_form?person_id=${userID}`, label: "Personal Data Form" },
-    { to: `/admin_office_of_the_registrar?person_id=${userID}`, label: "Application For EARIST College Admission" },
-    { to: `/admission_services?person_id=${userID}`, label: "Application/Student Satisfactory Survey" },
+    { to: `/admin_ecat_application_form`, label: "ECAT Application Form" },
+    { to: `/admission_form_process`, label: "Admission Form Process" },
+    { to: `/admin_personal_data_form`, label: "Personal Data Form" },
+    { to: `/admin_office_of_the_registrar`, label: "Application For EARIST College Admission" },
+    { to: `/admission_services`, label: "Application/Student Satisfactory Survey" },
     { label: "Examination Permit", onClick: handleExamPermitClick }, // ✅
   ];
 
@@ -579,8 +579,7 @@ const divToPrintRef = useRef();
 
 
 
-      {/* PDF Cards Section */}
-         {/* Cards Section */}
+{/* Cards Section */}
       <Box
         sx={{
           display: "flex",
@@ -612,21 +611,35 @@ const divToPrintRef = useRef();
                 textAlign: "center",
                 p: 1.5,
                 cursor: "pointer",
+                transition: "all 0.3s ease-in-out",
                 "&:hover": {
                   transform: "scale(1.05)",
-                  transition: "0.3s ease-in-out",
+                  backgroundColor: "#6D2323", // ✅ background becomes maroon
+                  "& .card-text": {
+                    color: "#fff", // ✅ text becomes white
+                  },
+                  "& .card-icon": {
+                    color: "#fff", // ✅ icon becomes white
+                  },
                 },
               }}
               onClick={() => {
                 if (lnk.onClick) {
-                  lnk.onClick();       // ✅ run handler for Examination Permit
+                  lnk.onClick(); // run handler
                 } else if (lnk.to) {
-                  navigate(lnk.to);    // ✅ navigate if it has a `to`
+                  navigate(lnk.to); // navigate if it has a `to`
                 }
               }}
             >
-              <PictureAsPdfIcon sx={{ fontSize: 35, color: "#6D2323", mr: 1.5 }} />
+              {/* Icon */}
+              <PictureAsPdfIcon
+                className="card-icon"
+                sx={{ fontSize: 35, color: "#6D2323", mr: 1.5 }}
+              />
+
+              {/* Label */}
               <Typography
+                className="card-text"
                 sx={{
                   color: "#6D2323",
                   fontFamily: "Arial",
@@ -640,7 +653,6 @@ const divToPrintRef = useRef();
           </motion.div>
         ))}
       </Box>
-
 
 
 

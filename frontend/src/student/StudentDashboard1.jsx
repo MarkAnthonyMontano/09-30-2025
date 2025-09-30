@@ -106,24 +106,24 @@ const StudentDashboard1 = () => {
     const queryPersonId = queryParams.get("person_id");
 
     // Always pull student_number from sessionStorage
-  const queryStudentNumber = sessionStorage.getItem("student_number");
- 
-     useEffect(() => {
-         if (!queryStudentNumber) return;
-         const fetchPersonId = async () => {
-             try {
-                 const res = await axios.get(`http://localhost:5000/api/person_id/${queryStudentNumber}`);
-                 setUserID(res.data.person_id);
-                 setStudentNumber(queryStudentNumber);
-                 setPerson(res.data);
-                 setSelectedPerson(res.data);
-             } catch (err) {
-                 console.error("❌ Failed to fetch person_id:", err);
-             }
-         };
-         fetchPersonId();
-     }, [queryStudentNumber]);
- 
+    const queryStudentNumber = sessionStorage.getItem("student_number");
+
+    useEffect(() => {
+        if (!queryStudentNumber) return;
+        const fetchPersonId = async () => {
+            try {
+                const res = await axios.get(`http://localhost:5000/api/person_id/${queryStudentNumber}`);
+                setUserID(res.data.person_id);
+                setStudentNumber(queryStudentNumber);
+                setPerson(res.data);
+                setSelectedPerson(res.data);
+            } catch (err) {
+                console.error("❌ Failed to fetch person_id:", err);
+            }
+        };
+        fetchPersonId();
+    }, [queryStudentNumber]);
+
 
     useEffect(() => {
         const storedUser = localStorage.getItem("email");
@@ -611,11 +611,12 @@ const StudentDashboard1 = () => {
     };
 
     const links = [
-        { to: `/student_ecat_application_form?person_id=${userID}`, label: "ECAT Application Form" },
+        { to: `/student_ecat_application_form`, label: "ECAT Application Form" },
         { to: `/student_form_process`, label: "Admission Form Process" },
-        { to: `/student_personal_data_form?person_id=${userID}`, label: "Personal Data Form" },
-        { to: `/student_office_of_the_registrar?person_id=${userID}`, label: "Application For EARIST College Admission" },
-        { to: `/student_admission_services`, label: "Application/Student Satisfactory Survey" },
+        { to: `/student_personal_data_form`, label: "Personal Data Form" },
+        { to: `/student_office_of_the_registrar`, label: "Application For EARIST College Admission" },
+        { to: `/student_admission_services`, label: "Admission Services" },
+
     ];
 
 
@@ -751,60 +752,81 @@ const StudentDashboard1 = () => {
 
             </Box>
 
-            {/* PDF Cards Section */}
-            <Box
-                sx={{
-                    display: "flex",
-                    flexWrap: "wrap",
-                    gap: 2,
-                    mt: 2,
-                    pb: 1,
-                    justifyContent: "center",
-                }}
-            >
-                {links.map((lnk, i) => (
-                    <motion.div
-                        key={i}
-                        style={{ flex: "0 0 calc(30% - 16px)" }}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: i * 0.1, duration: 0.4 }}
-                    >
-                        <Card
-                            sx={{
-                                minHeight: 60,
-                                borderRadius: 2,
-                                border: "2px solid #6D2323",
-                                backgroundColor: "#fff",
-                                display: "flex",
-                                flexDirection: "row",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                textAlign: "center",
-                                p: 1.5,
-                                "&:hover": {
-                                    transform: "scale(1.05)",
-                                    transition: "0.3s ease-in-out",
-                                },
-                            }}
-                        >
-                            <PictureAsPdfIcon sx={{ fontSize: 35, color: "#6D2323", mr: 1.5 }} />
-                            <Link
-                                to={lnk.to}
-                                style={{
-                                    textDecoration: "none",
-                                    color: "#6D2323",
-                                    fontFamily: "Arial",
-                                    fontWeight: "bold",
-                                    fontSize: "0.85rem",
-                                }}
-                            >
-                                {lnk.label}
-                            </Link>
-                        </Card>
-                    </motion.div>
-                ))}
-            </Box>
+           {/* Cards Section */}
+<Box
+  sx={{
+    display: "flex",
+    flexWrap: "wrap",
+    gap: 2,
+    mt: 2,
+    pb: 1,
+    justifyContent: "center", // Centers all cards horizontally
+  }}
+>
+  {links.map((lnk, i) => (
+    <motion.div
+      key={i}
+      style={{ flex: "0 0 calc(30% - 16px)" }}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: i * 0.1, duration: 0.4 }}
+    >
+      <Card
+        sx={{
+          minHeight: 60,
+          borderRadius: 2,
+          border: "2px solid #6D2323",
+          backgroundColor: "#fff",
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "center",
+          textAlign: "center",
+          p: 1.5,
+          cursor: "pointer",
+          transition: "all 0.3s ease-in-out",
+          "&:hover": {
+            transform: "scale(1.05)",
+            backgroundColor: "#6D2323", // ✅ background becomes maroon
+            "& .card-text": {
+              color: "#fff", // ✅ text becomes white
+            },
+            "& .card-icon": {
+              color: "#fff", // ✅ icon becomes white
+            },
+          },
+        }}
+        onClick={() => {
+          if (lnk.onClick) {
+            lnk.onClick(); // run handler
+          } else if (lnk.to) {
+            navigate(lnk.to); // navigate if it has a `to`
+          }
+        }}
+      >
+        {/* Icon */}
+        <PictureAsPdfIcon
+          className="card-icon"
+          sx={{ fontSize: 35, color: "#6D2323", mr: 1.5 }}
+        />
+
+        {/* Label */}
+        <Typography
+          className="card-text"
+          sx={{
+            color: "#6D2323",
+            fontFamily: "Arial",
+            fontWeight: "bold",
+            fontSize: "0.85rem",
+          }}
+        >
+          {lnk.label}
+        </Typography>
+      </Card>
+    </motion.div>
+  ))}
+</Box>
+
 
 
 

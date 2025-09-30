@@ -2157,6 +2157,8 @@ const PersonalDataForm = () => {
                                 </tr>
 
 
+
+
                                 <tr style={{ height: "5px" }}>
 
                                     <td colSpan={7} style={{
@@ -2168,59 +2170,6 @@ const PersonalDataForm = () => {
                                         fontSize: "15px"
                                     }}>
                                         6.
-
-                                    </td>
-
-
-                                    {/* GIVEN NAME */}
-                                    <td colSpan={13} style={{
-                                        border: "1px solid black",
-                                        textAlign: "left",
-                                        padding: "2px",  // Reduced padding to fit in 10px height
-                                        fontWeight: "bold",
-                                        fontSize: "12px"
-                                    }}>
-
-
-                                    </td>
-
-                                    {/* MIDDLE NAME */}
-                                    <td colSpan={10} style={{
-                                        border: "1px solid black",
-                                        textAlign: "left",
-                                        padding: "2px",  // Reduced padding to fit in 10px height
-                                        fontWeight: "bold",
-                                        fontSize: "12px"
-                                    }}>
-
-
-                                    </td>
-
-                                    {/* PERMANENT CONTACT NUMBER */}
-                                    <td colSpan={10} style={{
-                                        border: "1px solid black",
-                                        textAlign: "left",
-                                        padding: "2px",  // Reduced padding to fit in 10px height
-                                        fontWeight: "bold",
-                                        fontSize: "12px"
-                                    }}>
-
-
-                                    </td>
-                                </tr>
-
-
-                                <tr style={{ height: "5px" }}>
-
-                                    <td colSpan={7} style={{
-                                        border: "1px solid black",
-                                        textAlign: "right",
-                                        padding: "2px",  // Reduced padding to fit in 10px height
-                                        fontWeight: "bold",
-                                        fontFamily: "Times new Roman",
-                                        fontSize: "15px"
-                                    }}>
-                                        7.
 
                                     </td>
 

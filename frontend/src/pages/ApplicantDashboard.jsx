@@ -547,7 +547,7 @@ const ApplicantDashboard = (props) => {
                   <Box>
                     <Typography variant="h4" fontWeight="bold" color="maroon">
                       Welcome,&nbsp;
-                      {person.last_name?.toUpperCase()}, {person.first_name}{" "}
+                      {person.last_name}, {person.first_name}{" "}
                       {person.middle_name} {person.extension}
                     </Typography>
                     <Typography variant="body1" color="text.secondary">

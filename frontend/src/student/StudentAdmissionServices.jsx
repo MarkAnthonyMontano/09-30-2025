@@ -255,7 +255,7 @@ const StudentAdmissionServices = () => {
                                                 letterSpacing: '1px',
                                                 fontWeight: "normal"
                                             }}>
-                                                Nagtahan, Sampaloc, Manila 1008<br />
+                                                Nagtahan, Sampaloc, Manila 1008<br/>
                                                 Blk. 3 Lot 2, 5 Congressional Rd, General Mariano Alvarez
                                             </div>
 
@@ -476,7 +476,7 @@ const StudentAdmissionServices = () => {
                                     margin: "0 auto",
                                     textAlign: "left",
                                     tableLayout: "fixed",
-                                    marginTop: "-25px"
+                                    marginTop: "-30px"
                                 }}
                             >
                                 <tbody>
@@ -582,6 +582,7 @@ const StudentAdmissionServices = () => {
                                     margin: "0 auto",
                                     textAlign: "center",
                                     tableLayout: "fixed",
+                                    marginTop: "-15px"
                                 }}
                             >
                                 <tbody>
@@ -1481,7 +1482,7 @@ const StudentAdmissionServices = () => {
                                         <td colSpan={40} style={{ textAlign: "left", fontFamily: "Times New Roman", fontSize: "12px", paddingTop: "15px" }}>
                                             <span style={{ fontWeight: "bold", marginRight: "10px" }}>Email Address: (optional)</span>{" "}
 
-                                            <span style={{ marginTop: "15px", display: "inline-block", borderBottom: "1px solid black", width: "50%", paddingLeft: "10px" }}>
+                                            <span style={{ marginTop: "10px", display: "inline-block", borderBottom: "1px solid black", width: "50%", paddingLeft: "10px" }}>
                                                 {/* Full name goes here */}
                                             </span>
                                         </td>
