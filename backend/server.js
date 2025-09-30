@@ -10912,6 +10912,23 @@ app.get("/api/student-person-data/:id", async (req, res) => {
 });
 
 
+// Add near your other GET routes in server.js
+
+// Get person_id by applicant_number
+app.get("/api/person-by-applicant/:applicant_number", async (req, res) => {
+  const { applicant_number } = req.params;
+  try {
+    const [rows] = await db.query(
+      "SELECT person_id FROM applicant_numbering_table WHERE applicant_number = ? LIMIT 1",
+      [applicant_number]
+    );
+    if (!rows.length) return res.status(404).json({ message: "Applicant not found" });
+    res.json({ person_id: rows[0].person_id });
+  } catch (err) {
+    console.error("Error fetching person by applicant:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
 
 
 http.listen(5000, () => {

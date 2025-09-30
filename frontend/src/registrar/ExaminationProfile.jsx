@@ -9,22 +9,17 @@ import Search from '@mui/icons-material/Search';
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { QRCodeCanvas } from "qrcode.react";
 import { QRCodeSVG } from "qrcode.react";
+import QRScanner from "../components/QRScanner"; // adjust path if needed
+import CameraAltIcon from '@mui/icons-material/CameraAlt';
+
 
 const ExaminationProfile = () => {
-
-    const tabs = [
-        { label: "Entrance Exam Room Assignment", to: "/assign_entrance_exam" },
-        { label: "Entrance Exam Schedule Management", to: "/assign_schedule_applicant" },
-        { label: "Examination Profile", to: "/examination_profile" },
-        { label: "Proctor's Applicant List", to: "/proctor_applicant_list" },
-    ];
 
 
 
     const location = useLocation();
     const navigate = useNavigate();
     const [activeStep, setActiveStep] = useState(3);
-    const [clickedSteps, setClickedSteps] = useState(Array(tabs.length).fill(false));
 
 
     const handleStepClick = (index, to) => {
@@ -51,6 +46,7 @@ const ExaminationProfile = () => {
         extension: "",
     });
 
+    const [scannerOpen, setScannerOpen] = useState(false);
 
     useEffect(() => {
         const storedUser = localStorage.getItem("email");
@@ -366,60 +362,74 @@ const ExaminationProfile = () => {
                         EXAMINATION PROFILE
                     </Typography>
 
-                    <TextField
-                        variant="outlined"
-                        placeholder="Search Applicant Name / Email / Applicant ID"
-                        size="small"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        InputProps={{ startAdornment: <Search sx={{ mr: 1 }} /> }}
-                        sx={{ width: { xs: '100%', sm: '425px' }, mt: { xs: 2, sm: 0 } }}
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, width: { xs: '100%', sm: '600px' } }}>
+                        <TextField
+                            variant="outlined"
+                            placeholder="Search Applicant Name / Email / Applicant ID"
+                            size="small"
+                            
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            InputProps={{ startAdornment: <Search sx={{ mr: 1, }} /> }}
+                            sx={{ flex: 1, }}
+                        />
+
+                        {/* Scan button */}
+                        <Button
+                            variant="contained"
+                            color="secondary"
+                            startIcon={<CameraAltIcon />}
+                            onClick={() => setScannerOpen(true)}
+                            sx={{
+                                whiteSpace: "nowrap",
+                                width: "150px",
+                                height: "38px",
+                                minWidth: "50px",  // ensures width doesn’t auto-expand
+                                minHeight: "30px", // ensures height stays fixed
+                                px: 0,             // removes extra horizontal padding
+                            }}
+                        >
+                            Scan
+                        </Button>
+
+                    </Box>
+
+                    {/* QR Scanner dialog (place near end of component render) */}
+                    <QRScanner
+                        style={{ width: "50px" }}
+                        open={scannerOpen}
+                        onClose={() => setScannerOpen(false)}
+                        onScan={async (text) => {
+                            const applicantNumber = String(text || "").trim();
+                            try {
+                                // Prefetch person data BEFORE navigation
+                                const res = await axios.get(`http://localhost:5000/api/person-by-applicant/${applicantNumber}`);
+                                if (res.data?.person_id) {
+                                    const personRes = await axios.get(`http://localhost:5000/api/person/${res.data.person_id}`);
+                                    let personData = personRes.data;
+                                    personData.applicant_number = applicantNumber;
+
+                                    // ✅ Save in sessionStorage for instant display
+                                    sessionStorage.setItem("scanned_person", JSON.stringify(personData));
+                                }
+
+                                // Navigate immediately
+                                navigate(`/exam-permit/${applicantNumber}`);
+                            } catch (err) {
+                                console.error("Scan fetch failed:", err);
+                                alert("Invalid QR or applicant not found.");
+                            }
+                        }}
+
+
                     />
+
                 </Box>
 
                 <hr style={{ border: "1px solid #ccc", width: "100%" }} />
 
                 <br />
 
-
-
-                <Box display="flex" sx={{ border: "2px solid maroon", borderRadius: "4px", overflow: "hidden" }}>
-                    {tabs.map((tab, index) => {
-                        const isActive = location.pathname === tab.to;
-
-                        return (
-                            <Link
-                                key={index}
-                                to={tab.to}
-                                style={{ textDecoration: "none", flex: 1 }}
-                            >
-                                <Box
-                                    sx={{
-                                        backgroundColor: isActive ? "#6D2323" : "#E8C999",  // ✅ active vs default
-                                        padding: "16px",
-                                        color: isActive ? "#ffffff" : "#000000",            // ✅ text color contrast
-                                        textAlign: "center",
-                                        height: "75px",
-                                        display: "flex",
-                                        alignItems: "center",
-                                        justifyContent: "center",
-                                        cursor: "pointer",
-                                        borderRight: index !== tabs.length - 1 ? "2px solid white" : "none",
-                                        transition: "all 0.3s ease",
-                                        "&:hover": {
-                                            backgroundColor: isActive ? "#6D2323" : "#f9f9f9",
-                                            color: isActive ? "#ffffff" : "#6D2323",
-                                        },
-                                    }}
-                                >
-                                    <Typography sx={{ color: "inherit", fontWeight: "bold", wordBreak: "break-word" }}>
-                                        {tab.label}
-                                    </Typography>
-                                </Box>
-                            </Link>
-                        );
-                    })}
-                </Box>
 
 
                 <div style={{ height: "20px" }}></div>
@@ -864,7 +874,7 @@ const ExaminationProfile = () => {
 
                                     <tr style={{ fontFamily: "Times New Roman", fontSize: "15px" }}>
                                         <td colSpan={20}>
-                                            <div style={{ display: "flex", alignItems: "center", width: "100%", marginTop: "-65px" }}>
+                                            <div style={{ display: "flex", alignItems: "center", width: "100%", marginTop: "-95px" }}>
                                                 <label style={{ fontWeight: "bold", whiteSpace: "nowrap", marginRight: "10px" }}>
                                                     Bldg. :
                                                 </label>
@@ -892,7 +902,7 @@ const ExaminationProfile = () => {
                                                     justifyContent: "space-between", // space text & QR
                                                 }}
                                             >
-                                                <div style={{ display: "flex", alignItems: "center", marginTop: "-105px" }}>
+                                                <div style={{ display: "flex", alignItems: "center",  marginTop: "-155px" }}>
                                                     <label
                                                         style={{
                                                             fontWeight: "bold",
@@ -920,8 +930,8 @@ const ExaminationProfile = () => {
                                                 {/* ✅ QR Code placed beside Room No. */}
                                                 {selectedPerson?.applicant_number && (
                                                     <QRCodeSVG
-                                                        value={`http://localhost:5173/examination_profile/${selectedPerson.applicant_number}`}
-                                                        size={140} // adjust size
+                                                        value={selectedPerson.applicant_number}   // ✅ Only number
+                                                        size={200}
                                                         level={"H"}
                                                         includeMargin={true}
                                                     />
@@ -934,7 +944,7 @@ const ExaminationProfile = () => {
 
                                     <tr style={{ fontFamily: "Times New Roman", fontSize: "15px" }}>
                                         <td colSpan={20}>
-                                            <div style={{ display: "flex", alignItems: "center", width: "100%", marginTop: "-110px" }}>
+                                            <div style={{ display: "flex", alignItems: "center", width: "100%", marginTop: "-170px" }}>
                                                 <label style={{ fontWeight: "bold", whiteSpace: "nowrap", marginRight: "10px" }}>Scheduled by:</label>
                                                 <span style={{ flexGrow: 1, borderBottom: "1px solid black", height: "1.2em", fontFamily: "Arial", textAlign: "left" }}>
                                                     {examSchedule?.proctor || ""}
@@ -945,7 +955,7 @@ const ExaminationProfile = () => {
 
                                     <tr style={{ fontFamily: "Times New Roman", fontSize: "15px" }}>
                                         <td colSpan={20}>
-                                            <div style={{ display: "flex", alignItems: "center", width: "100%", marginTop: "-90px" }}>
+                                            <div style={{ display: "flex", alignItems: "center", width: "100%", marginTop: "-150px" }}>
                                                 <label
                                                     style={{
                                                         fontWeight: "bold",

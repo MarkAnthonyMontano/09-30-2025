@@ -418,8 +418,8 @@ function App() {
               <Route path="/class_list/ccs/:curriculum_id/:dstID" element={<ProtectedRoute><ProfessorListPerSection /></ProtectedRoute>} />
               <Route path="/email_template_manager" element={<ProtectedRoute><EmailTemplateManager /></ProtectedRoute>} />
               <Route path="/announcement" element={<ProtectedRoute><Announcement /></ProtectedRoute>} />
-              <Route path="/exam_permit" element={<ExamPermit />} />
-    
+              <Route path="/exam-permit/:applicant_number" element={<ExamPermit />} />
+
               <Route path="/student_ecat_application_form" element={<ProtectedRoute allowedRoles={['student',]}><StudentECATApplicationForm /></ProtectedRoute>} />
               <Route path="/student_personal_data_form" element={<ProtectedRoute allowedRoles={['student']} ><StudentPersonalDataForm /></ProtectedRoute>} />
               <Route path="/student_office_of_the_registrar" element={<ProtectedRoute allowedRoles={['student']}><StudentOfficeOfTheRegistrar /></ProtectedRoute>} />

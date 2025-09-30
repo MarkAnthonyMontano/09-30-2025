@@ -5,54 +5,65 @@ import EaristLogo from "../assets/EaristLogo.png";
 import EaristLogoBW from "../assets/earistblackandwhite.png";
 import "../styles/Print.css";
 
+import { useParams } from "react-router-dom";
+
+
 // ✅ Accept personId as a prop
 const ExamPermit = ({ personId }) => {
+    const cachedPerson = sessionStorage.getItem("scanned_person");
+    const [person, setPerson] = useState(
+        cachedPerson ? JSON.parse(cachedPerson) : null
+    );
+
+    useEffect(() => {
+        if (cachedPerson) {
+            sessionStorage.removeItem("scanned_person");
+        }
+    }, []);
+    const { applicant_number } = useParams();
     const divToPrintRef = useRef(null);
-    const [person, setPerson] = useState(null);
+
     const [examSchedule, setExamSchedule] = useState(null);
     const [curriculumOptions, setCurriculumOptions] = useState([]);
     const [printed, setPrinted] = useState(false);
 
+    useEffect(() => {
+        if (cachedPerson) {
+            sessionStorage.removeItem("scanned_person"); // clear cache after using once
+        }
+    }, []);
+
+
     // ✅ First data fetch
     useEffect(() => {
-        const pid = personId || localStorage.getItem("person_id");
-        if (!pid) return;
+        if (!applicant_number) return;
 
         const fetchData = async () => {
             try {
-                // Fetch person
-                const res = await axios.get(`http://localhost:5000/api/person/${pid}`);
-                let personData = res.data;
+                // Step 1: resolve applicant_number -> person_id
+                const res = await axios.get(`http://localhost:5000/api/person-by-applicant/${applicant_number}`);
+                const pid = res.data?.person_id;
+                if (!pid) return;
 
-                // Fetch applicant number separately
-                const applicantRes = await axios.get(`http://localhost:5000/api/applicant_number/${pid}`);
-                if (applicantRes.data?.applicant_number) {
-                    personData.applicant_number = applicantRes.data.applicant_number;
-                }
-
+                // Step 2: fetch person
+                const personRes = await axios.get(`http://localhost:5000/api/person/${pid}`);
+                let personData = personRes.data;
+                personData.applicant_number = applicant_number;
                 setPerson(personData);
 
-                // ✅ Check verification + schedule
-                if (applicantRes.data?.applicant_number) {
-                    const applicant_number = applicantRes.data.applicant_number;
-
-                    // Verify documents
-                    const verifyRes = await axios.get(`http://localhost:5000/api/verified-exam-applicants`);
-                    const verified = verifyRes.data.some(a => a.applicant_id === applicant_number);
-
-                    if (!verified) {
-                        alert("❌ Your documents are not yet verified. You cannot print the Exam Permit.");
-                        return;
-                    }
-
-                    // Fetch exam schedule
-                    const schedRes = await axios.get(
-                        `http://localhost:5000/api/exam-schedule/${applicant_number}`
-                    );
-                    setExamSchedule(schedRes.data);
+                // Step 3: verify applicant
+                const verifyRes = await axios.get(`http://localhost:5000/api/verified-exam-applicants`);
+                const verified = verifyRes.data.some(a => a.applicant_id === applicant_number);
+                if (!verified) {
+                    alert("❌ Your documents are not yet verified. You cannot print the Exam Permit.");
+                    return;
                 }
 
-                // Fetch programs
+                // Step 4: fetch schedule
+                const schedRes = await axios.get(`http://localhost:5000/api/exam-schedule/${applicant_number}`);
+                setExamSchedule(schedRes.data);
+
+                // Step 5: fetch programs
                 const progRes = await axios.get(`http://localhost:5000/api/applied_program`);
                 setCurriculumOptions(progRes.data);
 
@@ -62,48 +73,63 @@ const ExamPermit = ({ personId }) => {
         };
 
         fetchData();
-    }, [personId]);
+    }, [applicant_number]);
+
 
     // ✅ Secondary fetch for updates
     useEffect(() => {
-        const pid = personId || localStorage.getItem("person_id");
-        if (!pid) return;
+        if (!applicant_number) return;
 
-        // fetch person
-        axios.get(`http://localhost:5000/api/person/${pid}`)
-            .then(async (res) => {
-                let personData = res.data;
+        const fetchData = async () => {
+            try {
+                // resolve applicant -> person
+                const res = await axios.get(
+                    `http://localhost:5000/api/person-by-applicant/${applicant_number}`
+                );
+                const pid = res.data?.person_id;
+                if (!pid) return;
 
-                // fetch applicant_number separately
-                const applicantRes = await axios.get(`http://localhost:5000/api/applicant_number/${pid}`);
-                if (applicantRes.data?.applicant_number) {
-                    personData.applicant_number = applicantRes.data.applicant_number;
-                }
-
+                // fetch person
+                const personRes = await axios.get(
+                    `http://localhost:5000/api/person/${pid}`
+                );
+                let personData = personRes.data;
+                personData.applicant_number = applicant_number;
                 setPerson(personData);
-            })
-            .catch((err) => console.error(err));
 
-        // fetch applicant number then schedule
-        axios
-            .get(`http://localhost:5000/api/applicant_number/${pid}`)
-            .then((res) => {
-                const applicant_number = res.data?.applicant_number;
-                if (applicant_number) {
-                    return axios.get(
-                        `http://localhost:5000/api/exam-schedule/${applicant_number}`
+                // verify applicant
+                const verifyRes = await axios.get(
+                    `http://localhost:5000/api/verified-exam-applicants`
+                );
+                const verified = verifyRes.data.some(
+                    (a) => a.applicant_id === applicant_number
+                );
+                if (!verified) {
+                    alert(
+                        "❌ Your documents are not yet verified. You cannot print the Exam Permit."
                     );
+                    return;
                 }
-            })
-            .then((res) => setExamSchedule(res?.data))
-            .catch((err) => console.error(err));
 
-        // fetch curriculum/programs
-        axios
-            .get(`http://localhost:5000/api/applied_program`)
-            .then((res) => setCurriculumOptions(res.data))
-            .catch((err) => console.error(err));
-    }, [personId]);
+                // fetch schedule
+                const schedRes = await axios.get(
+                    `http://localhost:5000/api/exam-schedule/${applicant_number}`
+                );
+                setExamSchedule(schedRes.data);
+
+                // fetch programs
+                const progRes = await axios.get(
+                    `http://localhost:5000/api/applied_program`
+                );
+                setCurriculumOptions(progRes.data);
+            } catch (err) {
+                console.error("Error fetching exam permit data:", err);
+            }
+        };
+
+        fetchData();
+    }, [applicant_number]);
+
 
 
     if (!person) return <div>Loading Exam Permit...</div>;
@@ -474,7 +500,7 @@ const ExamPermit = ({ personId }) => {
                                     {person?.applicant_number && (
                                         <QRCodeSVG
                                             value={`http://localhost:5173/examination_profile/${person.applicant_number}`}
-                                            size={120}
+                                            size={200}
                                             level={"H"}
                                             includeMargin={true}
                                         />
