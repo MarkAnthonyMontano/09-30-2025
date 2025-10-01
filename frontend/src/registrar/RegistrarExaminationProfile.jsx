@@ -124,7 +124,6 @@ const ExaminationProfile = () => {
 
     useEffect(() => {
         if (!searchQuery.trim()) {
-            // empty search input: clear everything
             setSelectedPerson(null);
             setPerson({
                 profile_img: "",
@@ -144,12 +143,25 @@ const ExaminationProfile = () => {
         });
 
         if (match) {
+            console.log("✅ Found match locally:", match);
             setSelectedPerson(match);
-            setPerson(match);   // optional: preload person data
+            setPerson(match);
         } else {
-            setSelectedPerson(null);
+            axios.get(`http://localhost:5000/api/person-by-applicant/${searchQuery}`)
+                .then(res => {
+                    console.log("✅ API match:", res.data);
+                    if (res.data?.person_id) {
+                        setSelectedPerson(res.data);
+                        fetchPersonData(res.data.person_id);
+                    }
+                })
+                .catch(err => {
+                    console.error("❌ Applicant not found:", err);
+                    setSelectedPerson(null);
+                });
         }
     }, [searchQuery, persons]);
+
 
 
     const divToPrintRef = useRef();
@@ -477,8 +489,9 @@ const ExaminationProfile = () => {
                         Print Examination Permit
                     </span>
                 </button>
-                {showPrintView && (
-                    <div ref={divToPrintRef} style={{ display: "none", position: "relative" }}>
+
+                {selectedPerson && (
+                    <div ref={divToPrintRef} style={{ position: "relative" }}>
                         {/* ✅ Watermark */}
                         <div
                             style={{
@@ -921,7 +934,7 @@ const ExaminationProfile = () => {
                                                 {selectedPerson?.applicant_number && (
                                                     <QRCodeSVG
                                                         value={`http://localhost:5173/examination_profile/${selectedPerson.applicant_number}`}
-                                                        size={140} // adjust size
+                                                        size={160} // adjust size
                                                         level={"H"}
                                                         includeMargin={true}
                                                     />
@@ -1025,7 +1038,6 @@ const ExaminationProfile = () => {
 
                         </div>
                     </div>
-
                 )}
             </div>
 

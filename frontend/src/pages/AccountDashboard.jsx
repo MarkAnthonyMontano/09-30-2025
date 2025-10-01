@@ -29,6 +29,30 @@ const AccountDashboard = () => {
           </Link>
         </div>
 
+
+        <div className="relative">
+          <Link to={'/user_page_access'}>
+            <div className="bg-white p-4 border-4 rounded-lg border-maroon-500 absolute left-16 top-12 w-enough">
+              <ListAlt className="text-maroon-500 text-2xl" />
+            </div>
+            <button className="bg-white text-maroon-500 border-4 rounded-lg border-maroon-500 p-4 w-80 h-32 font-medium mt-20 ml-8 flex items-end justify-center">
+              USER PAGE ACCESS
+            </button>
+          </Link>
+        </div>
+
+        <div className="relative">
+          <Link to={'/page_crud'}>
+            <div className="bg-white p-4 border-4 rounded-lg border-maroon-500 absolute left-16 top-12 w-enough">
+              <ListAlt className="text-maroon-500 text-2xl" />
+            </div>
+            <button className="bg-white text-maroon-500 border-4 rounded-lg border-maroon-500 p-4 w-80 h-32 font-medium mt-20 ml-8 flex items-end justify-center">
+              PAGE TABLE
+            </button>
+          </Link>
+        </div>
+
+
         <div className="relative">
           <Link to={'/registrar_reset_password'}>
             <div className="bg-white p-4 border-4 rounded-lg border-maroon-500 absolute left-16 top-12 w-enough">

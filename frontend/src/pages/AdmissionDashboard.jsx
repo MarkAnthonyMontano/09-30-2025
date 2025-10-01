@@ -86,7 +86,7 @@ const AdmissionDashboardPanel = () => {
         </div>
 
         <div className="relative mb-5">
-          <Link to={'/examination_profile'}>
+          <Link to={'/registrar_examination_profile'}>
             <div className="bg-white p-4 border-4 rounded-lg border-solid border-maroon-500 absolute left-16 top-12 w-enough">
               <CollectionsBookmark className="text-maroon-500 text-2xl" />
             </div>

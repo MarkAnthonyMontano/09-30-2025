@@ -119,12 +119,13 @@ const LoginEnrollment = ({ setIsAuthenticated }) => {
       });
 
       // ✅ Only after OTP success, reset attempts automatically (backend clears them)
+      localStorage.setItem("userId", tempLoginData.id);
       localStorage.setItem("token", tempLoginData.token);
       localStorage.setItem("email", tempLoginData.email);
       localStorage.setItem("role", tempLoginData.role);
       localStorage.setItem("person_id", tempLoginData.person_id);
       localStorage.setItem("department", tempLoginData.department || "");
-      
+
       setIsAuthenticated(true);
       setShowOtpModal(false);
 

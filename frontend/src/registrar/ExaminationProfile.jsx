@@ -367,7 +367,7 @@ const ExaminationProfile = () => {
                             variant="outlined"
                             placeholder="Search Applicant Name / Email / Applicant ID"
                             size="small"
-                            
+
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             InputProps={{ startAdornment: <Search sx={{ mr: 1, }} /> }}
@@ -487,9 +487,10 @@ const ExaminationProfile = () => {
                         Print Examination Permit
                     </span>
                 </button>
-                {showPrintView && (
-                    <div ref={divToPrintRef} style={{ display: "none", position: "relative" }}>
-                        {/* ✅ Watermark */}
+
+                {selectedPerson && (
+                    <div ref={divToPrintRef} style={{ position: "relative" }}>
+                          {person?.document_status?.toLowerCase() === "verified" && (
                         <div
                             style={{
                                 position: "absolute",
@@ -518,6 +519,7 @@ const ExaminationProfile = () => {
                                 VERIFIED
                             </div>
                         </div>
+                        )}
                         <div className="section">
 
                             <table
@@ -533,34 +535,34 @@ const ExaminationProfile = () => {
                                 }}
                             >
                                 <style>{`
-  .certificate-wrapper {
-    position: relative;
-  }
-
-  .certificate-watermark {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) rotate(-30deg);
-    font-size: 9rem;
-    font-weight: 800;
-    letter-spacing: 0.25rem;
-    color: rgba(0, 0, 0, 0.06);
-    pointer-events: none;
-    z-index: 9999;
-    white-space: nowrap;
-    text-transform: uppercase;
-  }
-
-  @media print {
-    .certificate-watermark {
-      color: rgba(0, 0, 0, 0.12);
-    }
-    button {
-      display: none;
-    }
-  }
-`}</style>
+                .certificate-wrapper {
+                  position: relative;
+                }
+              
+                .certificate-watermark {
+                  position: absolute;
+                  top: 50%;
+                  left: 50%;
+                  transform: translate(-50%, -50%) rotate(-30deg);
+                  font-size: 9rem;
+                  font-weight: 800;
+                  letter-spacing: 0.25rem;
+                  color: rgba(0, 0, 0, 0.06);
+                  pointer-events: none;
+                  z-index: 9999;
+                  white-space: nowrap;
+                  text-transform: uppercase;
+                }
+              
+                @media print {
+                  .certificate-watermark {
+                    color: rgba(0, 0, 0, 0.12);
+                  }
+                  button {
+                    display: none;
+                  }
+                }
+              `}</style>
 
 
                                 <tbody>
@@ -874,7 +876,7 @@ const ExaminationProfile = () => {
 
                                     <tr style={{ fontFamily: "Times New Roman", fontSize: "15px" }}>
                                         <td colSpan={20}>
-                                            <div style={{ display: "flex", alignItems: "center", width: "100%", marginTop: "-95px" }}>
+                                            <div style={{ display: "flex", alignItems: "center", width: "100%", marginTop: "-65px" }}>
                                                 <label style={{ fontWeight: "bold", whiteSpace: "nowrap", marginRight: "10px" }}>
                                                     Bldg. :
                                                 </label>
@@ -902,7 +904,7 @@ const ExaminationProfile = () => {
                                                     justifyContent: "space-between", // space text & QR
                                                 }}
                                             >
-                                                <div style={{ display: "flex", alignItems: "center",  marginTop: "-155px" }}>
+                                                <div style={{ display: "flex", alignItems: "center", marginTop: "-105px" }}>
                                                     <label
                                                         style={{
                                                             fontWeight: "bold",
@@ -927,11 +929,10 @@ const ExaminationProfile = () => {
                                                     </span>
                                                 </div>
 
-                                                {/* ✅ QR Code placed beside Room No. */}
                                                 {selectedPerson?.applicant_number && (
                                                     <QRCodeSVG
                                                         value={selectedPerson.applicant_number}   // ✅ Only number
-                                                        size={200}
+                                                        size={160}
                                                         level={"H"}
                                                         includeMargin={true}
                                                     />
@@ -944,7 +945,7 @@ const ExaminationProfile = () => {
 
                                     <tr style={{ fontFamily: "Times New Roman", fontSize: "15px" }}>
                                         <td colSpan={20}>
-                                            <div style={{ display: "flex", alignItems: "center", width: "100%", marginTop: "-170px" }}>
+                                            <div style={{ display: "flex", alignItems: "center", width: "100%", marginTop: "-110px" }}>
                                                 <label style={{ fontWeight: "bold", whiteSpace: "nowrap", marginRight: "10px" }}>Scheduled by:</label>
                                                 <span style={{ flexGrow: 1, borderBottom: "1px solid black", height: "1.2em", fontFamily: "Arial", textAlign: "left" }}>
                                                     {examSchedule?.proctor || ""}
@@ -955,7 +956,7 @@ const ExaminationProfile = () => {
 
                                     <tr style={{ fontFamily: "Times New Roman", fontSize: "15px" }}>
                                         <td colSpan={20}>
-                                            <div style={{ display: "flex", alignItems: "center", width: "100%", marginTop: "-150px" }}>
+                                            <div style={{ display: "flex", alignItems: "center", width: "100%", marginTop: "-90px" }}>
                                                 <label
                                                     style={{
                                                         fontWeight: "bold",
@@ -1035,7 +1036,6 @@ const ExaminationProfile = () => {
 
                         </div>
                     </div>
-
                 )}
             </div>
 

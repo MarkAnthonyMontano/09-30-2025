@@ -1,20 +1,19 @@
 const express = require("express");
 const mysql = require("mysql2/promise");
 const cors = require("cors");
-
+const XLSX = require("xlsx");
 const webtoken = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const bodyparser = require("body-parser");
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
-
+const pageRoutes = require('./pageRoutes');
 
 require("dotenv").config();
 const app = express();
 const http = require("http").createServer(app);
 const { Server } = require("socket.io");
-const XLSX = require("xlsx");
 const io = new Server(http, {
   cors: {
     origin: "http://localhost:5173",
@@ -40,7 +39,7 @@ app.use(cors({
 app.use(bodyparser.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-
+app.use('/api', pageRoutes);
 
 const uploadPath = path.join(__dirname, "uploads");
 
@@ -212,6 +211,206 @@ db.query(`
 `);
 
 /*---------------------------------START---------------------------------------*/
+
+//=============== PAGE ACCESS CRUD START ===============//
+
+// 🔹 Get all pages
+app.get('/api/pages', (req, res) => {
+  db.query('SELECT * FROM page_table', (err, results) => {
+    if (err) return res.status(500).json({ error: 'Database error' });
+    res.json(results);
+  });
+});
+
+// 🔹 Get page by ID
+app.get('/api/pages/:id', (req, res) => {
+  const { id } = req.params;
+  db.query('SELECT * FROM page_table WHERE id = ?', [id], (err, results) => {
+    if (err) return res.status(500).json({ error: 'Database error' });
+    if (results.length === 0) return res.status(404).json({ message: 'Page not found' });
+    res.json(results[0]);
+  });
+});
+
+// 🔹 Create page
+app.post('/api/pages', (req, res) => {
+  const { page_description, page_group } = req.body;
+  db.query(
+    'INSERT INTO page_table (page_description, page_group) VALUES (?, ?)',
+    [page_description, page_group],
+    (err, result) => {
+      if (err) return res.status(500).json({ error: 'Database error' });
+      res.status(201).json({ id: result.insertId, page_description, page_group });
+    }
+  );
+});
+
+// 🔹 Update page
+app.put('/api/pages/:id', (req, res) => {
+  const { id } = req.params;
+  const { page_description, page_group } = req.body;
+  db.query(
+    'UPDATE page_table SET page_description = ?, page_group = ? WHERE id = ?',
+    [page_description, page_group, id],
+    (err) => {
+      if (err) return res.status(500).json({ error: 'Database error' });
+      res.json({ id, page_description, page_group });
+    }
+  );
+});
+
+// 🔹 Delete page
+app.delete('/api/pages/:id', (req, res) => {
+  const { id } = req.params;
+  db.query('DELETE FROM page_table WHERE id = ?', [id], (err) => {
+    if (err) return res.status(500).json({ error: 'Database error' });
+    res.status(204).send();
+  });
+});
+
+// 🔹 Get all page access for a user
+app.get('/api/page_access/:userId', (req, res) => {
+  const { userId } = req.params;
+  db.query(
+    `SELECT pa.page_id, pa.page_privilege, pt.page_description, pt.page_group
+     FROM page_access pa
+     JOIN page_table pt ON pa.page_id = pt.id
+     WHERE pa.user_id = ?`,
+    [userId],
+    (err, results) => {
+      if (err) return res.status(500).json({ error: 'Database error' });
+      res.json(results);
+    }
+  );
+});
+
+// 🔹 Check access for specific page
+// check access but lookup from db3 first
+// 🔹 Check access for specific page
+app.get('/api/page_access/:userId/:pageId', (req, res) => {
+  const { userId, pageId } = req.params;
+
+  // Step 1: Find person_id from db3.user_accounts
+  db3.query(
+    'SELECT person_id FROM user_accounts WHERE id = ?',
+    [userId],
+    (err, userResults) => {
+      if (err) {
+        console.error("DB3 error:", err);
+        return res.status(500).json({ error: 'DB3 error' });
+      }
+
+      if (userResults.length === 0) {
+        return res.json({ hasAccess: false }); // user not found
+      }
+
+      const personId = userResults[0].person_id;
+
+      // Step 2: Use person_id to check page_access in admission DB
+      db.query(
+        'SELECT page_privilege FROM page_access WHERE user_id = ? AND page_id = ? LIMIT 1',
+        [personId, pageId],
+        (err2, results) => {
+          if (err2) {
+            console.error("Admission DB error:", err2);
+            return res.status(500).json({ error: 'Admission DB error' });
+          }
+
+          if (results.length === 0) {
+            return res.json({ hasAccess: false });
+          }
+
+          const privilege = results2[0].page_privilege;
+          // ✅ Now 1 = allow, 0 = deny
+          const hasAccess = privilege === 1;
+          return res.json({ hasAccess });
+        }
+      );
+    }
+  );
+});
+
+
+
+// 🔹 Update or insert page access (toggle)
+// 🔹 Update or insert page access (toggle)
+app.put('/api/page_access/:userId/:pageId', (req, res) => {
+  const { userId, pageId } = req.params;
+  const { page_privilege } = req.body; 
+
+  // Step 1: Find person_id from db3.user_accounts
+  db3.query(
+    'SELECT person_id FROM user_accounts WHERE id = ?',
+    [userId],
+    (err, userResults) => {
+      if (err) return res.status(500).json({ error: 'DB3 error' });
+      if (userResults.length === 0) return res.status(404).json({ message: 'User not found' });
+
+      const personId = userResults[0].person_id;
+
+      // Step 2: Update or insert using personId
+      db.query(
+        'UPDATE page_access SET page_privilege = ? WHERE user_id = ? AND page_id = ?',
+        [page_privilege, personId, pageId],
+        (err, result) => {
+          if (err) return res.status(500).json({ error: 'Database error' });
+
+          if (result.affectedRows === 0) {
+            // Insert if not exists
+            db.query(
+              'INSERT INTO page_access (user_id, page_id, page_privilege) VALUES (?, ?, ?)',
+              [personId, pageId, page_privilege],
+              (insertErr, insertResult) => {
+                if (insertErr) return res.status(500).json({ error: 'Insert error' });
+                return res.json({ success: true, inserted: true, id: insertResult.insertId });
+              }
+            );
+          } else {
+            return res.json({ success: true, updated: true });
+          }
+        }
+      );
+    }
+  );
+});
+
+
+// 🔹 Combined route: User info + all pages + access
+app.get('/api/user-page-access/:userId', (req, res) => {
+  const { userId } = req.params;
+
+  // Step 1: Get user info from db3
+  db3.query(
+    'SELECT id, person_id, role, email, status FROM user_accounts WHERE id = ?',
+    [userId],
+    (err, userResults) => {
+      if (err) return res.status(500).json({ error: 'DB3 error' });
+      if (userResults.length === 0) return res.status(404).json({ message: 'User not found' });
+
+      const user = userResults[0];
+      const personId = user.person_id;
+
+      // Step 2: Get all pages + access using personId
+      db.query(
+        `SELECT pt.id AS page_id, pt.page_description, pt.page_group,
+                COALESCE(pa.page_privilege, 1) AS page_privilege
+         FROM page_table pt
+         LEFT JOIN page_access pa ON pt.id = pa.page_id AND pa.user_id = ?`,
+        [personId],
+        (err2, pages) => {
+          if (err2) return res.status(500).json({ error: 'Admission DB error' });
+          res.json({ user, pages });
+        }
+      );
+    }
+  );
+});
+
+
+//=============== PAGE ACCESS CRUD END ===============//
+
+
+
 
 //ADMISSION
 app.post("/register", async (req, res) => {
@@ -3082,6 +3281,7 @@ UNION ALL
       token,
       email: user.email,
       role: user.role,
+      id: user.id,
       person_id: user.person_id,
       department: user.dprtmnt_id
     });

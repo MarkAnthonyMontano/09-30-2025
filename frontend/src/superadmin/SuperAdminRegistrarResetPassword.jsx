@@ -12,6 +12,36 @@ import {
 import { Search } from "@mui/icons-material";
 
 const SuperAdminRegistrarResetPassword = () => {
+    //-------------------------------- PAGE ACCESS SCRIPT UPPER PART START --------------------------------//
+
+    const [hasAccess, setHasAccess] = useState(null);
+
+    useEffect(() => {
+        const userId = localStorage.getItem("userId");
+        const pageId = 1;
+
+        if (!userId) {
+            setHasAccess(false);
+            return;
+        }
+
+        const checkAccess = async () => {
+            try {
+                const response = await axios.get(
+                    `http://localhost:5000/api/page_access/${userId}/${pageId}`
+                );
+                setHasAccess(response.data?.hasAccess || false);
+            } catch (error) {
+                console.error("Error checking access:", error);
+                setHasAccess(false);
+            }
+        };
+
+        checkAccess();
+    }, []);
+
+    //--------------------------------- PAGE ACCESS SCRIPT UPPER PART END ---------------------------------//
+
     const [searchQuery, setSearchQuery] = useState("");
     const [userInfo, setUserInfo] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -56,7 +86,9 @@ const SuperAdminRegistrarResetPassword = () => {
             );
             setResetMsg(res.data.message);
         } catch (err) {
-            setSearchError(err.response?.data?.message || "Error resetting password");
+            setSearchError(
+                err.response?.data?.message || "Error resetting password"
+            );
         } finally {
             setLoading(false);
         }
@@ -76,30 +108,56 @@ const SuperAdminRegistrarResetPassword = () => {
         }
     };
 
-     // 🔒 Disable right-click
-  document.addEventListener('contextmenu', (e) => e.preventDefault());
+    //-------------------------------- PAGE ACCESS SCRIPT LOWER PART START --------------------------------//
 
-  // 🔒 Block DevTools shortcuts + Ctrl+P silently
-  document.addEventListener('keydown', (e) => {
-    const isBlockedKey =
-      e.key === 'F12' || // DevTools
-      e.key === 'F11' || // Fullscreen
-      (e.ctrlKey && e.shiftKey && (e.key.toLowerCase() === 'i' || e.key.toLowerCase() === 'j')) || // Ctrl+Shift+I/J
-      (e.ctrlKey && e.key.toLowerCase() === 'u') || // Ctrl+U (View Source)
-      (e.ctrlKey && e.key.toLowerCase() === 'p');   // Ctrl+P (Print)
+    const containerStyle = {
+        width: "100%",
+        minHeight: "100vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        textAlign: "center",
+    };
 
-    if (isBlockedKey) {
-      e.preventDefault();
-      e.stopPropagation();
+    // Loading state
+    if (hasAccess === null) {
+        return <div>Loading access information...</div>;
     }
-  });
 
+    if (!hasAccess) {
+        return (
+            <div style={containerStyle}>
+                <div>
+                    <h1 style={{ color: "#b71c1c", marginBottom: "10px", marginTop: "-120px" }}>
+                        Unauthorized Access
+                    </h1>
+                    <p style={{ fontSize: "16px", color: "#333" }}>
+                        You do not have access to this page. <br />
+                        Please contact the administrator.
+                    </p>
+                </div>
+            </div>
+        );
+    }
 
+    //--------------------------------- PAGE ACCESS SCRIPT LOWER PART END ---------------------------------//
 
     return (
         <Box p={3}>
-            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", mb: 2, px: 2 }}>
-                <Typography variant="h4" sx={{ fontWeight: "bold", color: "maroon", fontSize: "36px" }}>
+            <Box
+                sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    flexWrap: "wrap",
+                    mb: 2,
+                    px: 2,
+                }}
+            >
+                <Typography
+                    variant="h4"
+                    sx={{ fontWeight: "bold", color: "maroon", fontSize: "36px" }}
+                >
                     REGISTRAR PASSWORD RESET
                 </Typography>
 
@@ -124,10 +182,29 @@ const SuperAdminRegistrarResetPassword = () => {
             <br />
 
             <Paper sx={{ p: 3, border: "2px solid maroon" }}>
-                <Box display="grid" gridTemplateColumns={{ xs: "1fr", sm: "1fr 1fr" }} gap={2}>
-                    <TextField label="User ID" value={userInfo?.user_id || ""} fullWidth InputProps={{ readOnly: true }} />
-                    <TextField label="Email" value={userInfo?.email || ""} fullWidth InputProps={{ readOnly: true }} />
-                    <TextField label="Full Name" value={userInfo?.fullName || ""} fullWidth InputProps={{ readOnly: true }} />
+                <Box
+                    display="grid"
+                    gridTemplateColumns={{ xs: "1fr", sm: "1fr 1fr" }}
+                    gap={2}
+                >
+                    <TextField
+                        label="User ID"
+                        value={userInfo?.user_id || ""}
+                        fullWidth
+                        InputProps={{ readOnly: true }}
+                    />
+                    <TextField
+                        label="Email"
+                        value={userInfo?.email || ""}
+                        fullWidth
+                        InputProps={{ readOnly: true }}
+                    />
+                    <TextField
+                        label="Full Name"
+                        value={userInfo?.fullName || ""}
+                        fullWidth
+                        InputProps={{ readOnly: true }}
+                    />
                     <TextField
                         select
                         label="Status"
@@ -141,13 +218,22 @@ const SuperAdminRegistrarResetPassword = () => {
                 </Box>
 
                 <Box mt={3}>
-                    <Button variant="contained" color="error" onClick={handleReset} disabled={!userInfo || loading}>
+                    <Button
+                        variant="contained"
+                        color="error"
+                        onClick={handleReset}
+                        disabled={!userInfo || loading}
+                    >
                         {loading ? "Processing..." : "Reset Password"}
                     </Button>
                 </Box>
             </Paper>
 
-            {resetMsg && <Typography sx={{ mt: 2 }} color="green">{resetMsg}</Typography>}
+            {resetMsg && (
+                <Typography sx={{ mt: 2 }} color="green">
+                    {resetMsg}
+                </Typography>
+            )}
         </Box>
     );
 };

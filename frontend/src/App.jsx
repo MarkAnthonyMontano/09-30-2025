@@ -16,6 +16,8 @@ import Footer from './components/Footer';
 import SideBar from './components/Sidebar';
 import ProtectedRoute from './components/ProtectedRoute';
 import RegisterProf from './components/RegisterProf';
+import PageCRUD from './components/PageCRUD';
+import UserPageAccess from './components/UserPageAccess';
 
 // PAGES FOLDER
 import CourseManagement from './pages/CourseManagement';
@@ -54,6 +56,7 @@ import ApplicantList from './registrar/ApplicantList';
 import ApplicantListAdmin from './registrar/ApplicantListAdmin';
 import StudentRequirements from './registrar/StudentRequirements';
 import ExaminationProfile from './registrar/ExaminationProfile';
+import RegistrarExaminationProfile from './registrar/RegistrarExaminationProfile';
 import AssignScheduleToApplicants from './registrar/AssignScheduleToApplicants';
 import AssignEntranceExam from './registrar/AssignEntranceExam';
 import ProctorApplicantList from './registrar/ProctorApplicantList';
@@ -137,7 +140,7 @@ import SuperAdminDashboard5 from './superadmin/SuperAdminDashboard5';
 import SuperAdminApplicantResetPassword from './superadmin/SuperAdminApplicantResetPassword';
 import SuperAdminStudentResetPassword from './superadmin/SuperAdminStudentResetPassword';
 import SuperAdminFacultyResetPassword from './superadmin/SuperAdminFacultyResetPassword';
-import SuperAdminFacultyRegistrarPassword from './superadmin/SuperAdminRegistrarResetPassword';
+import SuperAdminRegistrarPassword from './superadmin/SuperAdminRegistrarResetPassword';
 import Notifications from './superadmin/Notifications';
 
 function App() {
@@ -197,7 +200,7 @@ function App() {
               <Route path="/superadmin_applicant_reset_password" element={<ProtectedRoute><SuperAdminApplicantResetPassword /></ProtectedRoute>} />
               <Route path="/superadmin_student_reset_password" element={<ProtectedRoute><SuperAdminStudentResetPassword /></ProtectedRoute>} />
               <Route path="/superadmin_faculty_reset_password" element={<ProtectedRoute><SuperAdminFacultyResetPassword /></ProtectedRoute>} />
-              <Route path="/superadmin_registrar_reset_password" element={<ProtectedRoute><SuperAdminFacultyRegistrarPassword /></ProtectedRoute>} />
+              <Route path="/superadmin_registrar_reset_password" element={<ProtectedRoute><SuperAdminRegistrarPassword /></ProtectedRoute>} />
 
 
               <Route path="/registrar_dashboard" element={<ProtectedRoute><RegistrarDashboard /></ProtectedRoute>} />
@@ -237,7 +240,7 @@ function App() {
               <Route path="/search_cor" element={<ProtectedRoute><SearchCertificateOfRegistration /></ProtectedRoute>} />
               <Route path="/cor" element={<ProtectedRoute><CertificateOfRegistration /></ProtectedRoute>} />
               <Route path="/select_college" element={<ProtectedRoute><ScheduleFilterer /></ProtectedRoute>} />
-              <Route path="/examination_profile" element={<ProtectedRoute><ExaminationProfile /></ProtectedRoute>} />
+
               <Route path="/assign_entrance_exam" element={<ProtectedRoute><AssignEntranceExam /></ProtectedRoute>} />
               <Route path="/assign_schedule_applicant" element={<ProtectedRoute><AssignScheduleToApplicants /></ProtectedRoute>} />
               <Route path="/applicant_scoring" element={<ProtectedRoute><ApplicantScoring /></ProtectedRoute>} />
@@ -425,8 +428,12 @@ function App() {
               <Route path="/student_office_of_the_registrar" element={<ProtectedRoute allowedRoles={['student']}><StudentOfficeOfTheRegistrar /></ProtectedRoute>} />
               <Route path="/student_admission_services" element={<ProtectedRoute allowedRoles={['student']} ><StudentAdmissionServices /></ProtectedRoute>} />
               <Route path="/student_form_process" element={<ProtectedRoute allowedRoles={['student', 'registrar', 'applicant']}><StudentAdmissionFormProcess /></ProtectedRoute>} />
+              <Route path="/examination_profile" element={<ExaminationProfile />} />
+              <Route path="/registrar_examination_profile" element={<ProtectedRoute><RegistrarExaminationProfile /></ProtectedRoute>} />
 
 
+              <Route path="/page_crud" element={<ProtectedRoute pageId={2}><PageCRUD /></ProtectedRoute>} />
+              <Route path="/user_page_access" element={<ProtectedRoute pageId={1}><UserPageAccess /></ProtectedRoute>} />
 
             </Routes>
           </main>
