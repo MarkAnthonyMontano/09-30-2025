@@ -9,6 +9,8 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 const pageRoutes = require('./pageRoutes');
+const { createCanvas, loadImage } = require("canvas");
+const QRCode = require("qrcode");
 
 require("dotenv").config();
 const app = express();
@@ -20,6 +22,8 @@ const io = new Server(http, {
     methods: ["GET", "POST"]
   }
 });
+
+
 
 async function getPersonIdByApplicantNumber(applicant_number) {
   const [rows] = await db.query(
@@ -211,210 +215,9 @@ db.query(`
 `);
 
 /*---------------------------------START---------------------------------------*/
-
-//=============== PAGE ACCESS CRUD START ===============//
-
-// 🔹 Get all pages
-app.get('/api/pages', (req, res) => {
-  db.query('SELECT * FROM page_table', (err, results) => {
-    if (err) return res.status(500).json({ error: 'Database error' });
-    res.json(results);
-  });
-});
-
-// 🔹 Get page by ID
-app.get('/api/pages/:id', (req, res) => {
-  const { id } = req.params;
-  db.query('SELECT * FROM page_table WHERE id = ?', [id], (err, results) => {
-    if (err) return res.status(500).json({ error: 'Database error' });
-    if (results.length === 0) return res.status(404).json({ message: 'Page not found' });
-    res.json(results[0]);
-  });
-});
-
-// 🔹 Create page
-app.post('/api/pages', (req, res) => {
-  const { page_description, page_group } = req.body;
-  db.query(
-    'INSERT INTO page_table (page_description, page_group) VALUES (?, ?)',
-    [page_description, page_group],
-    (err, result) => {
-      if (err) return res.status(500).json({ error: 'Database error' });
-      res.status(201).json({ id: result.insertId, page_description, page_group });
-    }
-  );
-});
-
-// 🔹 Update page
-app.put('/api/pages/:id', (req, res) => {
-  const { id } = req.params;
-  const { page_description, page_group } = req.body;
-  db.query(
-    'UPDATE page_table SET page_description = ?, page_group = ? WHERE id = ?',
-    [page_description, page_group, id],
-    (err) => {
-      if (err) return res.status(500).json({ error: 'Database error' });
-      res.json({ id, page_description, page_group });
-    }
-  );
-});
-
-// 🔹 Delete page
-app.delete('/api/pages/:id', (req, res) => {
-  const { id } = req.params;
-  db.query('DELETE FROM page_table WHERE id = ?', [id], (err) => {
-    if (err) return res.status(500).json({ error: 'Database error' });
-    res.status(204).send();
-  });
-});
-
-// 🔹 Get all page access for a user
-app.get('/api/page_access/:userId', (req, res) => {
-  const { userId } = req.params;
-  db.query(
-    `SELECT pa.page_id, pa.page_privilege, pt.page_description, pt.page_group
-     FROM page_access pa
-     JOIN page_table pt ON pa.page_id = pt.id
-     WHERE pa.user_id = ?`,
-    [userId],
-    (err, results) => {
-      if (err) return res.status(500).json({ error: 'Database error' });
-      res.json(results);
-    }
-  );
-});
-
-// 🔹 Check access for specific page
-// check access but lookup from db3 first
-// 🔹 Check access for specific page
-app.get('/api/page_access/:userId/:pageId', (req, res) => {
-  const { userId, pageId } = req.params;
-
-  // Step 1: Find person_id from db3.user_accounts
-  db3.query(
-    'SELECT person_id FROM user_accounts WHERE id = ?',
-    [userId],
-    (err, userResults) => {
-      if (err) {
-        console.error("DB3 error:", err);
-        return res.status(500).json({ error: 'DB3 error' });
-      }
-
-      if (userResults.length === 0) {
-        return res.json({ hasAccess: false }); // user not found
-      }
-
-      const personId = userResults[0].person_id;
-
-      // Step 2: Use person_id to check page_access in admission DB
-      db.query(
-        'SELECT page_privilege FROM page_access WHERE user_id = ? AND page_id = ? LIMIT 1',
-        [personId, pageId],
-        (err2, results) => {
-          if (err2) {
-            console.error("Admission DB error:", err2);
-            return res.status(500).json({ error: 'Admission DB error' });
-          }
-
-          if (results.length === 0) {
-            return res.json({ hasAccess: false });
-          }
-
-          const privilege = results2[0].page_privilege;
-          // ✅ Now 1 = allow, 0 = deny
-          const hasAccess = privilege === 1;
-          return res.json({ hasAccess });
-        }
-      );
-    }
-  );
-});
-
-
-
-// 🔹 Update or insert page access (toggle)
-// 🔹 Update or insert page access (toggle)
-app.put('/api/page_access/:userId/:pageId', (req, res) => {
-  const { userId, pageId } = req.params;
-  const { page_privilege } = req.body; 
-
-  // Step 1: Find person_id from db3.user_accounts
-  db3.query(
-    'SELECT person_id FROM user_accounts WHERE id = ?',
-    [userId],
-    (err, userResults) => {
-      if (err) return res.status(500).json({ error: 'DB3 error' });
-      if (userResults.length === 0) return res.status(404).json({ message: 'User not found' });
-
-      const personId = userResults[0].person_id;
-
-      // Step 2: Update or insert using personId
-      db.query(
-        'UPDATE page_access SET page_privilege = ? WHERE user_id = ? AND page_id = ?',
-        [page_privilege, personId, pageId],
-        (err, result) => {
-          if (err) return res.status(500).json({ error: 'Database error' });
-
-          if (result.affectedRows === 0) {
-            // Insert if not exists
-            db.query(
-              'INSERT INTO page_access (user_id, page_id, page_privilege) VALUES (?, ?, ?)',
-              [personId, pageId, page_privilege],
-              (insertErr, insertResult) => {
-                if (insertErr) return res.status(500).json({ error: 'Insert error' });
-                return res.json({ success: true, inserted: true, id: insertResult.insertId });
-              }
-            );
-          } else {
-            return res.json({ success: true, updated: true });
-          }
-        }
-      );
-    }
-  );
-});
-
-
-// 🔹 Combined route: User info + all pages + access
-app.get('/api/user-page-access/:userId', (req, res) => {
-  const { userId } = req.params;
-
-  // Step 1: Get user info from db3
-  db3.query(
-    'SELECT id, person_id, role, email, status FROM user_accounts WHERE id = ?',
-    [userId],
-    (err, userResults) => {
-      if (err) return res.status(500).json({ error: 'DB3 error' });
-      if (userResults.length === 0) return res.status(404).json({ message: 'User not found' });
-
-      const user = userResults[0];
-      const personId = user.person_id;
-
-      // Step 2: Get all pages + access using personId
-      db.query(
-        `SELECT pt.id AS page_id, pt.page_description, pt.page_group,
-                COALESCE(pa.page_privilege, 1) AS page_privilege
-         FROM page_table pt
-         LEFT JOIN page_access pa ON pt.id = pa.page_id AND pa.user_id = ?`,
-        [personId],
-        (err2, pages) => {
-          if (err2) return res.status(500).json({ error: 'Admission DB error' });
-          res.json({ user, pages });
-        }
-      );
-    }
-  );
-});
-
-
-//=============== PAGE ACCESS CRUD END ===============//
-
-
-
-
-//ADMISSION
+// ----------------- REGISTER -----------------
 app.post("/register", async (req, res) => {
-  const { email, password, campus } = req.body;  // ⬅️ add campus from frontend
+  const { email, password, campus } = req.body;
 
   if (!email || !password) {
     return res.status(400).json({ message: "Please fill up all required fields" });
@@ -425,7 +228,7 @@ app.post("/register", async (req, res) => {
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // 🚫 OPTIONAL: Check if email already exists
+    // 🚫 Check if email already exists
     const [existingUser] = await db.query(
       "SELECT * FROM user_accounts WHERE email = ?",
       [email.trim().toLowerCase()]
@@ -434,25 +237,24 @@ app.post("/register", async (req, res) => {
       return res.status(400).json({ message: "Email is already registered" });
     }
 
-    // ✅ STEP 1: Insert into person_table with campus
+    // ✅ Insert into person_table with campus
     const campusValue = campus && campus.toUpperCase() === "EARIST CAVITE"
       ? "EARIST CAVITE"
-      : "EARIST MANILA"; // default is Manila
+      : "EARIST MANILA";
 
     const [personResult] = await db.query(
       "INSERT INTO person_table (campus) VALUES (?)",
       [campusValue]
     );
     person_id = personResult.insertId;
-    console.log("✅ person_table insert:", person_id, "| campus:", campusValue);
 
-    // ✅ STEP 2: Insert into user_accounts
+    // ✅ Insert into user_accounts
     await db.query(
       "INSERT INTO user_accounts (person_id, email, password, role) VALUES (?, ?, ?, 'applicant')",
       [person_id, email.trim().toLowerCase(), hashedPassword]
     );
 
-    // ✅ STEP 3: Get year + semester from ENROLLMENT DB (db3)
+    // ✅ Get active school year + semester
     const [activeYearResult] = await db3.query(`
       SELECT yt.year_description, st.semester_code
       FROM active_school_year_table sy
@@ -463,40 +265,53 @@ app.post("/register", async (req, res) => {
     `);
 
     if (activeYearResult.length === 0) {
-      throw new Error("No active school year/semester found in ENROLLMENT DB.");
+      throw new Error("No active school year/semester found.");
     }
 
-    const year = activeYearResult[0].year_description.split("-")[0];
+    const year = String(activeYearResult[0].year_description).split("-")[0];
     const semCode = activeYearResult[0].semester_code;
 
-    // ✅ STEP 4: Generate applicant_number
-    const [countRes] = await db.query(
-      "SELECT COUNT(*) AS count FROM applicant_numbering_table"
-    );
+    const [countRes] = await db.query("SELECT COUNT(*) AS count FROM applicant_numbering_table");
     const padded = String(countRes[0].count + 1).padStart(5, "0");
     const applicant_number = `${year}${semCode}${padded}`;
 
-    // ✅ STEP 5: Insert into applicant_numbering_table
+    // ✅ Insert into applicant_numbering_table
     await db.query(
       "INSERT INTO applicant_numbering_table (applicant_number, person_id) VALUES (?, ?)",
       [applicant_number, person_id]
     );
 
+    // ✅ Generate QR code
+    const qrData = `http://localhost:5173/examination_profile/${applicant_number}`;
+    const qrFilename = `${applicant_number}_qrcode.png`;
+    const qrPath = path.join(__dirname, "uploads", qrFilename);
+
+    await QRCode.toFile(qrPath, qrData, {
+      color: { dark: "#000", light: "#FFF" },
+      width: 300
+    });
+
+    // ✅ Save QR filename into applicant_numbering_table
+    await db.query(
+      "UPDATE applicant_numbering_table SET qr_code = ? WHERE applicant_number = ?",
+      [qrFilename, applicant_number]
+    );
+
+    // ✅ Insert status + interview
     await db.query(
       "INSERT INTO person_status_table (person_id, applicant_id, exam_status, requirements, residency, student_registration_status, exam_result, hs_ave, qualifying_result, interview_result) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
       [person_id, applicant_number, 0, 0, 0, 0, 0, 0, 0, 0]
     );
-
     await db.query(
       "INSERT INTO interview_applicants (schedule_id, applicant_id, email_sent, status) VALUES (?, ?, ?, ?)",
       [null, applicant_number, 0, "Waiting List"]
     );
 
-
     res.status(201).json({
       message: "Registered Successfully",
       person_id,
       applicant_number,
+      qr_code: qrFilename,
       campus: campusValue
     });
 
@@ -508,6 +323,7 @@ app.post("/register", async (req, res) => {
     res.status(500).json({ message: "Internal Server Error", error: error.message });
   }
 });
+
 
 
 //GET ADMITTED USERS (UPDATED!)
@@ -3281,7 +3097,6 @@ UNION ALL
       token,
       email: user.email,
       role: user.role,
-      id: user.id,
       person_id: user.person_id,
       department: user.dprtmnt_id
     });
@@ -3292,7 +3107,7 @@ UNION ALL
 });
 
 
-// Login for Applicants
+// ----------------- LOGIN (Applicant) -----------------
 app.post("/login_applicant", async (req, res) => {
   const { email, password } = req.body;
 
@@ -3301,6 +3116,7 @@ app.post("/login_applicant", async (req, res) => {
   }
 
   try {
+    // ✅ Fetch user
     const query = `
       SELECT * FROM user_accounts AS ua
       LEFT JOIN person_table AS pt ON pt.person_id = ua.person_id
@@ -3327,12 +3143,14 @@ app.post("/login_applicant", async (req, res) => {
 
     // ✅ Check if applicant_number already exists
     const [existing] = await db.query(
-      "SELECT applicant_number FROM applicant_numbering_table WHERE person_id = ?",
+      "SELECT applicant_number, qr_code FROM applicant_numbering_table WHERE person_id = ?",
       [person_id]
     );
 
+    let applicantNumber, qrFilename;
+
     if (existing.length === 0) {
-      // ✅ Get active school year & semester
+      // ✅ No applicant_number yet → create one
       const [activeYear] = await db3.query(`
         SELECT yt.year_description, st.semester_description, st.semester_code
         FROM active_school_year_table AS sy
@@ -3346,21 +3164,38 @@ app.post("/login_applicant", async (req, res) => {
         return res.status(500).json({ message: "No active school year found" });
       }
 
-      const year = activeYear[0].year_description.split("-")[0]; // Get starting year (e.g., 2025)
-      const semCode = activeYear[0].semester_code; // Assumes values like 1, 2, 3
+      const year = String(activeYear[0].year_description).split("-")[0];
+      const semCode = activeYear[0].semester_code;
 
-      // ✅ Get next number (count + 1, padded to 5 digits)
       const [countRes] = await db.query("SELECT COUNT(*) AS count FROM applicant_numbering_table");
-      const next = countRes[0].count + 1;
-      const padded = String(next).padStart(5, "0");
+      const padded = String(countRes[0].count + 1).padStart(5, "0");
+      applicantNumber = `${year}${semCode}${padded}`;
 
-      const applicantNumber = `${year}${semCode}${padded}`;
-
-      // ✅ Insert into table
+      // Insert applicant_number
       await db.query(
         "INSERT INTO applicant_numbering_table (applicant_number, person_id) VALUES (?, ?)",
         [applicantNumber, person_id]
       );
+
+      // Generate QR code
+      const qrData = `http://localhost:5173/examination_profile/${applicantNumber}`;
+      qrFilename = `${applicantNumber}_qrcode.png`;
+      const qrPath = path.join(__dirname, "uploads", qrFilename);
+
+      await QRCode.toFile(qrPath, qrData, {
+        color: { dark: "#000", light: "#FFF" },
+        width: 300
+      });
+
+      // Save QR in DB
+      await db.query(
+        "UPDATE applicant_numbering_table SET qr_code = ? WHERE applicant_number = ?",
+        [qrFilename, applicantNumber]
+      );
+    } else {
+      // ✅ Already has applicant_number + QR
+      applicantNumber = existing[0].applicant_number;
+      qrFilename = existing[0].qr_code;
     }
 
     // ✅ Generate JWT token
@@ -3376,6 +3211,8 @@ app.post("/login_applicant", async (req, res) => {
       email: user.email,
       role: user.role,
       person_id: user.person_id,
+      applicant_number: applicantNumber,
+      qr_code: qrFilename
     });
   } catch (error) {
     console.error("Login error:", error);

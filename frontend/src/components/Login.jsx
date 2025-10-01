@@ -107,7 +107,7 @@ const Login = ({ setIsAuthenticated }) => {
               </div>
               <div className="HeaderBody">
                 <strong>EARIST</strong>
-                <p>Information System</p>
+                <p>Student Information System</p>
               </div>
             </div>
 
@@ -203,7 +203,7 @@ const Login = ({ setIsAuthenticated }) => {
 
             <div className="Footer">
               <div className="FooterText">
-                &copy; 2025 EARIST Information System. All rights reserved.
+                &copy; 2025 EARIST Student Information System. All rights reserved.
               </div>
             </div>
           </div>

@@ -428,7 +428,6 @@ const AdmissionFormProcess = () => {
                     )}
                   </div>
 
-                  {/* QR Code (same size as profile) */}
                   <div
                     style={{
                       width: "1.3in",
@@ -436,20 +435,42 @@ const AdmissionFormProcess = () => {
                       display: "flex",
                       justifyContent: "center",
                       alignItems: "center",
-                      border: "1px solid black",
-                      background: "#fff",
+                      border: "1px solid black",  // ✅ same border as profile_img
+                      background: "#fff",         // ✅ same background
                       flexShrink: 0,
+                      position: "relative"        // ✅ needed for overlay text
                     }}
                   >
-                    {person?.applicant_number && (
+                    {person?.qr_code ? (
+                      <img
+                        src={`http://localhost:5000/uploads/${person.qr_code}`}
+                        alt="QR Code"
+                        style={{ width: "110px", height: "110px" }}
+                      />
+                    ) : (
                       <QRCodeSVG
                         value={`http://localhost:5173/examination_profile/${person.applicant_number}`}
-                        size={110}   // fits well inside 1.5in box
+                        size={110}
                         level="H"
-                        includeMargin={false}
                       />
                     )}
+
+                    {/* Overlay applicant_number in middle */}
+                    <div
+                      style={{
+                        position: "absolute",
+                        fontSize: "10px",
+                        fontWeight: "bold",
+                        color: "maroon",
+                        background: "white",
+                        padding: "2px"
+                      }}
+                    >
+                      {person.applicant_number}
+                    </div>
                   </div>
+
+
                 </div>
 
               </div>
@@ -1157,7 +1178,6 @@ const AdmissionFormProcess = () => {
                     )}
                   </div>
 
-                  {/* QR Code (same size as profile) */}
                   <div
                     style={{
                       width: "1.3in",
@@ -1165,20 +1185,41 @@ const AdmissionFormProcess = () => {
                       display: "flex",
                       justifyContent: "center",
                       alignItems: "center",
-                      border: "1px solid black",
-                      background: "#fff",
+                      border: "1px solid black",  // ✅ same border as profile_img
+                      background: "#fff",         // ✅ same background
                       flexShrink: 0,
+                      position: "relative"        // ✅ needed for overlay text
                     }}
                   >
-                    {person?.applicant_number && (
+                    {person?.qr_code ? (
+                      <img
+                        src={`http://localhost:5000/uploads/${person.qr_code}`}
+                        alt="QR Code"
+                        style={{ width: "110px", height: "110px" }}
+                      />
+                    ) : (
                       <QRCodeSVG
                         value={`http://localhost:5173/examination_profile/${person.applicant_number}`}
-                        size={110}   // fits well inside 1.5in box
+                        size={110}
                         level="H"
-                        includeMargin={false}
                       />
                     )}
+
+                    {/* Overlay applicant_number in middle */}
+                    <div
+                      style={{
+                        position: "absolute",
+                        fontSize: "10px",
+                        fontWeight: "bold",
+                        color: "maroon",
+                        background: "white",
+                        padding: "2px"
+                      }}
+                    >
+                      {person.applicant_number}
+                    </div>
                   </div>
+
                 </div>
 
               </div>

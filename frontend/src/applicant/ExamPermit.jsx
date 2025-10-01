@@ -5,65 +5,58 @@ import EaristLogo from "../assets/EaristLogo.png";
 import EaristLogoBW from "../assets/earistblackandwhite.png";
 import "../styles/Print.css";
 
-import { useParams } from "react-router-dom";
-
-
 // ✅ Accept personId as a prop
 const ExamPermit = ({ personId }) => {
-    const cachedPerson = sessionStorage.getItem("scanned_person");
-    const [person, setPerson] = useState(
-        cachedPerson ? JSON.parse(cachedPerson) : null
-    );
-
-    useEffect(() => {
-        if (cachedPerson) {
-            sessionStorage.removeItem("scanned_person");
-        }
-    }, []);
-    const { applicant_number } = useParams();
     const divToPrintRef = useRef(null);
-
+    const [person, setPerson] = useState(null);
     const [examSchedule, setExamSchedule] = useState(null);
     const [curriculumOptions, setCurriculumOptions] = useState([]);
     const [printed, setPrinted] = useState(false);
 
-    useEffect(() => {
-        if (cachedPerson) {
-            sessionStorage.removeItem("scanned_person"); // clear cache after using once
-        }
-    }, []);
-
-
     // ✅ First data fetch
     useEffect(() => {
-        if (!applicant_number) return;
+        const pid = personId || localStorage.getItem("person_id");
+        if (!pid) return;
 
         const fetchData = async () => {
             try {
-                // Step 1: resolve applicant_number -> person_id
-                const res = await axios.get(`http://localhost:5000/api/person-by-applicant/${applicant_number}`);
-                const pid = res.data?.person_id;
-                if (!pid) return;
+                // Fetch person
+                const res = await axios.get(`http://localhost:5000/api/person/${pid}`);
+                let personData = res.data;
 
-                // Step 2: fetch person
-                const personRes = await axios.get(`http://localhost:5000/api/person/${pid}`);
-                let personData = personRes.data;
-                personData.applicant_number = applicant_number;
-                setPerson(personData);
-
-                // Step 3: verify applicant
-                const verifyRes = await axios.get(`http://localhost:5000/api/verified-exam-applicants`);
-                const verified = verifyRes.data.some(a => a.applicant_id === applicant_number);
-                if (!verified) {
-                    alert("❌ Your documents are not yet verified. You cannot print the Exam Permit.");
-                    return;
+                // Fetch applicant number separately
+                const applicantRes = await axios.get(`http://localhost:5000/api/applicant_number/${pid}`);
+                if (applicantRes.data?.applicant_number) {
+                    personData.applicant_number = applicantRes.data.applicant_number;
                 }
 
-                // Step 4: fetch schedule
-                const schedRes = await axios.get(`http://localhost:5000/api/exam-schedule/${applicant_number}`);
-                setExamSchedule(schedRes.data);
+                setPerson(personData);
 
-                // Step 5: fetch programs
+                // ✅ Check verification + schedule
+                if (applicantRes.data?.applicant_number) {
+                    const applicant_number = applicantRes.data.applicant_number;
+
+                    // Verify documents
+                    // Verify documents
+                    const verifyRes = await axios.get(`http://localhost:5000/api/verified-exam-applicants`);
+                    const verified = verifyRes.data.some(a =>
+                        a.applicant_number?.toString() === applicant_number?.toString()
+                    );
+
+                    if (!verified) {
+                        alert("❌ Your documents are not yet verified. You cannot print the Exam Permit.");
+                        return;
+                    }
+
+
+                    // Fetch exam schedule
+                    const schedRes = await axios.get(
+                        `http://localhost:5000/api/exam-schedule/${applicant_number}`
+                    );
+                    setExamSchedule(schedRes.data);
+                }
+
+                // Fetch programs
                 const progRes = await axios.get(`http://localhost:5000/api/applied_program`);
                 setCurriculumOptions(progRes.data);
 
@@ -73,63 +66,48 @@ const ExamPermit = ({ personId }) => {
         };
 
         fetchData();
-    }, [applicant_number]);
-
+    }, [personId]);
 
     // ✅ Secondary fetch for updates
     useEffect(() => {
-        if (!applicant_number) return;
+        const pid = personId || localStorage.getItem("person_id");
+        if (!pid) return;
 
-        const fetchData = async () => {
-            try {
-                // resolve applicant -> person
-                const res = await axios.get(
-                    `http://localhost:5000/api/person-by-applicant/${applicant_number}`
-                );
-                const pid = res.data?.person_id;
-                if (!pid) return;
+        // fetch person
+        axios.get(`http://localhost:5000/api/person/${pid}`)
+            .then(async (res) => {
+                let personData = res.data;
 
-                // fetch person
-                const personRes = await axios.get(
-                    `http://localhost:5000/api/person/${pid}`
-                );
-                let personData = personRes.data;
-                personData.applicant_number = applicant_number;
-                setPerson(personData);
-
-                // verify applicant
-                const verifyRes = await axios.get(
-                    `http://localhost:5000/api/verified-exam-applicants`
-                );
-                const verified = verifyRes.data.some(
-                    (a) => a.applicant_id === applicant_number
-                );
-                if (!verified) {
-                    alert(
-                        "❌ Your documents are not yet verified. You cannot print the Exam Permit."
-                    );
-                    return;
+                // fetch applicant_number separately
+                const applicantRes = await axios.get(`http://localhost:5000/api/applicant_number/${pid}`);
+                if (applicantRes.data?.applicant_number) {
+                    personData.applicant_number = applicantRes.data.applicant_number;
                 }
 
-                // fetch schedule
-                const schedRes = await axios.get(
-                    `http://localhost:5000/api/exam-schedule/${applicant_number}`
-                );
-                setExamSchedule(schedRes.data);
+                setPerson(personData);
+            })
+            .catch((err) => console.error(err));
 
-                // fetch programs
-                const progRes = await axios.get(
-                    `http://localhost:5000/api/applied_program`
-                );
-                setCurriculumOptions(progRes.data);
-            } catch (err) {
-                console.error("Error fetching exam permit data:", err);
-            }
-        };
+        // fetch applicant number then schedule
+        axios
+            .get(`http://localhost:5000/api/applicant_number/${pid}`)
+            .then((res) => {
+                const applicant_number = res.data?.applicant_number;
+                if (applicant_number) {
+                    return axios.get(
+                        `http://localhost:5000/api/exam-schedule/${applicant_number}`
+                    );
+                }
+            })
+            .then((res) => setExamSchedule(res?.data))
+            .catch((err) => console.error(err));
 
-        fetchData();
-    }, [applicant_number]);
-
+        // fetch curriculum/programs
+        axios
+            .get(`http://localhost:5000/api/applied_program`)
+            .then((res) => setCurriculumOptions(res.data))
+            .catch((err) => console.error(err));
+    }, [personId]);
 
 
     if (!person) return <div>Loading Exam Permit...</div>;
@@ -392,7 +370,7 @@ const ExamPermit = ({ personId }) => {
                             </td>
                             <td colSpan={20}>
                                 <div style={{ display: "flex", alignItems: "center", width: "100%" }}>
-                                    <label style={{ fontWeight: "bold", marginRight: "10px", marginBottom: "-15px" }}>
+                                    <label style={{ fontWeight: "bold", marginRight: "10px", marginBottom: "-20px" }}>
                                         Major:
                                     </label>
                                     <span
@@ -401,7 +379,7 @@ const ExamPermit = ({ personId }) => {
                                             borderBottom: "1px solid black",
                                             minWidth: "200px",
                                             fontFamily: "Arial",
-                                            marginBottom: "-25px"
+                                            marginBottom: "-15px"
                                         }}
                                     >
                                         {curriculumOptions.find(
@@ -457,7 +435,7 @@ const ExamPermit = ({ personId }) => {
                         {/* Building + Room + QR */}
                         <tr>
                             <td colSpan={20}>
-                                <div style={{ display: "flex", alignItems: "center", width: "100%", marginTop: "-55px" }}>
+                                <div style={{ display: "flex", alignItems: "center", width: "100%", marginTop: "-83px" }}>
                                     <label style={{ fontWeight: "bold", marginRight: "10px" }}>
                                         Bldg.:
                                     </label>
@@ -481,7 +459,7 @@ const ExamPermit = ({ personId }) => {
                                         width: "100%",
                                     }}
                                 >
-                                    <div style={{ display: "flex", alignItems: "center", marginTop: "-95px" }}>
+                                    <div style={{ display: "flex", alignItems: "center", marginTop: "-135px" }}>
                                         <label style={{ fontWeight: "bold", marginRight: "10px" }}>
                                             Room No.:
                                         </label>
@@ -490,7 +468,7 @@ const ExamPermit = ({ personId }) => {
                                                 flexGrow: 1,
                                                 borderBottom: "1px solid black",
                                                 fontFamily: "Arial",
-                                                width: "140px",
+                                                width: "150px",
                                             }}
                                         >
                                             {examSchedule?.room_description || ""}
@@ -498,13 +476,44 @@ const ExamPermit = ({ personId }) => {
                                     </div>
 
                                     {person?.applicant_number && (
-                                        <QRCodeSVG
-                                            value={`http://localhost:5173/examination_profile/${person.applicant_number}`}
-                                            size={200}
-                                            level={"H"}
-                                            includeMargin={true}
-                                        />
+                                        <div
+                                            style={{
+                                                width: "4.5cm", // same as profile box
+                                                height: "4.5cm",
+
+                                                borderRadius: "4px",
+                                                background: "#fff",       // ✅ white background
+                                                display: "flex",
+                                                justifyContent: "center",
+                                                alignItems: "center",
+                                                position: "relative",
+                                                overflow: "hidden",
+                                                marginLeft: "10px" // spacing from "Room No."
+                                            }}
+                                        >
+                                            <QRCodeSVG
+                                                value={`http://localhost:5173/examination_profile/${person.applicant_number}`}
+                                                size={150}
+                                                level="H"
+                                            />
+
+                                            {/* ✅ Applicant Number Overlay in Middle */}
+                                            <div
+                                                style={{
+                                                    position: "absolute",
+                                                    fontSize: "12px",
+                                                    fontWeight: "bold",
+                                                    color: "maroon",
+                                                    background: "white", // white backdrop so text doesn’t blend into QR
+                                                    padding: "2px 4px",
+                                                    borderRadius: "2px",
+                                                }}
+                                            >
+                                                {person.applicant_number}
+                                            </div>
+                                        </div>
                                     )}
+
                                 </div>
                             </td>
                         </tr>
@@ -512,7 +521,7 @@ const ExamPermit = ({ personId }) => {
                         {/* Scheduled By */}
                         <tr>
                             <td colSpan={40}>
-                                <div style={{ display: "flex", alignItems: "center", width: "50%", marginTop: "-95px" }}>
+                                <div style={{ display: "flex", alignItems: "center", width: "50%", marginTop: "-125px" }}>
                                     <label style={{ fontWeight: "bold", marginRight: "10px" }}>
                                         Scheduled by:
                                     </label>
@@ -532,7 +541,7 @@ const ExamPermit = ({ personId }) => {
                         {/* Date */}
                         <tr>
                             <td colSpan={40}>
-                                <div style={{ display: "flex", alignItems: "center", width: "50%", marginTop: "-75px" }}>
+                                <div style={{ display: "flex", alignItems: "center", width: "50%", marginTop: "-150px" }}>
                                     <label style={{ fontWeight: "bold", marginRight: "10px" }}>
                                         Date:
                                     </label>

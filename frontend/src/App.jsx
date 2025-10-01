@@ -429,6 +429,8 @@ function App() {
               <Route path="/student_admission_services" element={<ProtectedRoute allowedRoles={['student']} ><StudentAdmissionServices /></ProtectedRoute>} />
               <Route path="/student_form_process" element={<ProtectedRoute allowedRoles={['student', 'registrar', 'applicant']}><StudentAdmissionFormProcess /></ProtectedRoute>} />
               <Route path="/examination_profile" element={<ExaminationProfile />} />
+              <Route path="/examination_profile/:applicantNumber" element={<ExaminationProfile />} />
+
               <Route path="/registrar_examination_profile" element={<ProtectedRoute><RegistrarExaminationProfile /></ProtectedRoute>} />
 
 

@@ -119,13 +119,12 @@ const LoginEnrollment = ({ setIsAuthenticated }) => {
       });
 
       // ✅ Only after OTP success, reset attempts automatically (backend clears them)
-      localStorage.setItem("userId", tempLoginData.id);
       localStorage.setItem("token", tempLoginData.token);
       localStorage.setItem("email", tempLoginData.email);
       localStorage.setItem("role", tempLoginData.role);
       localStorage.setItem("person_id", tempLoginData.person_id);
       localStorage.setItem("department", tempLoginData.department || "");
-
+      
       setIsAuthenticated(true);
       setShowOtpModal(false);
 
@@ -226,7 +225,7 @@ const LoginEnrollment = ({ setIsAuthenticated }) => {
               </div>
               <div className="HeaderBody">
                 <strong>EARIST</strong>
-                <p>Information System</p>
+                <p>Student Information System</p>
               </div>
             </div>
 
@@ -335,7 +334,7 @@ const LoginEnrollment = ({ setIsAuthenticated }) => {
 
             <div className="Footer">
               <div className="FooterText">
-                &copy; 2025 EARIST Information System. All rights reserved.
+                &copy; 2025 EARIST Student Information System. All rights reserved.
               </div>
             </div>
           </div>
